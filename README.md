@@ -141,10 +141,10 @@ If you use this code in your research, please cite:
 
 ```
 @software{umaco2025,
-  author = {Your Name},
+  author = {Eden Eldith},
   title = {UMACO: Universal Multi-Agent Cognitive Optimization},
   year = {2025},
-  url = {https://github.com/yourusername/umaco}
+  url = {https://github.com/Eden-Eldith/UMACO}
 }
 ```
 
