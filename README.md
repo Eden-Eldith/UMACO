@@ -1,4 +1,6 @@
 # UMACO: Universal Multi-Agent Cognitive Optimization
+![pheromone_evolution](https://github.com/user-attachments/assets/81bf1f54-70a5-4f1a-998a-0fffee57567a)
+*Dynamic Evolution of UMACO's Pheromone Tensor:* This animation visualizes the real (Attraction) and imaginary (Repulsion) components of the pheromone field over optimization iterations.  Observe how pathways of attraction emerge and adapt, guiding the multi-agent search process.
 
 UMACO is a novel optimization framework that combines principles from quantum physics, multi-agent systems, topological analysis, and economic mechanisms to solve complex optimization problems.
 
