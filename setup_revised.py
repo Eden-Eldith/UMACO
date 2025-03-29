@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="umaco",
     version="0.1.0",
-    author="Your Name",
+    author="Eden Eldith",
     author_email="pcobrien@hotmail.co.uk",
     description="Universal Multi-Agent Cognitive Optimization",
     long_description=long_description,
