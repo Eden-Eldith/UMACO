@@ -136,6 +136,8 @@ This demonstrates how the fundamental concepts can be tailored to specific appli
 4. Topological analysis for landscape understanding
 
 See the documentation in the `docs/` directory for detailed explanations of these concepts and adaptation strategies.
+📄  !([Full UMACO Architecture](https://garden-backend-three.vercel.app/fixed-thesis-maco/)
+
 
 ## 📝 Citation
 
