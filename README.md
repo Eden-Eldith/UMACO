@@ -156,3 +156,8 @@ If you use this code in your research, please cite:
 ## 📄 License
 
 This project is licensed under the Recursive Cognitive License - see the LICENSE file for details.
+---
+> :warning: **Entanglement Notice:**  
+> Any use, inspiration, or derivative work from this repo, in whole or in part, is subject to the Recursive Entanglement Doctrine (RED.md) and Recursive Cognitive License (RCL.md).  
+> Non-attribution, commercial exploitation, or removal of epistemic provenance is a violation of licensing and will be treated accordingly.
+
