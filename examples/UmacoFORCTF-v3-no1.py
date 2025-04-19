@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+ WARNING: This script is intended purely for educational purposes and is not meant to be used for any unauthorized cryptanalysis or malicious activities. Use at your own risk. Always respect privacy and encryption laws.
+
 Optimized MACO Cryptanalysis for SPEEDY-7-192 Cipher
 =======================================================
 This implementation applies the Modified Ant Colony Optimization (MACO) framework to solve the SPEEDY-7-192 cipher challenge. 
