@@ -1,4 +1,5 @@
 # UMACO: Universal Multi-Agent Cognitive Optimization
+![output (1)](https://github.com/user-attachments/assets/11a19c53-e374-497b-8903-30a9c20ddf91)
 
 UMACO is a novel optimization framework that combines principles from quantum physics, multi-agent systems, topological analysis, and economic mechanisms to solve complex optimization problems that defeat traditional approaches.
 
