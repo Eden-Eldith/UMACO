@@ -17,7 +17,7 @@ This repository contains two main implementations:
 | **PAQ Core** | Biomimetic crisis-handling module (Panic-Anxiety-Quantum Triad) |
 | **TSF** | Advanced pheromone field using complex tensors (real=attraction, imaginary=repulsion) |
 | **Universal Economy** | Market-based computational resource allocation system |
-| **ZVSS** | Zero-value state search acceleration for GPU-powered optimization |
+| **ZVSS** | Zombie Virus Swarm Simulator: A Idea I had to use pheremones as guides for a swarm as well as hyperparamter tuning|
 | **NeuroPheromone** | Neural pathway formation inspired by biological neurochemicals |
 
 ## Problem-Solving Domains
