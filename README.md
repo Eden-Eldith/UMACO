@@ -8,6 +8,7 @@
 [![Version](https://img.shields.io/badge/version-10.0-blue)](https://github.com/EdenEldith/umaco)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Created By](https://img.shields.io/badge/created%20by-Eden%20Eldith-purple)](https://github.com/EdenEldith)
+![AI-First Framework](https://img.shields.io/badge/AI--First-Framework-blueviolet)
 
 </div>
 
