@@ -18,6 +18,12 @@ UMACO (Universal Multi-Agent Cognitive Optimization) is an AI-first framework sp
 
 This project represents not just a technical achievement, but a personal one: I created UMACO without formal computer science education, teaching myself programming from scratch in just over 3 months with the assistance of AI tools. My hope is that this framework demonstrates that meaningful contributions to complex fields can come from non-traditional backgrounds.
 
+### 📖 Developer Guide
+
+Looking to dive into the architecture, agent design, or code details?  
+ 
+➡️ [Read the UMACO Developer Guide (PDF)](https://github.com/Eden-Eldith/UMACO/blob/master/docs/UMACO%20Developer%20Guide.pdf)
+
 ### Key Innovation
 
 The core innovation of UMACO lies in its **AI-collaborative design** — it's built from the ground up to be understood, refactored, and specialized by AI models. By combining four interconnected systems in a way that's comprehensible to LLMs, it enables rapid creation of tailored optimization solutions through natural language problem descriptions.
@@ -483,6 +489,7 @@ Your sponsorship would help accelerate development in the following ways:
 - Support neurodivergent developers in continuing this innovative work
 
 ## Contributing
+[![Developer Guide](https://img.shields.io/badge/Docs-Developer_Guide-blue)](https://github.com/Eden-Eldith/UMACO/blob/master/docs/UMACO%20Developer%20Guide.pdf)
 
 UMACO was created by Eden Eldith, a self-taught developer who built this entire framework without formal computer science education. The project welcomes contributions from people of all backgrounds, especially those who might not fit the traditional developer profile. Here's how you can help:
 
@@ -494,7 +501,15 @@ UMACO was created by Eden Eldith, a self-taught developer who built this entire 
 6. **Accessibility**: Help make the project more accessible to neurodivergent developers and beginners
 
 If you're interested in contributing, please see [The UMACO discussions page](https://github.com/Eden-Eldith/UMACO/discussions) for detailed guidelines. The project aims to be inclusive and supportive, especially for first-time contributors and those from non-traditional backgrounds.
+## 📖 ❓ Developer Guide
 
+Want to go deeper?
+**Read the full [UMACO Developer Guide (PDF)](https://github.com/Eden-Eldith/UMACO/blob/master/docs/UMACO%20Developer%20Guide.pdf)** for:
+
+* Architecture & core concepts
+* Agent economy, PAQ triad, and topological stigmergy
+* Hands-on code examples
+* Tips for adapting UMACO to your own projects
 ## Scientific Background
 
 UMACO draws inspiration from several scientific fields:
