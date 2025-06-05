@@ -12,6 +12,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Eden-Eldith/UMACO",
+    license="MIT",
+    license_files=("LICENSE",),
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
