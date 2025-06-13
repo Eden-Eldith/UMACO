@@ -179,7 +179,7 @@ UMACO solves high-complexity problems across domains like optimization, AI, and 
 
 * `macov8no-3-25-02-2025.py`: **GPU-Accelerated SAT Solver** - High-performance SAT solver combining MACO with Zero-Value State Search (ZVSS) on GPU hardware. Achieves up to 8.4x speedup over traditional solvers on complex problems by distributing computation across thousands of GPU threads.
 
-* `setup_revised.py`: **Setup File** - Comprehensive installation script that handles all dependencies, CUDA configurations, and optional visualization tools based on your system capabilities.
+* `setup.py`: **Setup File** - Comprehensive installation script that handles all dependencies, CUDA configurations, and optional visualization tools based on your system capabilities.
 
 * `docs/adapting_to_llm.md`: **Adapting UMACO to LLM Training** - Detailed guide for applying UMACO to Large Language Model training, including specific hyperparameter recommendations and performance comparisons with traditional training approaches.
 
@@ -235,6 +235,21 @@ persim
 ```
 
 Additional dependencies may be required depending on specific usage. For example, GPU-accelerated examples require CUDA toolkit installation, and visualization components may need additional Python packages.
+
+## Installation
+
+Clone the repository and install UMACO locally:
+
+```bash
+pip install .
+```
+
+Optional features can be installed with extras:
+
+```bash
+pip install ".[llm]"   # Large Language Model tools
+pip install ".[gpu]"   # CUDA GPU acceleration
+```
 
 ## Using UMACO with AI
 
