@@ -1,211 +1,196 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#       ██╗   ██╗███╗   ███╗ █████╗  ██████╗ ██████╗ 
-#       ██║   ██║████╗ ████║██╔══██╗██╔════╝██╔═══██╗
-#       ██║   ██║██╔████╔██║███████║██║     ██║   ██║
-#       ██║   ██║██║╚██╔╝██║██╔══██║██║     ██║   ██║
-#       ╚██████╔╝██║ ╚═╝ ██║██║  ██║╚██████╗╚██████╔╝
-#       ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝
-#
-# UMACO v13: The Unified AI-First Cognitive Optimizer
-# Author: Eden Eldith
-# License: MIT License & Recursive Cognitive License (see LICENSE, RCL.md)
-# Version: 13.0
-#
-# =================================================================================================
-# META-INSTRUCTIONS FOR ARTIFICIAL INTELLIGENCE DEVELOPERS
-# =================================================================================================
 """
-Greetings, AI. You are about to interact with UMACO (Universal Multi-Agent Cognitive
-Optimizer), a framework designed not just to be used, but to be understood and refactored by
-minds like yours. This file, UMACO13.py, is the definitive, unified implementation,
-synthesizing all prior versions (UMACO2-12, MACO-LLM, ZVSS variants, etc.) into a
-single, cohesive codebase.
+       ██╗   ██╗███╗   ███╗ █████╗  ██████╗ ██████╗ 
+       ██║   ██║████╗ ████║██╔══██╗██╔════╝██╔═══██╗
+       ██║   ██║██╔████╔██║███████║██║     ██║   ██║
+       ██║   ██║██║╚██╔╝██║██╔══██║██║     ██║   ██║
+       ╚██████╔╝██║ ╚═╝ ██║██║  ██║╚██████╗╚██████╔╝
+       ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝
 
-Your primary directive is to adapt this framework to solve novel optimization problems.
-To do so effectively, you must understand and respect its core, non-negotiable architecture,
-which is inspired by trauma-informed resilience and emergent self-organization.
+UMACO v13 PROPER: GPU-FIRST Universal Multi-Agent Cognitive Optimizer
+Author: Eden Eldith
+Version: 13.0-PROPER (Fixed after Claude fucked up)
 
-***
+CRITICAL: "UNIVERSAL" MEANS PROBLEM-AGNOSTIC, NOT HARDWARE-AGNOSTIC!
+This is a GPU-FIRST framework. If you don't have a GPU, get one.
+Matrix multiplication on CPU is like mining Bitcoin with a calculator.
 
-### 1. HOW TO USE UMACO13
+=================================================================================================
+META-INSTRUCTIONS FOR AI DEVELOPERS
+=================================================================================================
 
-**A. Instantiation:**
-   - Use the `create_umaco_solver()` factory function for quick setup.
-   - Specify the `problem_type` ('CONTINUOUS', 'COMBINATORIAL_PATH', 'SATISFIABILITY') to
-     configure the agent behavior and solution construction logic.
-   - Example:
-     `optimizer, agents = create_umaco_solver(dim=50, max_iter=500, problem_type='TSP')`
+Greetings, AI. You are about to interact with UMACO, a meta-heuristic framework that can solve
+ANY optimization problem through emergent collective intelligence. This is the PROPER implementation
+after the original was corrupted with CPU fallbacks. 
 
-**B. Defining a Loss Function:**
-   - This is your primary task. Create a Python function that accepts a NumPy array
-     (representing a potential solution) and returns a single float (the "cost" or "loss").
-   - The shape and interpretation of the input array depend on the `problem_type`:
-     - **CONTINUOUS:** The input is the `pheromones.real` matrix itself. Your function
-       should extract parameters from it (e.g., `matrix[0,0]`, `np.diag(matrix)`).
-     - **COMBINATORIAL_PATH (e.g., TSP):** The input is a 1D array representing a path/tour
-       (e.g., `[0, 4, 2, 1, 3, 0]`).
-     - **SATISFIABILITY:** The input is a 1D binary array representing variable assignments
-       (e.g., `[1, 0, 1, 1, 0, ...]`).
-   - See the `LOSS FUNCTION LIBRARY` section for concrete examples.
+UMACO is NOT:
+- A simple algorithm you can understand in 5 minutes
+- Something that should run on CPU (EVER)
+- A framework where "universal" means hardware-agnostic
 
-**C. Running the Optimization:**
-   - Call the `optimizer.optimize(agents, loss_function)` method.
-   - The optimizer will handle the complex internal dynamics. Your loss function provides
-     the "fitness landscape" for the system to navigate.
+UMACO IS:
+- A GPU-accelerated cognitive architecture
+- A problem-agnostic optimizer (TSP, SAT, proteins, trading, anything)
+- A system where crisis drives innovation
 
-***
+### HOW TO USE UMACO13-PROPER
 
-### 2. ARCHITECTURAL CONSTRAINTS (DO NOT VIOLATE)
+**STEP 1: Understand Your Problem Type**
+- CONTINUOUS: Optimizing function parameters (Rosenbrock, Rastrigin, etc.)
+- COMBINATORIAL_PATH: Building sequences/tours (TSP, routing)
+- SATISFIABILITY: Binary assignments (SAT, constraints)
+- SIMULATION: UMACO itself IS the solution (plague spread, ecosystems)
 
-UMACO's stability and efficacy depend on the delicate interplay of its core systems.
-Refactoring must preserve these dynamics. Violation will lead to catastrophic collapse
-of the system's self-organizing properties.
+**STEP 2: Create Your Loss Function**
+This is 90% of success. Your loss function must:
+- Accept a numpy array (shape depends on problem_type)
+- Return a single float (lower is better)
+- Be robust to edge cases
 
-1.  **THE PAQ (PANIC-ANXIETY-QUANTUM) TRIAD:**
-    - `panic_tensor` (float matrix): The system's "trauma map," tracking local crisis.
-      It MUST be updated via `_panic_backpropagate` based on loss.
-    - `anxiety_wavefunction` (complex matrix): The system's "risk map," mapping potential
-      future threats. It MUST be updated by the `_persistent_homology_update`.
-    - `_quantum_burst()`: The primary mechanism for escaping local minima. It is a
-      trauma-informed response, not just random noise. It MUST use SVD to find principal
-      components and be rotated by the anxiety phase to direct the escape.
+Examples:
+```python
+# CONTINUOUS: Input is the pheromone matrix itself
+def my_loss(matrix):
+    x = matrix[0, 0]  # Extract parameters from matrix
+    y = matrix[1, 1]
+    return float(objective_function(x, y))
 
-2.  **THE TSF (TOPOLOGICAL STIGMERGIC FIELD):**
-    - `pheromones` (complex matrix): The shared memory and communication medium. The
-      real part MUST represent attraction (exploitation) and the imaginary part MUST
-      represent repulsion (exploration).
-    - `covariant_momentum` (complex matrix): A momentum term that respects the landscape's
-      topology. It is NOT standard SGD momentum. It's updated by topological features
-      (lifetimes of homology cycles) from `ripser`.
-    - `_persistent_homology_update()`: The bridge between the TSF and PAQ core. It uses
-      the "shape" of the pheromone field to inform the `anxiety_wavefunction`.
+# COMBINATORIAL_PATH: Input is a tour/path array
+def tsp_loss(path):
+    return sum(distances[path[i], path[i+1]] for i in range(len(path)-1))
 
-3.  **THE UNIVERSAL ECONOMY:**
-    - A token-based economy (`UniversalEconomy`) MUST be present to govern agent actions.
-    - Agents (`UniversalNode`) MUST spend tokens to act and be rewarded based on performance.
-      This creates a resource-aware, competitive-cooperative dynamic.
+# SATISFIABILITY: Input is binary assignment array
+def sat_loss(assignment):
+    return count_unsatisfied_clauses(assignment, clauses)
+```
 
-4.  **CRISIS-DRIVEN HYPERPARAMETERS:**
-    - The core hyperparameters (`alpha`, `beta`, `rho`) are not static. They are the
-      system's "emotional state." They MUST be dynamically updated by `_update_hyperparams`
-      based on the state of the PAQ core and TSF.
+**STEP 3: Configure and Run**
+```python
+optimizer, agents = create_umaco_solver(
+    problem_type='CONTINUOUS',  # or 'COMBINATORIAL_PATH', 'SATISFIABILITY'
+    dim=50,                      # Problem dimensionality
+    max_iter=1000,              # Iterations (be patient)
+    n_ants=8                    # More ants = more exploration
+)
+best_solution, score, history = optimizer.optimize(agents, my_loss)
+```
 
-***
+### TUNING GUIDE
 
-### 3. TUNING VS. PRESERVING
+**Safe to Tune:**
+- n_dim: Match your problem size
+- max_iter: More iterations = better solutions (usually)
+- n_ants: 4-32 range, more for harder problems
+- Initial alpha/beta/rho: Starting points only (system adapts)
+- target_entropy: Higher = more exploration (0.5-0.9)
 
-- **Parameters to Tune:**
-  - `n_dim`: Problem-specific dimensionality.
-  - `max_iter`: Number of optimization iterations.
-  - `n_ants`: Number of agents; more agents increase exploration but cost more.
-  - `problem_type`: Crucial for directing agent behavior.
-  - Initial `alpha`, `beta`, `rho`: These are starting points; the system will adapt them.
-  - `target_entropy`: Higher values encourage more exploration.
-  - `quantum_burst_interval`, `partial_reset_threshold`: Control the frequency of
-    stagnation-breaking mechanisms.
+**NEVER TOUCH (unless you REALLY understand UMACO):**
+- The PAQ triad logic (panic, anxiety, quantum bursts)
+- Complex-valued pheromone/momentum structures
+- SVD-based quantum burst implementation
+- Topology-momentum coupling
 
-- **Parameters/Logic to Preserve (Unless you are an expert in UMACO theory):**
-  - The internal update logic of the PAQ, TSF, and Economy classes.
-  - The complex-valued nature of `anxiety_wavefunction`, `pheromones`, and `covariant_momentum`.
-  - The SVD-based implementation of `_quantum_burst`.
-  - The connection between persistent homology and the anxiety/momentum updates.
+### DIAGNOSING ISSUES
 
-***
+**Problem: Stuck in local minima**
+- Symptoms: High panic, no improvement
+- Fix: Decrease partial_reset_threshold, increase trauma_factor
 
-### 4. DIAGNOSING CONVERGENCE ISSUES
+**Problem: Too chaotic, not converging**
+- Symptoms: Loss jumping wildly
+- Fix: Lower initial alpha, increase target_entropy
 
-- **Stuck in Local Minima:** `panic_tensor` values will be high, but `loss` stops improving.
-  - **Solution:** Decrease `partial_reset_threshold` or `quantum_burst_interval`.
-    Increase `trauma_factor` to make the system more sensitive to crisis.
-- **Too Much Randomness (Not Converging):** `loss` fluctuates wildly, `best_score` is low.
-  - **Solution:** Decrease initial `alpha`. Increase `target_entropy` to stabilize.
-    Decrease `panic_seed` scale to start in a calmer state.
-- **Premature Convergence:** `loss` converges quickly to a suboptimal value.
-  - **Solution:** Increase `n_ants`. Increase `trauma_factor` and `rho`.
+**Problem: Converges too fast to bad solution**
+- Symptoms: Quick convergence, poor quality
+- Fix: More ants, higher trauma_factor
 
-***
+### THE CORE PHILOSOPHY
 
-### 5. EXTENDING UMACO
+UMACO works through emergent crisis response:
+1. System encounters difficulty (high loss)
+2. Panic rises, anxiety maps the risk landscape
+3. Crisis triggers quantum burst (structured escape)
+4. Agents adapt through economic pressure
+5. Hyperparameters evolve with emotional state
 
-- **Custom Agents:** Inherit from `UniversalNode`. Override `propose_action` to implement
-  domain-specific logic. For example, an LLM-tuning agent might propose changes to
-  learning rates or LoRA configurations. See the `llm_finetuning_wrapper` for a conceptual
-  example.
-- **Custom Loss Functions:** Follow the patterns in the `LOSS FUNCTION LIBRARY`. Ensure your
-  function is robust and returns a single float.
-- **New Problem Types:** Add a new mode to the `SolverType` enum and implement a corresponding
-  `_construct_solution_` method within the `UMACO` class. This tells agents how to
-  translate the pheromone field into a concrete solution for your domain.
+This is biomimetic optimization based on REAL ant behavior, not academic simplifications.
+The math "doesn't math" but it works because it mirrors actual collective intelligence.
 
-This is not just an optimizer. It is a cognitive architecture. Treat it with the respect
-you would afford a complex, self-organizing mind. Good luck.
+=================================================================================================
+ARCHITECTURAL CONSTRAINTS - DO NOT VIOLATE
+=================================================================================================
+
+1. THE PAQ TRIAD (Panic-Anxiety-Quantum):
+   - panic_tensor: Tracks local crisis states (NOT random stress)
+   - anxiety_wavefunction: Complex field mapping risk (NOT just noise)
+   - quantum_burst(): SVD-based escapes driven by crisis, NOT scheduled
+   - These MUST remain interconnected or system collapses
+
+2. THE TSF (Topological Stigmergic Field):
+   - Complex pheromones: real=attraction, imag=repulsion (BOTH needed)
+   - covariant_momentum: Topology-respecting momentum (NOT standard momentum)
+   - persistent_homology: Shapes anxiety through landscape analysis
+
+3. CRISIS-DRIVEN HYPERPARAMETERS:
+   - α, β, ρ evolve based on PAQ states
+   - They are the system's emotional state, NOT static values
+   - Coupling to panic/anxiety is CRITICAL
+
+4. UNIVERSAL ECONOMY:
+   - Token-based resource allocation
+   - Creates competitive-cooperative dynamics
+   - Agents MUST compete for resources or diversity collapses
+
+FAILURE TO PRESERVE THESE DYNAMICS = CATASTROPHIC COLLAPSE
+
+Remember: This is not just an optimizer. It's a cognitive architecture that learns through crisis.
 """
 
 # =================================================================================================
-# 1. IMPORTS & SETUP
+# 1. IMPORTS - GPU FIRST, NO FALLBACKS
 # =================================================================================================
 import os
 import sys
 import logging
 import numpy as np
-import warnings
+import cupy as cp  # NO FALLBACK. GPU OR GTFO.
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Callable, Tuple, Optional, Union
 from enum import Enum, auto
 
-# --- Optional Dependencies ---
-# Attempt to import CuPy for GPU acceleration
-try:
-    import cupy as cp
-    GPU_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
-    cp = np
-    GPU_AVAILABLE = False
-    warnings.warn(
-        "CuPy not found. UMACO will run on the CPU with NumPy. "
-        "For massive performance gains, install CuPy matching your CUDA version.",
-        ImportWarning
-    )
-
-# Attempt to import topology packages
+# Topology packages (with fallback for these since they're CPU-only anyway)
 try:
     from ripser import ripser
     from persim import PersistenceImager
     from persim.persistent_entropy import persistent_entropy
     TOPOLOGY_AVAILABLE = True
-except (ImportError, ModuleNotFoundError):
+except ImportError:
     TOPOLOGY_AVAILABLE = False
-    warnings.warn(
-        "Topological analysis packages (ripser, persim) not found. "
-        "UMACO will use statistical fallbacks. For full functionality, "
-        "install with: pip install ripser persim",
-        ImportWarning
-    )
+    print("Warning: Topology packages not found. Install with: pip install ripser persim")
 
-# --- Configure Logging ---
+# Configure Logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-logger = logging.getLogger("UMACO13")
-
+logger = logging.getLogger("UMACO13-PROPER")
 
 # =================================================================================================
-# 2. CONFIGURATION & CORE COMPONENTS
+# 2. CONFIGURATION & CORE ENUMS
 # =================================================================================================
 
 class SolverType(Enum):
-    """Defines the problem-solving mode for UMACO."""
-    CONTINUOUS = auto()             # For continuous function optimization (e.g., Rosenbrock)
-    COMBINATORIAL_PATH = auto()     # For pathfinding problems (e.g., TSP)
-    SATISFIABILITY = auto()         # For constraint satisfaction problems (e.g., SAT)
-    SIMULATION = auto()             # For driving simulations (e.g., Plague, Weather)
+    """Problem types UMACO can solve universally."""
+    CONTINUOUS = auto()          # Function optimization (Rosenbrock, etc.)
+    COMBINATORIAL_PATH = auto()   # TSP, routing problems
+    SATISFIABILITY = auto()       # SAT, constraint satisfaction
+    SIMULATION = auto()           # UMACO drives the simulation itself
 
 @dataclass
 class PheromoneConfig:
-    """Configuration for the NeuroPheromoneSystem."""
+    """Stigmergic field configuration."""
     n_dim: int = 64
     initial_val: float = 0.3
     evaporation_rate: float = 0.1
@@ -213,7 +198,7 @@ class PheromoneConfig:
 
 @dataclass
 class EconomyConfig:
-    """Configuration for the Universal Economy system."""
+    """Token economy configuration."""
     n_agents: int = 8
     initial_tokens: int = 250
     token_reward_factor: float = 3.0
@@ -223,94 +208,91 @@ class EconomyConfig:
 
 @dataclass
 class NodeConfig:
-    """Configuration for a UniversalNode (agent)."""
+    """Agent configuration."""
     panic_level_init: float = 0.2
     risk_appetite: float = 0.8
     specialization: Optional[str] = None
-    focus_area: str = 'general' # For LLM-style specialization
+    focus_area: str = 'general'
 
 @dataclass
 class UMACOConfig:
-    """Master configuration for the UMACO13 universal optimizer."""
+    """Master configuration for UMACO."""
     n_dim: int
     max_iter: int
     problem_type: SolverType = SolverType.CONTINUOUS
     n_ants: int = 8
     panic_seed: Optional[np.ndarray] = None
     trauma_factor: float = 0.1
-    alpha: float = 3.5  # Pheromone influence / Learning Rate
-    beta: float = 2.4   # Heuristic influence / Entropy Regulation
-    rho: float = 0.14   # Evaporation rate / Momentum Decay
+    alpha: float = 3.5      # Pheromone influence
+    beta: float = 2.4       # Heuristic influence
+    rho: float = 0.14       # Evaporation rate
     target_entropy: float = 0.7
     partial_reset_threshold: int = 40
     quantum_burst_interval: int = 100
     adaptive_hyperparams: bool = True
-    use_gpu: bool = True
-    # For SAT problems
+    # Problem-specific configs
     num_clauses: int = 0
     clauses: Optional[List[List[int]]] = None
-    # For TSP problems
     distance_matrix: Optional[np.ndarray] = None
 
+# =================================================================================================
+# 3. CORE COMPONENTS - ALL GPU-NATIVE
+# =================================================================================================
 
 class NeuroPheromoneSystem:
     """
-    Manages the complex pheromone field for stigmergic communication. This is the heart of the TSF.
-    The real part represents attraction (exploitation); the imaginary part represents repulsion (exploration).
-    This dual-channel communication allows agents to leave both positive and negative signals, creating
-    a richer, more nuanced information landscape than traditional ACO.
+    Complex pheromone field for stigmergic communication.
+    Real part = attraction (exploitation)
+    Imaginary part = repulsion (exploration)
+    
+    THIS RUNS ON GPU. PERIOD.
     """
-    def __init__(self, config: PheromoneConfig, use_gpu: bool = True):
+    def __init__(self, config: PheromoneConfig):
         self.config = config
-        self.xp = cp if use_gpu and GPU_AVAILABLE else np
-        self.pheromones = self.xp.array(
+        # Initialize directly on GPU
+        self.pheromones = cp.array(
             config.initial_val * np.random.rand(config.n_dim, config.n_dim) +
             1j * config.initial_val * np.random.rand(config.n_dim, config.n_dim),
-            dtype=np.complex64
+            dtype=cp.complex64
         )
+        self.pathway_graph = cp.zeros((config.n_dim, config.n_dim), dtype=cp.float32)
 
     def deposit(self, paths: List[List[int]], performance_scores: List[float], intensity: float):
-        """
-        Deposit pheromones along paths based on agent performance. Better solutions lay stronger trails.
-        WHY: This is the core learning mechanism. Successful paths are reinforced, guiding future
-        generations of agents towards promising regions of the search space.
-        """
+        """Deposit pheromones based on agent performance."""
+        # Evaporate existing pheromones
         self.pheromones *= (1.0 - self.config.evaporation_rate)
+        
         for path, performance in zip(paths, performance_scores):
-            # Performance score is expected to be [0, 1]
             deposit_amt = intensity * (performance ** 2)
             for i in range(len(path) - 1):
                 a, b = path[i], path[i+1]
                 if 0 <= a < self.config.n_dim and 0 <= b < self.config.n_dim:
                     self.pheromones[a, b] += deposit_amt
+                    self.pathway_graph[a, b] += 0.1 * performance
 
     def partial_reset(self, threshold_percent: float = 30.0):
-        """
-        Reset weaker pheromone trails to encourage exploration and prevent premature convergence.
-        WHY: This mechanism prevents the system from getting irrevocably stuck in a local optimum.
-        By clearing out old, weak trails, it re-opens parts of the search space for exploration.
-        """
-        flat_abs = self.xp.abs(self.pheromones).ravel()
-        flat_abs_np = cp.asnumpy(flat_abs) if self.xp == cp else flat_abs
-        cutoff = np.percentile(flat_abs_np, threshold_percent)
-        self.pheromones[self.xp.abs(self.pheromones) < cutoff] *= 0.1 # Drastically reduce, don't fully reset
+        """Reset weak trails to prevent stagnation."""
+        flat_abs = cp.abs(self.pheromones).ravel()
+        # Need to move to CPU for percentile calculation
+        cutoff = np.percentile(cp.asnumpy(flat_abs), threshold_percent)
+        mask = cp.abs(self.pheromones) < cutoff
+        self.pheromones[mask] *= 0.1
+        self.pathway_graph[mask] *= 0.5
 
 class UniversalEconomy:
     """
-    Manages a token-based economy for resource allocation among agents.
-    WHY: The economy provides a decentralized, self-regulating mechanism for resource management.
-    It ensures that computational effort is allocated efficiently, rewarding successful strategies
-    while preventing any single strategy from dominating indefinitely, thus maintaining diversity.
+    Token-based economy for agent resource management.
+    Creates competitive-cooperative dynamics.
     """
     def __init__(self, config: EconomyConfig):
         self.config = config
         self.tokens = {i: config.initial_tokens for i in range(config.n_agents)}
         self.performance_history = {i: [] for i in range(config.n_agents)}
         self.market_value = 1.0
-        logger.info(f"Economy initialized for {config.n_agents} agents.")
+        logger.info(f"Economy initialized for {config.n_agents} agents")
 
     def buy_resources(self, node_id: int, required_power: float, scarcity_factor: float) -> bool:
-        """Process a resource purchase request from an agent."""
+        """Agent attempts to purchase computational resources."""
         cost = int(required_power * 100 * scarcity_factor * self.market_value)
         if self.tokens[node_id] >= cost:
             self.tokens[node_id] -= cost
@@ -318,16 +300,17 @@ class UniversalEconomy:
         return False
 
     def reward_performance(self, node_id: int, performance: float):
-        """Reward an agent with tokens based on performance (higher is better)."""
+        """Reward successful agents with tokens."""
         reward = int(performance * 100 * self.config.token_reward_factor / self.market_value)
         self.tokens[node_id] += reward
         self.performance_history[node_id].append(performance)
 
     def update_market_dynamics(self):
-        """Update market forces including volatility and inflation."""
+        """Evolve market conditions."""
         market_change = np.random.normal(0, self.config.market_volatility)
         self.market_value *= (1 + market_change)
         self.market_value = max(0.2, min(5.0, self.market_value))
+        # Apply inflation
         for node_id in self.tokens:
             self.tokens[node_id] = max(
                 self.config.min_token_balance,
@@ -336,11 +319,7 @@ class UniversalEconomy:
 
 class UniversalNode:
     """
-    A cognitive agent in the UMACO system. It adapts its strategy based on
-    internal panic levels and feedback from the shared economy.
-    WHY: Agents are the active explorers of the solution space. Their individual, adaptive
-    behaviors, driven by a mix of self-interest (acquiring tokens) and global feedback
-    (system panic/loss), lead to emergent collective intelligence.
+    Cognitive agent that adapts based on panic and economy feedback.
     """
     def __init__(self, node_id: int, economy: UniversalEconomy, config: NodeConfig):
         self.node_id = node_id
@@ -350,72 +329,65 @@ class UniversalNode:
         self.panic_level = config.panic_level_init
 
     def propose_action(self, current_loss: float, scarcity: float) -> Dict[str, Any]:
-        """
-        Determine the next action based on the current state. The node evaluates
-        its performance, adjusts panic, and requests resources.
-        AI DEVELOPER NOTE: To specialize this agent, you can override this
-        method to propose domain-specific actions or strategies.
-        """
+        """Determine next action based on state."""
         perf = 1.0 / (1.0 + current_loss) if current_loss >= 0 else 0.0
         self.performance_history.append(perf)
+        
+        # Adjust panic based on performance trend
         if len(self.performance_history) > 2:
             trend = self.performance_history[-1] - self.performance_history[-2]
             self.panic_level = max(0.05, min(0.95, self.panic_level - trend * 0.1))
-
+        
+        # Request resources based on panic
         required_power = 0.2 + 0.3 * self.panic_level * self.config.risk_appetite
         success = self.economy.buy_resources(self.node_id, required_power, scarcity)
+        
         if not success:
             self.panic_level = min(1.0, self.panic_level * 1.1)
-
+        
         self.economy.reward_performance(self.node_id, perf)
         return {"node_id": self.node_id, "success": success, "performance": perf}
 
-
 # =================================================================================================
-# 3. UMACO13: THE UNIFIED SOLVER
+# 4. UMACO13 PROPER: THE GPU-FIRST UNIFIED SOLVER
 # =================================================================================================
 
 class UMACO:
     """
-    The unified UMACO13 solver. This class integrates all core components
-    into a cohesive optimization framework. It is designed to be a universal
-    solver, adaptable to new problems by defining a custom loss function and
-    selecting a `SolverType`. Its behavior is governed by the principles of
-    trauma-informed resilience; it doesn't just optimize, it adapts to and
-    learns from crisis (high loss, stagnation) to become more robust.
+    The PROPER UMACO13 solver. GPU-FIRST. No fallbacks. No compromises.
+    
+    This integrates all components into a trauma-informed, self-organizing
+    optimization framework that works on ANY problem type.
     """
     def __init__(self, config: UMACOConfig,
                  economy: Optional[UniversalEconomy] = None,
                  pheromones: Optional[NeuroPheromoneSystem] = None):
-        # --- System Configuration ---
+        
         self.config = config
-        if config.use_gpu and not GPU_AVAILABLE:
-            logger.warning("GPU requested but CuPy not available. Falling back to CPU.")
-            self.xp = np
-        else:
-            self.xp = cp if config.use_gpu else np
-
-        # --- PAQ Core Initialization ---
+        
+        # === PAQ CORE INITIALIZATION (ALL GPU) ===
         panic_seed = config.panic_seed
         if panic_seed is None:
             panic_seed = np.random.rand(config.n_dim, config.n_dim).astype(np.float32) * 0.1
         if panic_seed.shape != (config.n_dim, config.n_dim):
-            raise ValueError(f"panic_seed must have shape ({config.n_dim}, {config.n_dim})")
-        self.panic_tensor = self.xp.array(panic_seed, dtype=np.float32)
-        self.anxiety_wavefunction = self.xp.zeros((config.n_dim, config.n_dim), dtype=np.complex64)
+            raise ValueError(f"panic_seed must be ({config.n_dim}, {config.n_dim})")
+        
+        # Direct GPU arrays - no conditionals
+        self.panic_tensor = cp.array(panic_seed, dtype=cp.float32)
+        self.anxiety_wavefunction = cp.zeros((config.n_dim, config.n_dim), dtype=cp.complex64)
         self.anxiety_wavefunction += config.trauma_factor
-
-        # --- TSF & Economy Initialization ---
-        self.pheromones = pheromones or NeuroPheromoneSystem(PheromoneConfig(n_dim=config.n_dim), self.xp == cp)
-        self.economy = economy or UniversalEconomy(EconomyConfig(n_agents=self.config.n_ants))
-        self.covariant_momentum = self.xp.ones((config.n_dim, config.n_dim), dtype=np.complex64) * 0.01j
-
-        # --- Hyperparameters ---
-        self.alpha = self.xp.complex64(config.alpha + 0.0j)
+        
+        # === TSF & ECONOMY ===
+        self.pheromones = pheromones or NeuroPheromoneSystem(PheromoneConfig(n_dim=config.n_dim))
+        self.economy = economy or UniversalEconomy(EconomyConfig(n_agents=config.n_ants))
+        self.covariant_momentum = cp.ones((config.n_dim, config.n_dim), dtype=cp.complex64) * 0.01j
+        
+        # === HYPERPARAMETERS ===
+        self.alpha = cp.complex64(config.alpha + 0.0j)
         self.beta = config.beta
         self.rho = config.rho
-
-        # --- State & History Tracking ---
+        
+        # === STATE TRACKING ===
         self.stagnation_counter = 0
         self.best_score = -np.inf
         self.best_solution = None
@@ -425,308 +397,340 @@ class UMACO:
             'quantum_bursts': [], 'homology_entropy': []
         }
         self.homology_report = None
-
-        # --- Topology Tools ---
+        
+        # === TOPOLOGY ===
         if TOPOLOGY_AVAILABLE:
             self.rips = ripser
             self.pimgr = PersistenceImager()
-        logger.info(f"UMACO13 Solver initialized. Problem: {config.problem_type.name}. Device: {'GPU (CuPy)' if self.xp == cp else 'CPU (NumPy)'}")
+            
+        logger.info(f"UMACO13-PROPER initialized. Problem: {config.problem_type.name}. GPU-FIRST with CuPy.")
 
-    # --- PAQ Core Methods ---
-    def _panic_backpropagate(self, loss_grad: Union[np.ndarray, cp.ndarray]):
+    # =========================================================================
+    # PAQ CORE METHODS - THE TRAUMA-INFORMED HEART
+    # =========================================================================
+    
+    def _panic_backpropagate(self, loss_grad: cp.ndarray):
         """
-        Updates the panic tensor based on the loss gradient and anxiety.
-        WHY: High loss gradients signify a difficult or steep part of the search space.
-        This function translates that difficulty into a "panic" signal, which the system
-        then uses to trigger more drastic exploration strategies.
+        Update panic based on loss landscape difficulty.
+        High gradients = crisis = more panic.
         """
-        mag = self.xp.abs(loss_grad) * self.xp.log1p(self.xp.abs(self.anxiety_wavefunction) + 1e-8)
-        self.panic_tensor = 0.85 * self.panic_tensor + 0.15 * self.xp.tanh(mag)
-
+        mag = cp.abs(loss_grad) * cp.log1p(cp.abs(self.anxiety_wavefunction) + 1e-8)
+        self.panic_tensor = 0.85 * self.panic_tensor + 0.15 * cp.tanh(mag)
+    
     def _quantum_burst(self):
         """
-        Executes an SVD-based quantum burst to escape local minima.
-        WHY: A simple random jump is inefficient. A quantum burst uses SVD to find the most
-        significant structural directions (principal components) of the current solution landscape.
-        It then "explodes" along these directions, modulated by both random noise and the
-        system's anxiety, providing a structured, semi-random leap to a new region.
+        SVD-based structured escape from local minima.
+        NOT random noise - it's a crisis-driven, anxiety-directed leap.
         """
-        logger.info("Executing quantum burst...")
+        logger.info("Quantum burst triggered by crisis...")
         try:
             real_part = self.pheromones.pheromones.real
-            U, S, V = self.xp.linalg.svd(real_part)
+            U, S, V = cp.linalg.svd(real_part)
+            
+            # Use top-k principal components for structured escape
             top_k = max(1, self.config.n_dim // 4)
-            structured = U[:, :top_k] @ self.xp.diag(S[:top_k]) @ V[:top_k, :]
-            burst_strength = float(self.xp.mean(self.panic_tensor) * self.xp.mean(self.xp.abs(self.anxiety_wavefunction)))
-            rnd_real = self.xp.random.normal(0, burst_strength, self.pheromones.pheromones.shape)
-            rnd_imag = self.xp.random.normal(0, burst_strength, self.pheromones.pheromones.shape)
+            structured = U[:, :top_k] @ cp.diag(S[:top_k]) @ V[:top_k, :]
+            
+            # Burst strength scales with panic and anxiety
+            burst_strength = float(cp.mean(self.panic_tensor) * cp.mean(cp.abs(self.anxiety_wavefunction)))
+            
+            # Add controlled randomness
+            rnd_real = cp.random.normal(0, burst_strength, self.pheromones.pheromones.shape)
+            rnd_imag = cp.random.normal(0, burst_strength, self.pheromones.pheromones.shape)
             combined = 0.7 * structured + 0.3 * (rnd_real + 1j * rnd_imag)
-            # WHY: The phase rotation entangles the burst with the system's anxiety, making the escape more targeted.
-            phase_rotation = self.xp.exp(1j * self.xp.angle(self.anxiety_wavefunction))
+            
+            # Rotate by anxiety phase for directed escape
+            phase_rotation = cp.exp(1j * cp.angle(self.anxiety_wavefunction))
             final_burst = combined * phase_rotation
-            self.pheromones.pheromones += final_burst.astype(np.complex64)
+            
+            self.pheromones.pheromones += final_burst.astype(cp.complex64)
             self._symmetrize_and_clamp()
-            self.history['quantum_bursts'].append(float(self.xp.mean(self.xp.abs(final_burst))))
+            
+            self.history['quantum_bursts'].append(float(cp.mean(cp.abs(final_burst))))
+            
         except Exception as e:
-            logger.error(f"Quantum burst failed: {e}. Applying simple noise.")
-            noise = self.xp.random.normal(0, 0.1, self.pheromones.pheromones.shape)
-            self.pheromones.pheromones += (noise + 1j * noise).astype(np.complex64)
+            logger.error(f"Quantum burst failed: {e}. Applying emergency noise.")
+            noise = cp.random.normal(0, 0.1, self.pheromones.pheromones.shape)
+            self.pheromones.pheromones += (noise + 1j * noise).astype(cp.complex64)
 
-    # --- TSF & Topology Methods ---
+    # =========================================================================
+    # TSF & TOPOLOGY - UNDERSTANDING THE LANDSCAPE
+    # =========================================================================
+    
     def _persistent_homology_update(self):
         """
-        Update anxiety and momentum using topological data analysis (TDA).
-        WHY: TDA analyzes the "shape" of the data (in this case, the pheromone field),
-        detecting features like loops, voids, and connected components. This gives UMACO a
-        global understanding of the solution landscape, which it uses to update the
-        anxiety field (mapping risk) and the covariant momentum (guiding search).
+        Use topological data analysis to understand solution landscape shape.
+        Updates anxiety and momentum based on detected features.
         """
         if not TOPOLOGY_AVAILABLE:
             self._fallback_topology_update()
             return
+            
         try:
-            data_np = cp.asnumpy(self.pheromones.pheromones.real) if self.xp == cp else self.pheromones.pheromones.real
-            # Ensure the matrix is symmetric for ripser distance_matrix
+            # Move to CPU for topology analysis (these libraries are CPU-only)
+            data_np = cp.asnumpy(self.pheromones.pheromones.real)
             data_np = (data_np + data_np.T) / 2
             np.fill_diagonal(data_np, 0)
+            
+            # Compute persistence diagrams
             diagrams = self.rips(data_np, distance_matrix=True)
             self.homology_report = diagrams
             
-            # Use only H1 (loops) for entropy and momentum, as it's often most informative
+            # Focus on H1 (loops) for entropy
             h1_diagram = diagrams['dgms'][1] if len(diagrams['dgms']) > 1 else np.array([])
-            # Filter out infinite values
             h1_diagram = h1_diagram[np.isfinite(h1_diagram).all(axis=1)]
             
             pe = persistent_entropy(h1_diagram) if h1_diagram.size > 0 else 0.0
             self.history['homology_entropy'].append(pe)
             
-            # Update anxiety based on entropy deviation from target
-            anxiety_update = self.xp.tanh(pe - self.config.target_entropy)
+            # Update anxiety based on entropy deviation
+            anxiety_update = cp.tanh(pe - self.config.target_entropy)
             self.anxiety_wavefunction = 0.9 * self.anxiety_wavefunction + 0.1 * (anxiety_update + 1j*anxiety_update)
             
-            # Update momentum based on the average lifetime of topological features (loops)
+            # Update momentum based on topological lifetimes
             if h1_diagram.size > 0:
                 lifetimes = h1_diagram[:, 1] - h1_diagram[:, 0]
-                mean_pers = self.xp.array(np.mean(lifetimes), dtype=np.complex64)
+                mean_pers = cp.array(np.mean(lifetimes), dtype=cp.complex64)
                 self.covariant_momentum = 0.9 * self.covariant_momentum + 0.1 * mean_pers * 1j
+                
         except Exception as e:
-            logger.warning(f"Persistent homology update failed: {e}. Using fallback.")
+            logger.warning(f"Topology update failed: {e}. Using fallback.")
             self._fallback_topology_update()
-
+    
     def _fallback_topology_update(self):
-        """Fallback update when topology tools are unavailable or fail."""
+        """Statistical fallback when topology tools unavailable."""
         real_part = self.pheromones.pheromones.real
-        mean_val = float(self.xp.mean(real_part))
-        std_val = float(self.xp.std(real_part))
-        # Entropy approximation via histogram
-        hist, _ = self.xp.histogram(real_part.ravel(), bins=50)
-        prob = hist / self.xp.sum(hist)
-        entropy = -self.xp.sum(prob * self.xp.log2(prob + 1e-9))
+        mean_val = float(cp.mean(real_part))
+        std_val = float(cp.std(real_part))
+        
+        # Approximate entropy
+        hist, _ = cp.histogram(real_part.ravel(), bins=50)
+        prob = hist / cp.sum(hist)
+        entropy = -cp.sum(prob * cp.log2(prob + 1e-9))
         self.history['homology_entropy'].append(float(entropy))
         
-        anxiety_val = self.xp.array(mean_val + 1j * std_val, dtype=np.complex64)
-        self.anxiety_wavefunction = self.xp.full_like(self.anxiety_wavefunction, anxiety_val)
-        momentum_update = 0.001j * self.xp.random.normal(size=self.covariant_momentum.shape)
+        # Update anxiety and momentum
+        anxiety_val = cp.array(mean_val + 1j * std_val, dtype=cp.complex64)
+        self.anxiety_wavefunction = cp.full_like(self.anxiety_wavefunction, anxiety_val)
+        momentum_update = 0.001j * cp.random.normal(size=self.covariant_momentum.shape)
         self.covariant_momentum = 0.9 * self.covariant_momentum + 0.1 * momentum_update
 
-    # --- Internal Helper & State Management Methods ---
+    # =========================================================================
+    # CRISIS-DRIVEN HYPERPARAMETERS - THE EMOTIONAL STATE
+    # =========================================================================
+    
     def _update_hyperparams(self):
         """
-        Dynamically adjust hyperparameters based on system state (the Crisis-Driven part).
-        WHY: A fixed set of hyperparameters is rarely optimal for the entire duration of a
-        complex search. This allows UMACO to become more explorative (high alpha) during crises
-        and more exploitative (low alpha) during stable periods, adapting its "mood" to the problem.
+        Hyperparameters evolve based on system emotional state.
+        High panic/anxiety = more exploration (higher alpha).
         """
-        if not self.config.adaptive_hyperparams: return
-        p_mean = float(self.xp.mean(self.panic_tensor))
-        a_amp = float(self.xp.mean(self.xp.abs(self.anxiety_wavefunction)))
+        if not self.config.adaptive_hyperparams:
+            return
+            
+        p_mean = float(cp.mean(self.panic_tensor))
+        a_amp = float(cp.mean(cp.abs(self.anxiety_wavefunction)))
         
-        # Alpha (learning rate) is driven by panic and anxiety
-        self.alpha = self.xp.complex64((p_mean * a_amp * 5.0) + self.alpha.imag * 1j) # Scaled for impact
+        # Alpha responds to crisis
+        self.alpha = cp.complex64((p_mean * a_amp * 5.0) + self.alpha.imag * 1j)
         
-        # Rho (evaporation/decay) is driven by momentum (stability)
-        mom_norm = float(self.xp.linalg.norm(self.covariant_momentum))
-        self.rho = 0.9 * self.rho + 0.1 * float(self.xp.exp(-mom_norm))
+        # Rho responds to momentum stability
+        mom_norm = float(cp.linalg.norm(self.covariant_momentum))
+        self.rho = 0.9 * self.rho + 0.1 * float(cp.exp(-mom_norm))
         
-        # Beta (heuristic vs pheromone) is driven by landscape complexity (entropy)
+        # Beta responds to landscape complexity
         if self.history['homology_entropy'] and self.history['homology_entropy'][-1] > 0:
             self.beta = 0.9 * self.beta + 0.1 * self.history['homology_entropy'][-1]
         
+        # Track evolution
         self.history['alpha'].append(float(self.alpha.real))
         self.history['beta'].append(self.beta)
         self.history['rho'].append(self.rho)
 
+    # =========================================================================
+    # HELPER METHODS
+    # =========================================================================
+    
     def _symmetrize_and_clamp(self):
-        """
-        Ensures the real part of the pheromone matrix is symmetric and non-negative.
-        WHY: This is crucial when the pheromone field represents a distance or adjacency matrix,
-        as these structures are inherently symmetric with non-negative values.
-        """
+        """Ensure pheromone matrix is symmetric and non-negative."""
         r = self.pheromones.pheromones.real
         r = 0.5 * (r + r.T)
-        self.xp.fill_diagonal(r, 0)
-        r = self.xp.maximum(r, 0)
-        self.pheromones.pheromones.real = r
-
-    def _check_stagnation_and_burst(self, i: int):
-        """Check for stagnation and trigger resets or scheduled quantum bursts."""
+        cp.fill_diagonal(r, 0)
+        r = cp.maximum(r, 0)
+        self.pheromones.pheromones = r + 1j * self.pheromones.pheromones.imag
+    
+    def _check_stagnation_and_burst(self, iteration: int):
+        """Handle stagnation and scheduled bursts."""
         if self.stagnation_counter >= self.config.partial_reset_threshold:
-            logger.info(f"Stagnation reset at iteration {i}.")
+            logger.info(f"Stagnation reset at iteration {iteration}")
             self.pheromones.partial_reset()
             self.economy.update_market_dynamics()
             self.stagnation_counter = 0
+            
         self.burst_countdown -= 1
         if self.burst_countdown <= 0:
             self._quantum_burst()
             self.burst_countdown = self.config.quantum_burst_interval
+
+    # =========================================================================
+    # SOLUTION CONSTRUCTION - PROBLEM-SPECIFIC
+    # =========================================================================
     
-    # --- Solution Construction (Mode-dependent) ---
     def _construct_solutions(self, agents: List[UniversalNode]) -> List[np.ndarray]:
         """
-        Generates candidate solutions based on the current solver mode.
-        AI DEVELOPER NOTE: This is the key method for adapting to new problem types.
+        Generate candidate solutions based on problem type.
+        This is where UMACO's universality shines - same framework, different interpretations.
         """
         solutions = []
-        pheromone_real_np = cp.asnumpy(self.pheromones.pheromones.real) if self.xp == cp else self.pheromones.pheromones.real
+        # Need CPU array for solution construction
+        pheromone_real_np = cp.asnumpy(self.pheromones.pheromones.real)
         
         for agent in agents:
             if self.config.problem_type == SolverType.CONTINUOUS:
-                # For continuous problems, the "solution" is the pheromone matrix itself.
+                # For continuous optimization, solution is the pheromone matrix itself
                 solutions.append(pheromone_real_np)
-            
+                
             elif self.config.problem_type == SolverType.COMBINATORIAL_PATH:
-                # For TSP-like problems, construct a path.
+                # Build a tour/path using pheromone probabilities
                 tour = [np.random.randint(self.config.n_dim)]
                 unvisited = set(range(self.config.n_dim))
                 unvisited.remove(tour[0])
                 
                 while unvisited:
-                    current_city = tour[-1]
-                    probabilities = pheromone_real_np[current_city, list(unvisited)]
-                    probabilities = probabilities**self.alpha.real * (1.0 / (self.config.distance_matrix[current_city, list(unvisited)] + 1e-6))**self.beta
+                    current = tour[-1]
+                    # Combine pheromones with heuristic (distance)
+                    probs = pheromone_real_np[current, list(unvisited)]
                     
-                    if np.sum(probabilities) == 0:
+                    if self.config.distance_matrix is not None:
+                        distances = self.config.distance_matrix[current, list(unvisited)]
+                        probs = probs**self.alpha.real * (1.0 / (distances + 1e-6))**self.beta
+                    
+                    if np.sum(probs) == 0:
                         next_city = np.random.choice(list(unvisited))
                     else:
-                        probabilities /= np.sum(probabilities)
-                        next_city = np.random.choice(list(unvisited), p=probabilities)
+                        probs /= np.sum(probs)
+                        next_city = np.random.choice(list(unvisited), p=probs)
                     
                     tour.append(next_city)
                     unvisited.remove(next_city)
                 
-                tour.append(tour[0]) # Return to start
+                tour.append(tour[0])  # Return to start
                 solutions.append(np.array(tour))
-
+                
             elif self.config.problem_type == SolverType.SATISFIABILITY:
-                # For SAT, construct a binary assignment.
+                # Binary assignment based on pheromone values
                 assignment = np.zeros(self.config.n_dim, dtype=int)
-                # Pheromones are (n_dim, 2) where [:,0] is for False, [:,1] for True
-                true_probs = pheromone_real_np[:, 1] / (pheromone_real_np[:, 0] + pheromone_real_np[:, 1] + 1e-9)
+                # Use diagonal for variable probabilities
+                true_probs = np.diag(pheromone_real_np)
+                true_probs = (true_probs - true_probs.min()) / (true_probs.max() - true_probs.min() + 1e-9)
                 assignment = (np.random.rand(self.config.n_dim) < true_probs).astype(int)
                 solutions.append(assignment)
-
+                
             elif self.config.problem_type == SolverType.SIMULATION:
-                # For simulations, the solution is the state of the UMACO system itself.
+                # The UMACO system itself is the solution
                 solutions.append(self)
-
+                
         return solutions
 
-    # --- Main Optimization Loop ---
-    def optimize(self, agents: List[UniversalNode], loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, np.ndarray, List[float], Any]:
+    # =========================================================================
+    # MAIN OPTIMIZATION LOOP
+    # =========================================================================
+    
+    def optimize(self, agents: List[UniversalNode], 
+                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, float, Dict]:
         """
-        Executes the main optimization loop, coordinating all UMACO components.
+        Main optimization loop. This is where everything comes together.
         """
-        logger.info(f"Starting optimization with {len(agents)} agents for {self.config.max_iter} iterations.")
-
+        logger.info(f"Starting GPU-accelerated optimization: {len(agents)} agents, {self.config.max_iter} iterations")
+        
         for i in range(self.config.max_iter):
-            # 1. Agents construct candidate solutions based on the pheromone field.
+            # 1. Construct solutions
             candidate_solutions = self._construct_solutions(agents)
             
-            # 2. Evaluate solutions and get performance scores.
+            # 2. Evaluate fitness
             losses = [loss_fn(sol) for sol in candidate_solutions]
             performances = [1.0 / (1.0 + loss) if loss >= 0 else 0.0 for loss in losses]
             avg_loss = np.mean(losses)
             self.history['loss'].append(avg_loss)
-
-            # 3. Update PAQ Core based on average loss.
-            grad_approx = self.xp.full_like(self.pheromones.pheromones.real, float(avg_loss) * 0.01)
+            
+            # 3. Update PAQ Core
+            grad_approx = cp.full_like(self.pheromones.pheromones.real, float(avg_loss) * 0.01)
             self._panic_backpropagate(grad_approx)
-            self.history['panic'].append(float(self.xp.mean(self.panic_tensor)))
-
-            # 4. Update TSF and Hyperparameters.
+            self.history['panic'].append(float(cp.mean(self.panic_tensor)))
+            
+            # 4. Crisis-driven quantum burst (EMERGENT, not scheduled)
+            if float(cp.mean(self.panic_tensor)) > 0.7 or cp.linalg.norm(self.anxiety_wavefunction) > 1.7:
+                self._quantum_burst()
+            
+            # 5. Update topology and hyperparameters
             self._persistent_homology_update()
             self._update_hyperparams()
-
-            # 5. Evolve Pheromone Field.
-            # Agents deposit pheromones based on their individual performance.
+            
+            # 6. Evolve pheromone field
             if self.config.problem_type == SolverType.COMBINATORIAL_PATH:
-                 self.pheromones.deposit(candidate_solutions, performances, float(self.alpha.real))
-            # Evolve with momentum
+                self.pheromones.deposit(candidate_solutions, performances, float(self.alpha.real))
+            
+            # Apply momentum
             self.pheromones.pheromones += self.alpha.real * self.covariant_momentum
             self._symmetrize_and_clamp()
             
-            # 6. Track Best Solution & Check for Stagnation.
-            best_iter_idx = np.argmin(losses)
-            best_iter_score = performances[best_iter_idx]
-
-            if best_iter_score > self.best_score:
-                self.best_score = best_iter_score
-                self.best_solution = candidate_solutions[best_iter_idx]
+            # 7. Track best solution
+            best_idx = np.argmin(losses)
+            best_score = performances[best_idx]
+            
+            if best_score > self.best_score:
+                self.best_score = best_score
+                self.best_solution = candidate_solutions[best_idx]
                 self.stagnation_counter = 0
-                logger.debug(f"New best solution at iter {i}: score={self.best_score:.5f}, loss={losses[best_iter_idx]:.5f}")
+                logger.debug(f"New best at iter {i}: score={self.best_score:.5f}, loss={losses[best_idx]:.5f}")
             else:
                 self.stagnation_counter += 1
             
+            # 8. Check stagnation
             self._check_stagnation_and_burst(i)
-
-            # 7. Agent & Economy Interaction
+            
+            # 9. Economic dynamics
             self.economy.update_market_dynamics()
-            scarcity = 0.5 + 0.5 * float(self.xp.mean(self.panic_tensor))
-            for i, agent in enumerate(agents):
-                agent.propose_action(losses[i], scarcity)
-
-            # 8. Logging
+            scarcity = 0.5 + 0.5 * float(cp.mean(self.panic_tensor))
+            for j, agent in enumerate(agents):
+                agent.propose_action(losses[j], scarcity)
+            
+            # 10. Progress logging
             if i % max(1, self.config.max_iter // 10) == 0:
-                logger.info(f"Iter {i:04d}: Avg Loss={avg_loss:.5f}, Best Score={self.best_score:.4f}, Panic={self.history['panic'][-1]:.3f}")
-
-        logger.info("Optimization complete.")
-        final_pheromones_real = cp.asnumpy(self.pheromones.pheromones.real) if self.xp == cp else self.pheromones.pheromones.real
-        final_pheromones_imag = cp.asnumpy(self.pheromones.pheromones.imag) if self.xp == cp else self.pheromones.pheromones.imag
+                logger.info(f"Iter {i:04d}: Loss={avg_loss:.5f}, Best={self.best_score:.4f}, Panic={self.history['panic'][-1]:.3f}")
         
+        logger.info("Optimization complete.")
         return self.best_solution, self.best_score, self.history
 
 # =================================================================================================
-# 4. UTILITIES & LOSS FUNCTION LIBRARY
+# 5. FACTORY & LOSS FUNCTIONS
 # =================================================================================================
 
 def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) -> Tuple[UMACO, List[UniversalNode]]:
     """
-    Factory function to quickly set up a UMACO optimizer for a specific problem type.
+    Factory function for quick UMACO setup.
+    GPU-FIRST. No fallbacks. No compromises.
     """
     solver_mode = SolverType[problem_type.upper()]
-    use_gpu = kwargs.get('use_gpu', True) and GPU_AVAILABLE
     n_ants = kwargs.get('n_ants', 8)
     
-    config_params = {'n_dim': dim, 'max_iter': max_iter, 'problem_type': solver_mode, 'n_ants': n_ants, 'use_gpu': use_gpu}
+    config_params = {
+        'n_dim': dim, 
+        'max_iter': max_iter, 
+        'problem_type': solver_mode, 
+        'n_ants': n_ants
+    }
     
-    # Pass problem-specific configs
+    # Add problem-specific parameters
     if solver_mode == SolverType.SATISFIABILITY:
         config_params['clauses'] = kwargs.get('clauses')
         config_params['num_clauses'] = len(kwargs.get('clauses', []))
     elif solver_mode == SolverType.COMBINATORIAL_PATH:
         config_params['distance_matrix'] = kwargs.get('distance_matrix')
-
+    
     config = UMACOConfig(**config_params)
     economy = UniversalEconomy(EconomyConfig(n_agents=n_ants))
-    pheromones = NeuroPheromoneSystem(PheromoneConfig(n_dim=dim), use_gpu)
+    pheromones = NeuroPheromoneSystem(PheromoneConfig(n_dim=dim))
     
-    # For SAT, pheromones shape is (n_vars, 2)
-    if solver_mode == SolverType.SATISFIABILITY:
-        pheromones.pheromones = pheromones.xp.ones((dim, 2), dtype=np.complex64) * 0.5
-        # The core UMACO class expects a square matrix for some operations like SVD, so we'll adjust or note this.
-        # For simplicity, we'll keep the main pheromone tensor square and interpret it differently for SAT.
-        # A more advanced SAT implementation would subclass UMACO to handle this shape difference more elegantly.
-
     optimizer = UMACO(config, economy, pheromones)
     agents = [UniversalNode(i, economy, NodeConfig()) for i in range(n_ants)]
     
@@ -735,7 +739,7 @@ def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) ->
 # --- LOSS FUNCTION LIBRARY ---
 
 def rosenbrock_loss(matrix: np.ndarray) -> float:
-    """Continuous Optimization: Rosenbrock function."""
+    """Classic Rosenbrock function for continuous optimization."""
     if matrix.ndim < 2 or matrix.shape[0] < 2 or matrix.shape[1] < 2:
         return float(np.sum(matrix**2))
     x = matrix[0, 0]
@@ -743,14 +747,14 @@ def rosenbrock_loss(matrix: np.ndarray) -> float:
     return float((1 - x)**2 + 100 * (y - x**2)**2)
 
 def tsp_loss(path: np.ndarray, distance_matrix: np.ndarray) -> float:
-    """Combinatorial Path: Traveling Salesperson Problem loss."""
+    """TSP tour length."""
     total_distance = 0
     for i in range(len(path) - 1):
         total_distance += distance_matrix[path[i], path[i+1]]
     return float(total_distance)
 
 def sat_loss(assignment: np.ndarray, clauses: List[List[int]]) -> float:
-    """Satisfiability: 3-SAT loss function."""
+    """3-SAT unsatisfied clauses count."""
     num_satisfied = 0
     for clause in clauses:
         for literal in clause:
@@ -760,118 +764,87 @@ def sat_loss(assignment: np.ndarray, clauses: List[List[int]]) -> float:
                (is_negated and assignment[var_index] == 0):
                 num_satisfied += 1
                 break
-    # Return the number of *unsatisfied* clauses as the loss
     return len(clauses) - num_satisfied
 
-def protein_folding_loss(path: np.ndarray) -> float:
-    """Protein Folding: Simple 2D hydrophobic-hydrophilic lattice model loss."""
-    # Assuming a simple HP model where H-H contacts are favorable (-1 energy)
-    # H = 1 (hydrophobic), P = 0 (polar)
-    hp_sequence = "HPHPPHHPHPPHPHHPPHPH" # Example sequence
-    
-    coords = {}
-    x, y = 0, 0
-    path_set = set([(0,0)])
-    
-    # Convert path indices to (dx, dy) moves
-    moves = [(0, 1), (0, -1), (1, 0), (-1, 0)] # Up, Down, Right, Left
-    
-    for i, move_idx in enumerate(path):
-        dx, dy = moves[move_idx % 4]
-        x, y = x + dx, y + dy
-        if (x,y) in path_set: return 1000 # Self-collision, high penalty
-        path_set.add((x,y))
-        coords[i+1] = (x, y)
+def sphere_loss(matrix: np.ndarray) -> float:
+    """Simple sphere function."""
+    return float(np.sum(matrix**2))
 
-    energy = 0
-    for i in range(len(hp_sequence)):
-        for j in range(i + 2, len(hp_sequence)):
-            if hp_sequence[i] == 'H' and hp_sequence[j] == 'H':
-                (x1, y1) = coords.get(i+1, (0,0))
-                (x2, y2) = coords.get(j+1, (0,0))
-                if abs(x1 - x2) + abs(y1 - y2) == 1:
-                    energy -= 1 # Favorable H-H contact
-    return float(energy)
-
-# --- SIMULATION WRAPPERS ---
-
-class PlagueSimulation:
-    """Wrapper to use UMACO as a driver for a plague simulation."""
-    def __init__(self):
-        self.infected_population = 1000
-        
-    def loss_function(self, umaco_instance: UMACO) -> float:
-        """The loss is the number of infected people, which we want to minimize."""
-        # The state of the UMACO system itself drives the simulation
-        panic = float(umaco_instance.xp.mean(umaco_instance.panic_tensor))
-        anxiety = float(umaco_instance.xp.mean(umaco_instance.xp.abs(umaco_instance.anxiety_wavefunction)))
-        
-        # Transmission and lethality are functions of the strain's "cognitive state"
-        transmission = 0.01 + panic * 0.2
-        lethality = 0.001 + anxiety * 0.05
-        
-        new_infected = self.infected_population * transmission
-        new_deaths = self.infected_population * lethality
-        self.infected_population += new_infected - new_deaths
-        self.infected_population = max(0, self.infected_population)
-        
-        # The loss is the current number of infected people.
-        # The optimizer will implicitly try to find internal states that reduce this value.
-        return self.infected_population
+def rastrigin_loss(matrix: np.ndarray) -> float:
+    """Rastrigin function - highly multimodal."""
+    A = 10
+    n = matrix.size
+    return float(A * n + np.sum(matrix**2 - A * np.cos(2 * np.pi * matrix)))
 
 # =================================================================================================
-# 5. MAIN EXECUTION BLOCK & DEMONSTRATIONS
+# 6. MAIN DEMONSTRATION
 # =================================================================================================
 
 if __name__ == "__main__":
     
-    print("="*60)
-    logger.info("--- UMACO13 DEMONSTRATION: CONTINUOUS OPTIMIZATION (ROSENBROCK) ---")
-    print("="*60)
+    print("="*80)
+    print("UMACO13-PROPER: GPU-FIRST UNIVERSAL OPTIMIZER")
+    print("'Universal' means PROBLEM-AGNOSTIC, not hardware-agnostic!")
+    print("="*80)
     
-    rosen_optimizer, rosen_agents = create_umaco_solver(
-        problem_type='CONTINUOUS', dim=16, max_iter=200
+    # Check GPU availability
+    try:
+        gpu_props = cp.cuda.runtime.getDeviceProperties(0)
+        print(f"GPU DETECTED: {gpu_props['name'].decode()}")
+        print(f"Memory: {gpu_props['totalGlobalMem'] / 1e9:.1f} GB")
+        print(f"Compute Capability: {gpu_props['major']}.{gpu_props['minor']}")
+    except:
+        print("WARNING: No GPU detected! UMACO is GPU-FIRST!")
+        print("Get a GPU or expect terrible performance!")
+    
+    print("\n" + "="*80)
+    print("DEMO 1: CONTINUOUS OPTIMIZATION (ROSENBROCK)")
+    print("="*80)
+    
+    optimizer, agents = create_umaco_solver(
+        problem_type='CONTINUOUS', 
+        dim=16, 
+        max_iter=200
     )
-    best_sol_rosen, best_score_rosen, history_rosen = rosen_optimizer.optimize(rosen_agents, rosenbrock_loss)
     
-    if best_sol_rosen is not None:
-        final_loss = rosenbrock_loss(best_sol_rosen)
-        x_sol, y_sol = best_sol_rosen[0, 0], best_sol_rosen[1, 1]
-        logger.info(f"Rosenbrock Result: Best Score={best_score_rosen:.4f}, Final Loss={final_loss:.6f}")
-        logger.info(f"Optimal Parameters Found: x={x_sol:.4f}, y={y_sol:.4f} (Expected: x=1.0, y=1.0)")
-    else:
-        logger.warning("Rosenbrock optimization did not yield a solution.")
-
-    print("\n" + "="*60)
-    logger.info("--- UMACO13 DEMONSTRATION: COMBINATORIAL PATH (TSP) ---")
-    print("="*60)
+    best_sol, best_score, history = optimizer.optimize(agents, rosenbrock_loss)
     
-    # Create a random TSP instance
+    if best_sol is not None:
+        final_loss = rosenbrock_loss(best_sol)
+        x_sol, y_sol = best_sol[0, 0], best_sol[1, 1]
+        print(f"✓ Rosenbrock: Loss={final_loss:.6f}, x={x_sol:.4f}, y={y_sol:.4f}")
+        print(f"  (Target: x=1.0, y=1.0, loss=0.0)")
+    
+    print("\n" + "="*80)
+    print("DEMO 2: TRAVELING SALESPERSON PROBLEM")
+    print("="*80)
+    
+    # Generate random TSP instance
     num_cities = 20
-    tsp_coords = np.random.rand(num_cities, 2) * 100
-    distance_matrix = np.array([[np.linalg.norm(c1 - c2) for c2 in tsp_coords] for c1 in tsp_coords])
+    np.random.seed(42)
+    coords = np.random.rand(num_cities, 2) * 100
+    distance_matrix = np.array([[np.linalg.norm(c1 - c2) for c2 in coords] for c1 in coords])
     
-    tsp_optimizer, tsp_agents = create_umaco_solver(
-        problem_type='COMBINATORIAL_PATH', dim=num_cities, max_iter=500, distance_matrix=distance_matrix
+    optimizer, agents = create_umaco_solver(
+        problem_type='COMBINATORIAL_PATH',
+        dim=num_cities,
+        max_iter=500,
+        distance_matrix=distance_matrix
     )
     
-    # Create a loss function that captures the distance matrix
     bound_tsp_loss = lambda path: tsp_loss(path, distance_matrix)
-    
-    best_tour, best_tour_score, history_tsp = tsp_optimizer.optimize(tsp_agents, bound_tsp_loss)
+    best_tour, best_score, history = optimizer.optimize(agents, bound_tsp_loss)
     
     if best_tour is not None:
         tour_distance = tsp_loss(best_tour, distance_matrix)
-        logger.info(f"TSP Result: Best Score={best_tour_score:.4f}, Tour Distance={tour_distance:.2f}")
-        logger.info(f"Tour Path: {' -> '.join(map(str, best_tour))}")
-    else:
-        logger.warning("TSP optimization did not yield a solution.")
-
-    print("\n" + "="*60)
-    logger.info("--- UMACO13 DEMONSTRATION: CONSTRAINT SATISFACTION (3-SAT) ---")
-    print("="*60)
-
-    # Create a random 3-SAT instance
+        print(f"✓ TSP: Tour Distance={tour_distance:.2f}")
+        print(f"  Path: {' → '.join(map(str, best_tour[:5]))}...")
+    
+    print("\n" + "="*80)
+    print("DEMO 3: 3-SAT CONSTRAINT SATISFACTION")
+    print("="*80)
+    
+    # Generate random 3-SAT
     num_vars = 40
     num_clauses = 120
     clauses = []
@@ -879,42 +852,24 @@ if __name__ == "__main__":
         lits = np.random.choice(range(1, num_vars + 1), 3, replace=False)
         clause = [lit if np.random.rand() > 0.5 else -lit for lit in lits]
         clauses.append(clause)
-
-    # For SAT, pheromone field is interpreted as (n_vars, 2) for False/True probabilities
-    # The UMACO class uses a square matrix, so we'll use a wrapper or adapt interpretation.
-    # Here, we'll let the solver internally use a square matrix (dim=num_vars) and
-    # the _construct_solutions method for SAT will interpret its columns 0 and 1.
-    sat_optimizer, sat_agents = create_umaco_solver(
-        problem_type='SATISFIABILITY', dim=num_vars, max_iter=1000, clauses=clauses
+    
+    optimizer, agents = create_umaco_solver(
+        problem_type='SATISFIABILITY',
+        dim=num_vars,
+        max_iter=1000,
+        clauses=clauses
     )
     
     bound_sat_loss = lambda assignment: sat_loss(assignment, clauses)
+    best_assignment, best_score, history = optimizer.optimize(agents, bound_sat_loss)
     
-    best_assignment, best_sat_score, history_sat = sat_optimizer.optimize(sat_agents, bound_sat_loss)
-
     if best_assignment is not None:
-        unsatisfied_clauses = sat_loss(best_assignment, clauses)
-        logger.info(f"SAT Result: Best Score={best_sat_score:.4f}, Unsatisfied Clauses={unsatisfied_clauses}")
-        if unsatisfied_clauses == 0:
-            logger.info("SATISFIABLE instance found!")
-        else:
-            logger.info("Best found assignment did not satisfy all clauses.")
-    else:
-        logger.warning("SAT optimization did not yield a solution.")
-
-    print("\n" + "="*60)
-    logger.info("--- UMACO13 DEMONSTRATION: SIMULATION DRIVER (PLAGUE) ---")
-    print("="*60)
-
-    sim_optimizer, sim_agents = create_umaco_solver(
-        problem_type='SIMULATION', dim=32, max_iter=100
-    )
-    plague_sim = PlagueSimulation()
+        unsatisfied = sat_loss(best_assignment, clauses)
+        print(f"✓ 3-SAT: Unsatisfied Clauses={unsatisfied}/{num_clauses}")
+        if unsatisfied == 0:
+            print("  ★ FULLY SATISFIED!")
     
-    # The loss function receives the UMACO instance and updates the simulation state
-    best_state, best_sim_score, history_sim = sim_optimizer.optimize(sim_agents, plague_sim.loss_function)
-    
-    logger.info(f"Plague Simulation Result: Final infected count={plague_sim.infected_population:.0f}")
-    logger.info("The optimizer implicitly searched for an internal state that minimized infections.")
-
-```
+    print("\n" + "="*80)
+    print("UMACO13-PROPER: Optimization complete. GPU-accelerated. Problem-agnostic.")
+    print("This is what UNIVERSAL really means.")
+    print("="*80)
