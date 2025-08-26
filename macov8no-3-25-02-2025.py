@@ -250,6 +250,24 @@ void evaluate_assignments_kernel(
 ''', 'evaluate_assignments_kernel')
 
 
+pheromone_evaporation_kernel = cp.RawKernel(r'''
+extern "C" __global__
+void pheromone_evaporation_kernel(
+    float* pheromones,
+    const float rho,
+    const int num_vars
+)
+{
+    int v = blockDim.x * blockIdx.x + threadIdx.x;
+    if (v >= num_vars) return;
+
+    // Evaporate both false and true pheromones
+    pheromones[v*2 + 0] = fmaxf(fminf((1.0f - rho) * pheromones[v*2 + 0], 10.0f), 0.001f);
+    pheromones[v*2 + 1] = fmaxf(fminf((1.0f - rho) * pheromones[v*2 + 1], 10.0f), 0.001f);
+}
+''', 'pheromone_evaporation_kernel')
+
+
 pheromone_update_kernel = cp.RawKernel(r'''
 extern "C" __global__
 void pheromone_update_kernel(
@@ -273,26 +291,15 @@ void pheromone_update_kernel(
     for (int v = 0; v < num_vars; v++) {
         int chosen_val = assignments[idx * num_vars + v];
 
-        float oldF = pheromones[v*2 + 0];
-        float oldT = pheromones[v*2 + 1];
+        // Calculate deposit amount
+        float deposit = alpha * scaledQ;
 
-        // Evaporate
-        oldF = (1.0f - rho) * oldF;
-        oldT = (1.0f - rho) * oldT;
-
-        // Deposit
+        // Atomic deposit - thread-safe pheromone updates
         if (chosen_val == 1) {
-            oldT += (alpha * scaledQ);
+            atomicAdd(&pheromones[v*2 + 1], deposit);
         } else {
-            oldF += (alpha * scaledQ);
+            atomicAdd(&pheromones[v*2 + 0], deposit);
         }
-
-        // Keep pheromone in [0.001, 10.0]
-        oldF = fmaxf(fminf(oldF, 10.0f), 0.001f);
-        oldT = fmaxf(fminf(oldT, 10.0f), 0.001f);
-
-        pheromones[v*2 + 0] = oldF;
-        pheromones[v*2 + 1] = oldT;
     }
 }
 ''', 'pheromone_update_kernel')
@@ -846,6 +853,20 @@ class MACOSystem:
         return avg_q, best_q, best_idx
 
     def _launch_pheromone_update(self) -> None:
+        # First evaporate pheromones
+        evap_block_size = 64
+        evap_grid_size = (self.num_vars + evap_block_size - 1) // evap_block_size
+        pheromone_evaporation_kernel(
+            (evap_grid_size,), (evap_block_size,),
+            (
+                self.pheromones_gpu,
+                np.float32(self.rho),
+                np.int32(self.num_vars)
+            )
+        )
+        cp.cuda.Stream.null.synchronize()
+        
+        # Then deposit pheromones atomically
         block_size = 64
         grid_size = (self.num_ants + block_size - 1) // block_size
         pheromone_update_kernel(

@@ -668,6 +668,33 @@ class UMACO:
             # 6. Evolve pheromone field
             if self.config.problem_type == SolverType.COMBINATORIAL_PATH:
                 self.pheromones.deposit(candidate_solutions, performances, float(self.alpha.real))
+            elif self.config.problem_type == SolverType.CONTINUOUS:
+                # For continuous problems, create paths from matrix structure
+                paths = []
+                for sol in candidate_solutions:
+                    # Create path based on highest pheromone values in matrix
+                    path = []
+                    for i in range(min(sol.shape[0], self.config.n_dim)):
+                        # Find strongest connections from each dimension
+                        strongest_conn = np.argmax(sol[i])
+                        path.extend([i, strongest_conn])
+                    paths.append(path[:self.config.n_dim*2])  # Limit path length
+                self.pheromones.deposit(paths, performances, float(self.alpha.real))
+            elif self.config.problem_type == SolverType.SATISFIABILITY:
+                # For SAT problems, create paths from binary assignments  
+                paths = []
+                for sol in candidate_solutions:
+                    # Create path representing variable assignments
+                    path = []
+                    for i, val in enumerate(sol):
+                        if val == 1:
+                            # True variables connect forward
+                            path.extend([i, (i + 1) % len(sol)])
+                        else:
+                            # False variables connect backward
+                            path.extend([i, (i - 1) % len(sol)])
+                    paths.append(path)
+                self.pheromones.deposit(paths, performances, float(self.alpha.real))
             
             # Apply momentum
             self.pheromones.pheromones += self.alpha.real * self.covariant_momentum
