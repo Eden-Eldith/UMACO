@@ -714,6 +714,10 @@ class NeuroPheromoneSystem:
             self.anxiety_wavefunction.imag = 0.7 * self.anxiety_wavefunction.imag + 0.3 * creativity_potential
         else:
             self.anxiety_wavefunction.imag *= 0.9
+        
+        # Update panic_tensor based on performance crisis
+        crisis_level = cp.maximum(performance_gap, 0) * cp.abs(anxiety_factor)
+        self.panic_tensor = 0.85 * self.panic_tensor + 0.15 * cp.tanh(crisis_level + self.stagnation_counter * 0.01)
 
     def apply_neurochemical_effects(self):
         stability_factor = cp.exp(-cp.abs(self.anxiety_wavefunction.real) * self.config.myrcene_factor)
@@ -806,8 +810,13 @@ class NeuroPheromoneSystem:
             self.pathway_graph[int(i), int(j)] = 0.5 + 0.5 * cp.random.random()
 
     def check_quantum_burst(self) -> bool:
+        # Check panic levels for emergency burst
+        panic_mean = cp.mean(self.panic_tensor)
+        anxiety_magnitude = cp.mean(cp.abs(self.anxiety_wavefunction))
+        emergency_threshold = 0.7
+        
         self.quantum_burst_countdown -= 1
-        if self.quantum_burst_countdown <= 0:
+        if self.quantum_burst_countdown <= 0 or panic_mean > emergency_threshold or anxiety_magnitude > 1.5:
             self._apply_quantum_burst()
             self.quantum_burst_countdown = self.config.quantum_burst_interval
             return True
@@ -816,8 +825,14 @@ class NeuroPheromoneSystem:
     def _apply_quantum_burst(self):
         logging.info("NeuroPheromone system: Applying quantum burst.")
         burst_pattern = self._generate_quantum_burst()
-        self.pheromone_tensor += burst_pattern * self.config.limonene_factor
+        # Scale burst by panic and anxiety levels
+        panic_strength = float(cp.mean(self.panic_tensor))
+        anxiety_strength = float(cp.mean(cp.abs(self.anxiety_wavefunction)))
+        burst_scale = 0.5 + 0.5 * (panic_strength + anxiety_strength)
+        self.pheromone_tensor += burst_pattern * self.config.limonene_factor * burst_scale
+        # Reset anxiety and panic after burst
         self.anxiety_wavefunction *= 0.2
+        self.panic_tensor *= 0.3
 
 # =========================================================================================
 #   Enhanced Cognitive Node (Agent)
@@ -982,7 +997,97 @@ class EnhancedCognitiveNode:
                 f"agent/{self.node_id}/panic_level": self.panic_level
             })
 
-        # [Similar expansions for 'regularization', 'architecture', 'data_focus' if needed]
+        elif self.focus == 'regularization':
+            market_value = self.economy.market_value
+            adjustment_factor = 0.1 if resource_granted else 0.02
+            
+            # Regularization increases during overfitting signs
+            if self.consecutive_regressions >= 2:
+                # Increase regularization
+                direction = 1.0 * (0.8 + 0.2 * self.innovation_drive)
+            elif self.consecutive_improvements >= 3:
+                # Decrease regularization to allow more learning
+                direction = -0.5 * (0.6 + 0.2 * self.innovation_drive)
+            elif previous_loss is not None:
+                if loss_improved:
+                    direction = -0.3 * (0.5 + 0.2 * self.innovation_drive)
+                else:
+                    direction = 0.7 * (0.7 + 0.3 * self.innovation_drive)
+            else:
+                direction = -0.2 + 0.4 * np.random.random() * self.innovation_drive
+
+            # Apply regularization changes
+            reg_change = adjustment_factor * direction
+            new_strategy['weight_decay'] *= (1.0 + reg_change)
+            new_strategy['dropout'] *= (1.0 + reg_change * 0.5)
+            new_strategy['lora_dropout'] *= (1.0 + reg_change * 0.3)
+            
+            # Clamp values
+            new_strategy['weight_decay'] = max(0.001, min(0.1, new_strategy['weight_decay']))
+            new_strategy['dropout'] = max(0.0, min(0.5, new_strategy['dropout']))
+            new_strategy['lora_dropout'] = max(0.0, min(0.3, new_strategy['lora_dropout']))
+
+        elif self.focus == 'architecture':
+            market_value = self.economy.market_value
+            adjustment_factor = 0.15 if resource_granted else 0.05
+            
+            # Architecture changes based on gradient behavior
+            if gradient_norm is not None and gradient_norm > 2.0:
+                # High gradients suggest need for more capacity
+                direction = 1.0 * (0.8 + 0.2 * self.innovation_drive)
+            elif self.consecutive_improvements >= 2:
+                # Keep current architecture but fine-tune
+                direction = 0.1 * self.innovation_drive
+            elif self.consecutive_regressions >= 3:
+                # Try different architecture
+                direction = np.random.choice([-1, 1]) * (0.6 + 0.4 * self.innovation_drive)
+            else:
+                direction = -0.3 + 0.6 * np.random.random() * self.innovation_drive
+
+            # Apply architecture changes
+            arch_change = adjustment_factor * direction
+            new_strategy['lora_rank'] = int(new_strategy['lora_rank'] * (1.0 + arch_change))
+            new_strategy['lora_alpha'] *= (1.0 + arch_change * 0.5)
+            
+            # Clamp values
+            new_strategy['lora_rank'] = max(4, min(256, new_strategy['lora_rank']))
+            new_strategy['lora_alpha'] = max(4.0, min(64.0, new_strategy['lora_alpha']))
+
+        elif self.focus == 'data_focus':
+            market_value = self.economy.market_value
+            adjustment_factor = 0.12 if resource_granted else 0.03
+            
+            # Data focus adjustments based on learning progress
+            if self.consecutive_improvements >= 3:
+                # Increase sequence length for more complex learning
+                direction = 1.0 * (0.7 + 0.3 * self.innovation_drive)
+            elif self.consecutive_regressions >= 2:
+                # Reduce complexity, add augmentation
+                direction = -0.8 * (0.6 + 0.4 * self.innovation_drive)
+            elif previous_loss is not None:
+                if loss_improved:
+                    direction = 0.5 * (0.5 + 0.3 * self.innovation_drive)
+                else:
+                    direction = -0.4 * (0.6 + 0.2 * self.innovation_drive)
+            else:
+                direction = -0.2 + 0.4 * np.random.random() * self.innovation_drive
+
+            # Apply data focus changes
+            data_change = adjustment_factor * direction
+            new_strategy['sequence_length'] = int(new_strategy['sequence_length'] * (1.0 + data_change * 0.1))
+            new_strategy['augmentation'] += data_change * 0.1
+            
+            # Update batch priority based on performance
+            if self.consecutive_improvements >= 2:
+                new_strategy['batch_priority'] = 'hard_examples'
+            elif self.consecutive_regressions >= 2:
+                new_strategy['batch_priority'] = 'easy_examples'
+            else:
+                new_strategy['batch_priority'] = 'default'
+            
+            # Clamp values
+            new_strategy['sequence_length'] = max(64, min(self.config.max_seq_length, new_strategy['sequence_length']))
+            new_strategy['augmentation'] = max(0.0, min(0.3, new_strategy['augmentation']))
 
         self.last_loss = current_loss
         self.current_strategy = new_strategy
