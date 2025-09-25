@@ -11,7 +11,9 @@
 ![AI-First Framework](https://img.shields.io/badge/AI--First-Framework-blueviolet)
 
 </div>
-#### 25/09/2025
+
+### 25/09/2025
+
 I have ensured all if not most files run as intended, however I either require help getting it all working, or need to leanr more myself and get this finished, any help would be much appreciated. 
 ## What is UMACO?
 
