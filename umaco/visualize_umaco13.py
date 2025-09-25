@@ -137,8 +137,15 @@ class UMACOVisualizer:
             return fig
 
         try:
+            # Clean the pheromone matrix (remove NaN and infinite values)
+            clean_matrix = np.nan_to_num(pheromone_matrix, nan=0.0, posinf=1.0, neginf=-1.0)
+            
+            # Ensure it's symmetric and has zero diagonal for distance matrix
+            clean_matrix = (clean_matrix + clean_matrix.T) / 2
+            np.fill_diagonal(clean_matrix, 0)
+            
             # Compute persistent homology
-            diagrams = ripser(pheromone_matrix, maxdim=2)['dgms']
+            diagrams = ripser(clean_matrix, maxdim=2, distance_matrix=True)['dgms']
 
             # Create persistence images
             pimager = PersistenceImager(pixel_size=0.2, birth_range=(0, 1), pers_range=(0, 1))
@@ -149,8 +156,16 @@ class UMACOVisualizer:
             for i, dgm in enumerate(diagrams[:2]):  # H0 and H1
                 ax = axes[0, i]
                 if len(dgm) > 0:
-                    ax.scatter(dgm[:, 0], dgm[:, 1], alpha=0.6, s=20)
-                    ax.plot([0, max(dgm[:, 1])], [0, max(dgm[:, 1])], 'k--', alpha=0.3)
+                    # Filter out infinite death times for visualization
+                    finite_mask = np.isfinite(dgm[:, 1])
+                    if np.any(finite_mask):
+                        finite_dgm = dgm[finite_mask]
+                        ax.scatter(finite_dgm[:, 0], finite_dgm[:, 1], alpha=0.6, s=20)
+                        max_val = max(np.max(finite_dgm[:, 0]), np.max(finite_dgm[:, 1]))
+                        ax.plot([0, max_val], [0, max_val], 'k--', alpha=0.3)
+                    else:
+                        ax.text(0.5, 0.5, 'No finite persistence pairs',
+                               transform=ax.transAxes, ha='center', va='center')
                 ax.set_xlabel('Birth')
                 ax.set_ylabel('Death')
                 ax.set_title(f'H{i} Persistence Diagram')
@@ -160,9 +175,16 @@ class UMACOVisualizer:
             for i, dgm in enumerate(diagrams[:2]):
                 ax = axes[1, i]
                 if len(dgm) > 0:
-                    img = pimager.transform([dgm])[0]
-                    im = ax.imshow(img, origin='lower', extent=pimager.extent, cmap='viridis')
-                    plt.colorbar(im, ax=ax, shrink=0.8)
+                    # Filter out infinite death times for persistence image
+                    finite_mask = np.isfinite(dgm[:, 1])
+                    if np.any(finite_mask):
+                        finite_dgm = dgm[finite_mask]
+                        img = pimager.transform([finite_dgm])[0]
+                        im = ax.imshow(img, origin='lower', extent=pimager.extent, cmap='viridis')
+                        plt.colorbar(im, ax=ax, shrink=0.8)
+                    else:
+                        ax.text(0.5, 0.5, 'No finite persistence pairs',
+                               transform=ax.transAxes, ha='center', va='center')
                 ax.set_title(f'H{i} Persistence Image')
 
             fig.suptitle(title, fontsize=16, fontweight='bold')
@@ -355,28 +377,28 @@ def run_live_visualization(problem_name: str = 'rosenbrock', max_iter: int = 50)
         break
 
     # Run full optimization
-    pheromone_real, pheromone_imag, full_panic_history, loss_history, homology_report = solver.optimize(
+    pheromone_real, pheromone_imag, panic_history, loss_history, homology_report = solver.optimize(
         agents, loss_func
     )
 
     # Create visualizations
-    fig1 = viz.plot_optimization_progress(full_panic_history,
+    fig1 = viz.plot_optimization_progress(panic_history,
                                         loss_history,  # Now we have loss history!
                                         title=f"UMACO13 {problem_name.title()} Optimization")
     fig1.savefig(f'umaco_{problem_name}_progress.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out for headless environments
 
     fig2 = viz.plot_pheromone_heatmap(pheromone_real,
                                     pheromone_imag if pheromone_imag is not None else None,
                                     title=f"Final Pheromone Matrix - {problem_name.title()}")
     fig2.savefig(f'umaco_{problem_name}_pheromones.png', dpi=300, bbox_inches='tight')
-    plt.show()
+    # plt.show()  # Commented out for headless environments
 
     if TOPOLOGY_AVAILABLE:
         fig3 = viz.plot_topology_analysis(pheromone_real,
                                         title=f"Topological Analysis - {problem_name.title()}")
         fig3.savefig(f'umaco_{problem_name}_topology.png', dpi=300, bbox_inches='tight')
-        plt.show()
+        # plt.show()  # Commented out for headless environments
 
     print("Live visualization complete. Check the generated PNG files.")
 

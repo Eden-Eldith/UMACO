@@ -683,7 +683,7 @@ class UMACO:
             self.anxiety_wavefunction = repeated
 
             lifetimes = []
-            for d in diagrams:
+            for d in filtered_diagrams:  # Use filtered diagrams to avoid inf values
                 if len(d) > 0:
                     pers = d[:, 1] - d[:, 0]
                     lifetimes.append(pers.mean())
