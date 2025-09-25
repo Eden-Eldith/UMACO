@@ -37,10 +37,10 @@ import networkx as nx
 
 try:
     import cupy as cp
+    HAS_CUPY = True
 except ImportError:
-    print("ERROR: This script requires CuPy for GPU acceleration.\n"
-          "Please install via 'pip install cupy' or an appropriate cupy-cudaXX wheel.")
-    sys.exit(1)
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
 
 # =============================================================================
 # Configuration Dataclass
@@ -683,7 +683,7 @@ class MACOSystem:
             # Track best
             if best_q > best_global_quality:
                 best_global_quality = best_q
-                best_assignment = self.assignments_gpu[best_idx, :].get()
+                best_assignment = self.assignments_gpu[best_idx, :]
                 best_global_assignment = best_assignment
                 self.last_improvement_iter = it
 
@@ -703,7 +703,7 @@ class MACOSystem:
                 _, final_q, best_idx2 = self._launch_evaluation()
                 if final_q > best_global_quality:
                     best_global_quality = final_q
-                    best_assignment = self.assignments_gpu[best_idx2, :].get()
+                    best_assignment = self.assignments_gpu[best_idx2, :]
                     best_global_assignment = best_assignment
                 if final_q >= 0.999999:
                     logging.info(">>> Full or near-full SAT found. Exiting.")
@@ -743,7 +743,7 @@ class MACOSystem:
         p = self.pheromones_gpu / cp.sum(self.pheromones_gpu, axis=1, keepdims=True)
         epsilon = 1e-9
         ent = -cp.sum(p * cp.log2(p + epsilon), axis=1)
-        return float(cp.mean(ent).get())
+        return float(cp.mean(ent))
 
     def _adapt_parameters(self, iteration: int) -> None:
         """
@@ -771,7 +771,7 @@ class MACOSystem:
         Partially resets pheromones below a certain quantile, per ZVSS logic.
         """
         ph = self.pheromones_gpu.ravel()
-        ph_cpu = ph.get()
+        ph_cpu = ph
         cutoff_idx = int(len(ph_cpu) * 0.05)
         cutoff_idx = max(1, cutoff_idx)
 
@@ -846,7 +846,7 @@ class MACOSystem:
         )
         cp.cuda.Stream.null.synchronize()
 
-        qualities_cpu = self.qualities_gpu.get()
+        qualities_cpu = self.qualities_gpu
         avg_q = float(np.mean(qualities_cpu))
         best_q = float(np.max(qualities_cpu))
         best_idx = int(np.argmax(qualities_cpu))

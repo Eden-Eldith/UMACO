@@ -64,10 +64,15 @@ import logging
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
 import numpy as np
 
-from umaco.Umaco13 import (
+from Umaco13 import (
     SolverType,
     UMACO,
     UniversalNode,
