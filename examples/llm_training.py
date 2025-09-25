@@ -26,7 +26,7 @@ from transformers import (
 )
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from umaco.maco_direct_train16 import (
+from maco_direct_train16 import (
     MACAOConfig, EnhancedQuantumEconomy, 
     EnhancedCognitiveNode, NeuroPheromoneSystem
 )

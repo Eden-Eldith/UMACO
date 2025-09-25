@@ -26,7 +26,12 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import numpy as np
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
 import matplotlib.pyplot as plt
 
 # ----------------------
@@ -153,7 +158,7 @@ class ProteinFoldingOptimizer:
 
         # Final log
         self.log_progress(self.cfg.max_iterations)
-        return self.best_path.get(), self.best_energy
+        return self.best_path, self.best_energy
 
     def update_ant_positions(self, iteration: int):
         """
@@ -276,7 +281,7 @@ void build_paths(
         current_best_value = cp.min(self.ant_energies)
         current_best_idx = cp.argmin(self.ant_energies)
         if current_best_value < self.best_energy:
-            self.best_energy = float(current_best_value.get())
+            self.best_energy = float(current_best_value)
             self.best_path = self.ant_paths[current_best_idx].copy()
             self.last_improvement_iter = 0  # reset stagnation
 
@@ -301,8 +306,8 @@ void build_paths(
             deposit = deposit_amounts[ant_idx]
             # We'll do the deposit in pure Python to keep it simpler,
             # though it's not the most efficient for large n_ants:
-            host_path = path_xy.get()  # shape (protein_length, 2)
-            val = float(deposit.get())
+            host_path = path_xy  # shape (protein_length, 2)
+            val = float(deposit)
             for (x, y) in host_path:
                 pheromone_update[x, y] += val
 
@@ -363,10 +368,10 @@ void build_paths(
             pheromone_probs * cp.log2(pheromone_probs + epsilon),
             axis=1
         )
-        entropy_avg = float(cp.mean(row_entropies).get())
+        entropy_avg = float(cp.mean(row_entropies))
 
-        min_pher = float(cp.min(self.pheromones).get())
-        max_pher = float(cp.max(self.pheromones).get())
+        min_pher = float(cp.min(self.pheromones))
+        max_pher = float(cp.max(self.pheromones))
 
         logging.info(
             f"Iter {iteration:03d} | "
@@ -386,8 +391,8 @@ void build_paths(
             return
 
         # Convert to CPU
-        energy_map = self.energy_grid.get()
-        best_path = self.best_path.get()
+        energy_map = self.energy_grid
+        best_path = self.best_path
 
         plt.figure(figsize=(12, 6))
 

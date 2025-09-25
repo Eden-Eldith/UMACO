@@ -24,7 +24,12 @@ import time
 import argparse
 import logging
 import numpy as np
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
@@ -153,7 +158,7 @@ class MACOCryptoOptimizer:
     def _compute_entropy(self) -> float:
         pheromones = self.pheromones_gpu / cp.sum(self.pheromones_gpu, axis=1, keepdims=True)
         entropy = -cp.sum(pheromones * cp.log2(pheromones + 1e-9), axis=1)
-        return float(cp.mean(entropy).get())
+        return float(cp.mean(entropy))
 
     def _build_assignments(self) -> None:
         # Build ant assignments based on pheromones and current parameters

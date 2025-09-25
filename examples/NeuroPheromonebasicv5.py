@@ -2,7 +2,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import random
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
+
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has  method
+        return arr
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        return val
+    else:
+        return float(val) if hasattr(val, 'item') else float(val)
 from cupy.cuda import MemoryPool
 from persim import PersistenceImager
 from ripser import Rips
@@ -419,7 +439,7 @@ class SelfOptimizingBrainModel:
                 
                 # Transfer optimized pheromones back to model
                 try:
-                    optimized_pheromones = cp.asnumpy(self.maco_optimizer.pheromones)
+                    optimized_pheromones = asnumpy(self.maco_optimizer.pheromones)
                     
                     # Check for valid values and update
                     if np.all(np.isfinite(optimized_pheromones)):

@@ -11,7 +11,7 @@ It shows the basic setup and configuration of the optimization process.
 
 import numpy as np
 import matplotlib.pyplot as plt
-from umaco.Umaco9 import (
+from Umaco9 import (
     UMACO9, UMACO9Config,
     UniversalEconomy, EconomyConfig,
     UniversalNode, NodeConfig,
@@ -62,7 +62,7 @@ def main():
         alpha=0.2,
         beta=0.1,
         rho=0.3,
-        max_iter=500,
+        max_iter=10,  # Reduced for testing
         quantum_burst_interval=50
     )
     

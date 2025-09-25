@@ -25,7 +25,12 @@ from typing import List, Tuple, Dict, Optional
 
 try:
     import numpy as np
+    try:
     import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
     import networkx as nx
 except ImportError as e:
     print("ERROR: NumPy, CuPy, and NetworkX required.\n", e)
@@ -250,7 +255,7 @@ class MACOZVSSSystem:
 
             if best_q > best_global_quality:
                 best_global_quality = best_q
-                best_assignment = self.assignments_gpu[best_idx, :].get()
+                best_assignment = self.assignments_gpu[best_idx, :]
                 best_global_assignment = best_assignment
                 self.last_improvement_iter = it
 
@@ -284,7 +289,7 @@ class MACOZVSSSystem:
         p = self.pheromones_gpu / cp.sum(self.pheromones_gpu, axis=1, keepdims=True)
         epsilon = 1e-9
         ent = -cp.sum(p * cp.log2(p + epsilon), axis=1)
-        return float(cp.mean(ent).get())
+        return float(cp.mean(ent))
 
     def _adapt_parameters(self, iteration: int) -> None:
         """
@@ -304,7 +309,7 @@ class MACOZVSSSystem:
         Partially resets low-value pheromones to a small random value. Useful to escape local minima.
         """
         ph = self.pheromones_gpu.ravel()
-        ph_cpu = ph.get()
+        ph_cpu = ph
         cutoff_idx = int(len(ph_cpu) * 0.05)
         if cutoff_idx < 1:
             cutoff_idx = 1
@@ -369,7 +374,7 @@ class MACOZVSSSystem:
 
         # Real evaluation on CPU for each ant
         qualities_cpu_list = []
-        assignments_cpu = self.assignments_gpu.get()
+        assignments_cpu = self.assignments_gpu
         for ant_idx in range(self.num_ants):
             params = assignments_cpu[ant_idx, :]
             quality_score = self._evaluate_zvss_swarm_quality(params)
@@ -832,7 +837,7 @@ def run_zvss_pygame(best_params: Dict[str, float]) -> None:
     running = True
     step = 0
     while running:
-        for event in pygame.event.get():
+        for event in pygame.to_numpy_scalar(event):
             if event.type == pygame.QUIT:
                 running = False
 

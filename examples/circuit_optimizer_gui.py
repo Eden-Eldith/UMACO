@@ -16,7 +16,7 @@ visualize the final layout.
 import tkinter as tk
 from tkinter import messagebox
 import numpy as np
-from umaco.Umaco9 import (
+from Umaco9 import (
     UMACO9, UMACO9Config,
     UniversalEconomy, EconomyConfig,
     UniversalNode, NodeConfig,
