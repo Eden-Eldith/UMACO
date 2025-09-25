@@ -820,14 +820,6 @@ class NeuroPheromoneSystem(BaseNeuroPheromoneSystem):
         self._apply_partial_reset()
 
     def _apply_partial_reset(self):
-        """Apply partial reset to pheromone tensor."""
-        flat_abs = cp.abs(self.pheromone_tensor).ravel()
-        cutoff = np.percentile(asnumpy(flat_abs), 30.0)  # Use fixed 30% as in base
-        mask = cp.abs(self.pheromone_tensor) < cutoff
-        self.pheromone_tensor[mask] *= 0.1
-        self.pathway_graph[mask] *= 0.5
-
-    def _apply_partial_reset(self):
         logging.info("NeuroPheromone system: Applying partial reset.")
         flat_pheromones = cp.abs(self.pheromone_tensor.flatten())
         sorted_indices = cp.argsort(flat_pheromones)

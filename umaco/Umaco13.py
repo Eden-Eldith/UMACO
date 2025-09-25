@@ -496,7 +496,6 @@ class UMACO:
             'loss': [], 'panic': [], 'alpha': [], 'beta': [], 'rho': [],
             'quantum_bursts': [], 'homology_entropy': []
         }
-        self.quantum_burst_history = []
         self.homology_report = None
         
         # === TOPOLOGY ===
@@ -605,7 +604,6 @@ class UMACO:
             self._symmetrize_and_clamp()
             
             self.history['quantum_bursts'].append(float(cp.mean(cp.abs(final_burst))))
-            self.quantum_burst_history.append(float(final_burst.real.mean()))
             
         except Exception as e:
             logger.error(f"Quantum burst failed: {e}. Applying emergency noise.")
