@@ -14,7 +14,7 @@
 
 ### 25/09/2025
 
-I have ensured all if not most files run as intended, however I either require help getting it all working, or need to leanr more myself and get this finished, any help would be much appreciated. 
+I have ensured all if not most files run as intended, however I either require help getting it all working, or need to learn more myself and get this finished, any help would be much appreciated. 
 ## What is UMACO?
 
 UMACO (Universal Multi-Agent Cognitive Optimization) is an AI-first framework specifically designed to be refactored and adapted by Large Language Models (LLMs) to solve domain-specific optimization problems. Unlike traditional libraries that you install and use directly, UMACO serves as a template that LLMs can understand and modify to address your unique optimization challenges.
