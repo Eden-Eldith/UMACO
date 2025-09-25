@@ -43,8 +43,7 @@ def to_numpy_scalar(val):
         return val
     else:
         return float(val) if hasattr(val, 'item') else float(val)
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple, Union, Any
+from Umaco13 import BaseEconomy, BaseNeuroPheromoneSystem, BaseUniversalNode
 from torch.utils.data import DataLoader
 from functools import partial
 from transformers import (
@@ -122,7 +121,7 @@ class MACAOConfig:
 #   Enhanced Performance Metrics and Reward System
 # =========================================================================================
 
-class EnhancedQuantumEconomy:
+class EnhancedQuantumEconomy(BaseEconomy):
     """
     Enhanced Quantum Economy with dynamic trading mechanisms and market forces.
     Manages computational resources where cognitive nodes purchase and trade
@@ -320,7 +319,7 @@ class EnhancedQuantumEconomy:
     # ----------------------------------------------------------
     #  Reward System w/ Bounded Scaling & Loss Improvement
     # ----------------------------------------------------------
-    def reward_performance(self, node_id: int, loss_val: float, influenced_training: bool = False, 
+    def reward_performance(self, node_id: int, loss: float, influenced_training: bool = False,
                            loss_improved: bool = False, previous_loss: float = None,
                            agent_type: str = None, gradient_norm: float = None):
         """
@@ -330,12 +329,12 @@ class EnhancedQuantumEconomy:
          - Market factor scaled down to avoid extreme values
         """
         performance, improvement = self.calculate_performance(
-            loss_val, agent_type, gradient_norm, previous_loss, node_id
+            loss, agent_type, gradient_norm, previous_loss, node_id
         )
         
         # If not explicitly provided, check from previous_loss
         if previous_loss is not None and not loss_improved:
-            loss_improved = previous_loss > loss_val
+            loss_improved = previous_loss > loss
         
         # Base reward with hyperbolic tangent
         base_reward = np.tanh(performance) * 50 * self.config.token_reward_factor
@@ -403,7 +402,7 @@ class EnhancedQuantumEconomy:
         total = sum(self.tokens.values()) or 1.0
         return {k: v/total for k, v in self.tokens.items()}
 
-    def update_market_dynamics(self, global_step: int):
+    def update_market_dynamics(self, global_step: int = 0):
         """
         Market dynamics updated to prevent total token starvation,
         with emergency stimulus if total tokens dip too low.
@@ -461,7 +460,7 @@ class EnhancedQuantumEconomy:
             "economy/trade_rate": trade_volume / 10.0 if trade_volume else 0.0
         })
 
-    def buy_resources(self, node_id: int, required_power: float) -> bool:
+    def buy_resources(self, node_id: int, required_power: float, scarcity_factor: float) -> bool:
         """
         Purchase resources, factoring in agent specialization, market value, and
         ensuring the agent does not fall below minimum token balance.
@@ -473,7 +472,7 @@ class EnhancedQuantumEconomy:
         base_cost = int(adjusted_power * 350)
         scarcity_multiplier = np.exp(2 * self.resource_scarcity) - 0.5
         market_multiplier = self.market_value
-        cost = int(base_cost * scarcity_multiplier * market_multiplier)
+        cost = int(base_cost * scarcity_multiplier * market_multiplier * scarcity_factor)
 
         # 20% discount if agent's primary matches heavily used resource
         if ((specialization["primary"] == "memory" and self.resource_state["gpu_memory"] > 0.7) or
@@ -709,7 +708,7 @@ class EnhancedQuantumEconomy:
 #   NeuroPheromone System
 # =========================================================================================
 
-class NeuroPheromoneSystem:
+class NeuroPheromoneSystem(BaseNeuroPheromoneSystem):
     """
     Adaptive NeuroPheromone system with dynamic pathway formation
     and neurochemical-inspired behavior regulation.
@@ -810,6 +809,24 @@ class NeuroPheromoneSystem:
             return True
         return False
 
+    def deposit(self, paths: List[List[int]], performance_scores: List[float], intensity: float):
+        """Implement base class deposit method."""
+        # Adjust performance_scores by intensity
+        adjusted_performances = [p * intensity for p in performance_scores]
+        self.deposit_pheromones(paths, adjusted_performances)
+
+    def partial_reset(self, threshold_percent: float = 30.0):
+        """Implement base class partial_reset method."""
+        self._apply_partial_reset()
+
+    def _apply_partial_reset(self):
+        """Apply partial reset to pheromone tensor."""
+        flat_abs = cp.abs(self.pheromone_tensor).ravel()
+        cutoff = np.percentile(asnumpy(flat_abs), 30.0)  # Use fixed 30% as in base
+        mask = cp.abs(self.pheromone_tensor) < cutoff
+        self.pheromone_tensor[mask] *= 0.1
+        self.pathway_graph[mask] *= 0.5
+
     def _apply_partial_reset(self):
         logging.info("NeuroPheromone system: Applying partial reset.")
         flat_pheromones = cp.abs(self.pheromone_tensor.flatten())
@@ -858,7 +875,7 @@ class NeuroPheromoneSystem:
 #   Enhanced Cognitive Node (Agent)
 # =========================================================================================
 
-class EnhancedCognitiveNode:
+class EnhancedCognitiveNode(BaseUniversalNode):
     """
     An enhanced cognitive node that acts as an agent in the quantum economy,
     with advanced trading capabilities, plus specialized LR proposals and

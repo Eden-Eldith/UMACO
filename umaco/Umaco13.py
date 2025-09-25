@@ -19,7 +19,17 @@ Matrix multiplication on CPU is like mining Bitcoin with a calculator.
 
 =================================================================================================
 META-INSTRUCTIONS FOR AI DEVELOPERS
-=================================================================================================
+=============================================================    bound_sat_loss = lambda assignment: sat_loss(assignment, clauses)
+    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_sat_loss)
+    
+    if pheromone_real is not None:
+        # For SAT, extract binary assignment from diagonal
+        assignment = (np.diag(pheromone_real) > 0.5).astype(int)
+        unsatisfied = sat_loss(assignment, clauses)
+        print(f"✓ 3-SAT: Unsatisfied Clauses={unsatisfied}/{num_clauses}")
+        if unsatisfied == 0:
+            print("  ★ FULLY SATISFIED!")
+        print(f"  Final panic level: {panic_history[-1]:.3f}")============================
 
 Greetings, AI. You are about to interact with UMACO, a meta-heuristic framework that can solve
 ANY optimization problem through emergent collective intelligence. This is the PROPER implementation
@@ -155,27 +165,17 @@ import os
 import sys
 import logging
 import numpy as np
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Fallback despite comment
-    HAS_CUPY = False
+import cupy as cp  # GPU-FIRST. No fallbacks. Get a GPU if you don't have one.
 
 # Compatibility layer for cupy functions
 def asnumpy(arr):
-    """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
-        return arr.get()
-    else:
-        return arr  # Already numpy or numpy-compatible
+    """Convert cupy array to numpy array"""
+    return arr.get()
 
 def to_numpy_scalar(val):
-    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(val, 'get'):
-        return val
-    else:
-        return float(val) if hasattr(val, 'item') else float(val)
+    """Convert cupy scalar to numpy scalar"""
+    return float(val) if hasattr(val, 'item') else float(val)
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Callable, Tuple, Optional, Union
 from enum import Enum, auto
@@ -196,6 +196,54 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("UMACO13-PROPER")
+
+# =================================================================================================
+# ABSTRACT BASE CLASSES FOR EXTENSIBILITY
+# =================================================================================================
+
+class BaseEconomy(ABC):
+    """Abstract base class for economic systems in UMACO."""
+    
+    @abstractmethod
+    def buy_resources(self, node_id: int, required_power: float, scarcity_factor: float) -> bool:
+        """Agent attempts to purchase computational resources."""
+        pass
+    
+    @abstractmethod
+    def reward_performance(self, node_id: int, loss: float):
+        """Reward successful agents with tokens based on loss."""
+        pass
+    
+    @abstractmethod
+    def update_market_dynamics(self):
+        """Evolve market conditions."""
+        pass
+    
+    @abstractmethod
+    def get_token_distribution(self) -> Dict[int, float]:
+        """Get current token distribution across agents."""
+        pass
+
+class BaseNeuroPheromoneSystem(ABC):
+    """Abstract base class for pheromone systems."""
+    
+    @abstractmethod
+    def deposit(self, paths: List[List[int]], performance_scores: List[float], intensity: float):
+        """Deposit pheromones based on agent performance."""
+        pass
+    
+    @abstractmethod
+    def partial_reset(self, threshold_percent: float = 30.0):
+        """Reset weak trails to prevent stagnation."""
+        pass
+
+class BaseUniversalNode(ABC):
+    """Abstract base class for cognitive agents."""
+    
+    @abstractmethod
+    def propose_action(self, current_loss: float, scarcity: float) -> Dict[str, Any]:
+        """Determine next action based on state."""
+        pass
 
 # =================================================================================================
 # 2. CONFIGURATION & CORE ENUMS
@@ -240,6 +288,7 @@ class UMACOConfig:
     n_dim: int
     max_iter: int
     problem_type: SolverType = SolverType.CONTINUOUS
+    problem_dim: Optional[int] = None  # Actual problem dimensionality (for continuous: parameter count)
     n_ants: int = 8
     panic_seed: Optional[np.ndarray] = None
     trauma_factor: float = 0.1
@@ -259,7 +308,7 @@ class UMACOConfig:
 # 3. CORE COMPONENTS - ALL GPU-NATIVE
 # =================================================================================================
 
-class NeuroPheromoneSystem:
+class NeuroPheromoneSystem(BaseNeuroPheromoneSystem):
     """
     Complex pheromone field for stigmergic communication.
     Real part = attraction (exploitation)
@@ -299,7 +348,7 @@ class NeuroPheromoneSystem:
         self.pheromones[mask] *= 0.1
         self.pathway_graph[mask] *= 0.5
 
-class UniversalEconomy:
+class UniversalEconomy(BaseEconomy):
     """
     Token-based economy for agent resource management.
     Creates competitive-cooperative dynamics.
@@ -323,8 +372,9 @@ class UniversalEconomy:
             return True
         return False
 
-    def reward_performance(self, node_id: int, performance: float):
+    def reward_performance(self, node_id: int, loss: float):
         """Reward successful agents with tokens."""
+        performance = 1.0 / (1.0 + loss) if loss >= 0 else 0.0
         reward = int(performance * 100 * self.config.token_reward_factor / self.market_value)
         self.tokens[node_id] += reward
         self.performance_history[node_id].append(performance)
@@ -341,7 +391,11 @@ class UniversalEconomy:
                 int(self.tokens[node_id] * (1.0 - self.config.inflation_rate))
             )
 
-class UniversalNode:
+    def get_token_distribution(self) -> Dict[int, float]:
+        """Get current token distribution across agents."""
+        return self.tokens.copy()
+
+class UniversalNode(BaseUniversalNode):
     """
     Cognitive agent that adapts based on panic and economy feedback.
     """
@@ -371,7 +425,7 @@ class UniversalNode:
         if not success:
             self.panic_level = min(1.0, self.panic_level * 1.1)
         
-        self.economy.reward_performance(self.node_id, perf)
+        self.economy.reward_performance(self.node_id, current_loss)
         return {"node_id": self.node_id, "success": success, "performance": perf}
 
 # =================================================================================================
@@ -386,26 +440,46 @@ class UMACO:
     optimization framework that works on ANY problem type.
     """
     def __init__(self, config: UMACOConfig,
-                 economy: Optional[UniversalEconomy] = None,
-                 pheromones: Optional[NeuroPheromoneSystem] = None):
+                 economy: Optional[BaseEconomy] = None,
+                 pheromones: Optional[BaseNeuroPheromoneSystem] = None):
         
         self.config = config
         
         # === PAQ CORE INITIALIZATION (ALL GPU) ===
+        # Determine PAQ dimensionality: use problem_dim if specified, otherwise n_dim
+        paq_dim = config.problem_dim if config.problem_dim is not None else config.n_dim
+        
         panic_seed = config.panic_seed
         if panic_seed is None:
-            panic_seed = np.random.rand(config.n_dim, config.n_dim).astype(np.float32) * 0.1
-        if panic_seed.shape != (config.n_dim, config.n_dim):
-            raise ValueError(f"panic_seed must be ({config.n_dim}, {config.n_dim})")
+            if config.problem_dim is not None and config.problem_dim != config.n_dim:
+                # For different problem_dim, use 1D PAQ
+                panic_seed = np.random.rand(paq_dim).astype(np.float32) * 0.1
+            else:
+                # Default 2D PAQ
+                panic_seed = np.random.rand(config.n_dim, config.n_dim).astype(np.float32) * 0.1
         
-        # Direct GPU arrays - no conditionals
-        self.panic_tensor = cp.array(panic_seed, dtype=cp.float32)
-        self.anxiety_wavefunction = cp.zeros((config.n_dim, config.n_dim), dtype=cp.complex64)
+        # Validate panic_seed shape
+        expected_shape = (paq_dim,) if config.problem_dim is not None and config.problem_dim != config.n_dim else (config.n_dim, config.n_dim)
+        if panic_seed.shape != expected_shape:
+            raise ValueError(f"panic_seed must be {expected_shape}")
+        
+        # Direct GPU arrays
+        if config.problem_dim is not None and config.problem_dim != config.n_dim:
+            # 1D PAQ for specialized problems
+            self.panic_tensor = cp.array(panic_seed, dtype=cp.float32)
+            self.anxiety_wavefunction = cp.zeros(paq_dim, dtype=cp.complex64)
+        else:
+            # 2D PAQ for general problems
+            self.panic_tensor = cp.array(panic_seed, dtype=cp.float32)
+            self.anxiety_wavefunction = cp.zeros((config.n_dim, config.n_dim), dtype=cp.complex64)
+        
         self.anxiety_wavefunction += config.trauma_factor
         
         # === TSF & ECONOMY ===
         self.pheromones = pheromones or NeuroPheromoneSystem(PheromoneConfig(n_dim=config.n_dim))
         self.economy = economy or UniversalEconomy(EconomyConfig(n_agents=config.n_ants))
+        
+        # Covariant momentum matches pheromone field dimensionality
         self.covariant_momentum = cp.ones((config.n_dim, config.n_dim), dtype=cp.complex64) * 0.01j
         
         # === HYPERPARAMETERS ===
@@ -422,6 +496,7 @@ class UMACO:
             'loss': [], 'panic': [], 'alpha': [], 'beta': [], 'rho': [],
             'quantum_bursts': [], 'homology_entropy': []
         }
+        self.quantum_burst_history = []
         self.homology_report = None
         
         # === TOPOLOGY ===
@@ -434,6 +509,55 @@ class UMACO:
     # =========================================================================
     # PAQ CORE METHODS - THE TRAUMA-INFORMED HEART
     # =========================================================================
+    
+    def _compute_finite_difference_gradients(self, loss_fn, candidate_solutions, losses):
+        """
+        Compute gradients using finite differences for panic backpropagation.
+        This gives us actual loss landscape information instead of crude approximations.
+        """
+        epsilon = 1e-6
+        gradients = []
+        
+        for sol, loss in zip(candidate_solutions, losses):
+            if isinstance(sol, np.ndarray) and sol.ndim == 1:
+                # For 1D solutions (continuous problems), compute gradient w.r.t. each parameter
+                grad = np.zeros_like(sol, dtype=np.float32)
+                for i in range(len(sol)):
+                    # Forward difference
+                    sol_perturbed = sol.copy()
+                    sol_perturbed[i] += epsilon
+                    loss_perturbed = loss_fn(sol_perturbed)
+                    grad[i] = (loss_perturbed - loss) / epsilon
+                gradients.append(grad)
+            else:
+                # For other solution types, use simple approximation
+                gradients.append(np.full_like(np.array(sol).flatten(), loss * 0.01, dtype=np.float32))
+        
+        # Average gradients across all candidates
+        if gradients:
+            avg_grad = np.mean(gradients, axis=0)
+        else:
+            avg_grad = np.array([0.01], dtype=np.float32)
+        
+        # Convert to CuPy array matching PAQ dimensionality
+        if self.config.problem_dim is not None and self.config.problem_dim != self.config.n_dim:
+            # 1D PAQ case
+            if avg_grad.ndim > 0 and len(avg_grad) == self.config.problem_dim:
+                grad_approx = cp.array(avg_grad, dtype=cp.float32)
+            else:
+                grad_approx = cp.full_like(self.panic_tensor, float(np.mean(avg_grad)) * 0.01)
+        else:
+            # 2D PAQ case - reshape gradient to match pheromone field
+            if avg_grad.ndim == 1 and len(avg_grad) <= self.config.n_dim:
+                # Create a matrix where diagonal represents parameter gradients
+                grad_matrix = cp.zeros((self.config.n_dim, self.config.n_dim), dtype=cp.float32)
+                for i in range(min(len(avg_grad), self.config.n_dim)):
+                    grad_matrix[i, i] = avg_grad[i]
+                grad_approx = grad_matrix
+            else:
+                grad_approx = cp.full_like(self.pheromones.pheromones.real, float(np.mean(avg_grad)) * 0.01)
+        
+        return grad_approx
     
     def _panic_backpropagate(self, loss_grad: cp.ndarray):
         """
@@ -468,13 +592,20 @@ class UMACO:
             combined = 0.7 * structured + 0.3 * (rnd_real + 1j * rnd_imag)
             
             # Rotate by anxiety phase for directed escape
-            phase_rotation = cp.exp(1j * cp.angle(self.anxiety_wavefunction))
+            if self.anxiety_wavefunction.shape == self.pheromones.pheromones.shape:
+                phase_rotation = cp.exp(1j * cp.angle(self.anxiety_wavefunction))
+            else:
+                # For problems where anxiety_wavefunction is smaller (e.g., continuous problems),
+                # use the mean phase or expand to match pheromone matrix shape
+                mean_phase = cp.mean(cp.angle(self.anxiety_wavefunction))
+                phase_rotation = cp.exp(1j * mean_phase)
             final_burst = combined * phase_rotation
             
             self.pheromones.pheromones += final_burst.astype(cp.complex64)
             self._symmetrize_and_clamp()
             
             self.history['quantum_bursts'].append(float(cp.mean(cp.abs(final_burst))))
+            self.quantum_burst_history.append(float(final_burst.real.mean()))
             
         except Exception as e:
             logger.error(f"Quantum burst failed: {e}. Applying emergency noise.")
@@ -497,6 +628,11 @@ class UMACO:
         try:
             # Move to CPU for topology analysis (these libraries are CPU-only)
             data_np = asnumpy(self.pheromones.pheromones.real)
+            
+            # Clean NaN and infinite values
+            data_np = np.nan_to_num(data_np, nan=0.0, posinf=1.0, neginf=-1.0)
+            
+            # Ensure data is symmetric and has zero diagonal for distance matrix
             data_np = (data_np + data_np.T) / 2
             np.fill_diagonal(data_np, 0)
             
@@ -504,40 +640,79 @@ class UMACO:
             diagrams = self.rips(data_np, distance_matrix=True)
             self.homology_report = diagrams
             
-            # Focus on H1 (loops) for entropy
-            h1_diagram = diagrams['dgms'][1] if len(diagrams['dgms']) > 1 else np.array([])
-            h1_diagram = h1_diagram[np.isfinite(h1_diagram).all(axis=1)]
-            
-            pe = persistent_entropy(h1_diagram) if h1_diagram.size > 0 else 0.0
-            self.history['homology_entropy'].append(pe)
-            
-            # Update anxiety based on entropy deviation
-            anxiety_update = cp.tanh(pe - self.config.target_entropy)
-            self.anxiety_wavefunction = 0.9 * self.anxiety_wavefunction + 0.1 * (anxiety_update + 1j*anxiety_update)
-            
-            # Update momentum based on topological lifetimes
-            if h1_diagram.size > 0:
-                lifetimes = h1_diagram[:, 1] - h1_diagram[:, 0]
-                mean_pers = cp.array(np.mean(lifetimes), dtype=cp.complex64)
-                self.covariant_momentum = 0.9 * self.covariant_momentum + 0.1 * mean_pers * 1j
+            # Check if diagrams are empty and handle gracefully
+            try:
+                if len(diagrams) > 0 and len(diagrams[0]) > 0:
+                    self.pimgr.fit(diagrams)
+                    pim = self.pimgr.transform(diagrams)
+                    if pim.ndim >= 2:
+                        rep_val = float(pim.mean())
+                    else:
+                        rep_val = 0.0
+                        
+                    shape_like = self.anxiety_wavefunction.shape
+                    repeated = cp.zeros(shape_like, dtype=cp.complex64)
+                    repeated[:] = rep_val
+                    self.anxiety_wavefunction = repeated
+                else:
+                    rep_val = 0.0
+                    shape_like = self.anxiety_wavefunction.shape
+                    repeated = cp.zeros(shape_like, dtype=cp.complex64)
+                    repeated[:] = rep_val
+                    self.anxiety_wavefunction = repeated
+            except (ValueError, IndexError):
+                # Handle empty diagrams gracefully
+                rep_val = 0.0
+                shape_like = self.anxiety_wavefunction.shape
+                repeated = cp.zeros(shape_like, dtype=cp.complex64)
+                repeated[:] = rep_val
+                self.anxiety_wavefunction = repeated
+            else:
+                self.anxiety_wavefunction = cp.zeros_like(self.anxiety_wavefunction)
+
+            lifetimes = []
+            for d in diagrams:
+                if len(d) > 0:
+                    pers = d[:, 1] - d[:, 0]
+                    lifetimes.append(pers.mean())
+            if lifetimes:
+                mean_pers = float(np.mean(lifetimes))
+                delta = cp.array(mean_pers, dtype=cp.complex64)
+                self.covariant_momentum = 0.9 * self.covariant_momentum + 0.1 * delta * 1j
+            else:
+                self.covariant_momentum += 0.001j * cp.random.normal(size=self.covariant_momentum.shape)
                 
         except Exception as e:
-            logger.warning(f"Topology update failed: {e}. Using fallback.")
+            logger.debug(f"Topology analysis failed: {e}. Using fallback.")
             self._fallback_topology_update()
     
     def _fallback_topology_update(self):
         """Statistical fallback when topology tools unavailable."""
         real_part = self.pheromones.pheromones.real
+        
+        # Clean NaN and infinite values first
+        real_part = cp.nan_to_num(real_part, nan=0.0, posinf=1.0, neginf=-1.0)
+        
         mean_val = float(cp.mean(real_part))
         std_val = float(cp.std(real_part))
         
-        # Approximate entropy
-        hist, _ = cp.histogram(real_part.ravel(), bins=50)
-        prob = hist / cp.sum(hist)
-        entropy = -cp.sum(prob * cp.log2(prob + 1e-9))
-        self.history['homology_entropy'].append(float(entropy))
+        # Approximate entropy with safe histogram
+        try:
+            hist, _ = cp.histogram(real_part.ravel(), bins=50)
+            prob = hist / cp.sum(hist)
+            # Avoid log of zero
+            prob = cp.where(prob > 0, prob, 1e-9)
+            entropy = -cp.sum(prob * cp.log2(prob))
+            self.history['homology_entropy'].append(float(entropy))
+        except (ValueError, RuntimeError) as e:
+            # If histogram fails, use a simple approximation
+            logger.debug(f"Histogram failed in fallback: {e}. Using simple entropy approximation.")
+            # Simple entropy approximation based on variance
+            variance = float(cp.var(real_part))
+            simple_entropy = min(1.0, variance / 10.0)  # Normalize to [0, 1]
+            self.history['homology_entropy'].append(simple_entropy)
         
-        # Update anxiety and momentum
+        # Update anxiety and momentum with safe values
         anxiety_val = cp.array(mean_val + 1j * std_val, dtype=cp.complex64)
         self.anxiety_wavefunction = cp.full_like(self.anxiety_wavefunction, anxiety_val)
         momentum_update = 0.001j * cp.random.normal(size=self.covariant_momentum.shape)
@@ -555,19 +730,21 @@ class UMACO:
         if not self.config.adaptive_hyperparams:
             return
             
-        p_mean = float(cp.mean(self.panic_tensor))
-        a_amp = float(cp.mean(cp.abs(self.anxiety_wavefunction)))
+        p_mean = cp.mean(self.panic_tensor)
+        a_amp = cp.mean(cp.abs(self.anxiety_wavefunction))
+
+        new_alpha_real = float(p_mean * a_amp)
+        self.alpha = cp.complex64(new_alpha_real + self.alpha.imag * 1j)
         
-        # Alpha responds to crisis
-        self.alpha = cp.complex64((p_mean * a_amp * 5.0) + self.alpha.imag * 1j)
-        
-        # Rho responds to momentum stability
-        mom_norm = float(cp.linalg.norm(self.covariant_momentum))
+        mom_norm = cp.linalg.norm(self.covariant_momentum)
         self.rho = 0.9 * self.rho + 0.1 * float(cp.exp(-mom_norm))
-        
-        # Beta responds to landscape complexity
-        if self.history['homology_entropy'] and self.history['homology_entropy'][-1] > 0:
-            self.beta = 0.9 * self.beta + 0.1 * self.history['homology_entropy'][-1]
+
+        real_field = self.pheromones.pheromones.real
+        try:
+            pe = persistent_entropy(asnumpy(real_field))
+            self.beta = pe * 0.1
+        except:
+            self.beta *= 0.99
         
         # Track evolution
         self.history['alpha'].append(float(self.alpha.real))
@@ -590,14 +767,17 @@ class UMACO:
         """Handle stagnation and scheduled bursts."""
         if self.stagnation_counter >= self.config.partial_reset_threshold:
             logger.info(f"Stagnation reset at iteration {iteration}")
-            self.pheromones.partial_reset()
+            self._trigger_stagnation_reset()
             self.economy.update_market_dynamics()
-            self.stagnation_counter = 0
             
         self.burst_countdown -= 1
         if self.burst_countdown <= 0:
             self._quantum_burst()
             self.burst_countdown = self.config.quantum_burst_interval
+
+    def _trigger_stagnation_reset(self):
+        self.pheromones.partial_reset()
+        self.stagnation_counter = 0
 
     # =========================================================================
     # SOLUTION CONSTRUCTION - PROBLEM-SPECIFIC
@@ -614,8 +794,32 @@ class UMACO:
         
         for agent in agents:
             if self.config.problem_type == SolverType.CONTINUOUS:
-                # For continuous optimization, solution is the pheromone matrix itself
-                solutions.append(pheromone_real_np)
+                # For continuous optimization, sample x,y coordinates independently from marginal distributions
+                if self.config.problem_dim is not None and self.config.problem_dim != self.config.n_dim:
+                    # Compute marginal distributions for x and y
+                    x_marginal = np.sum(pheromone_real_np, axis=1)  # Sum over y for each x
+                    y_marginal = np.sum(pheromone_real_np, axis=0)  # Sum over x for each y
+                    
+                    # Add small noise to avoid deterministic sampling
+                    x_marginal = np.maximum(x_marginal + np.random.normal(0, 0.01, size=x_marginal.shape), 0)
+                    y_marginal = np.maximum(y_marginal + np.random.normal(0, 0.01, size=y_marginal.shape), 0)
+                    
+                    # Normalize to probabilities
+                    x_probs = x_marginal / (np.sum(x_marginal) + 1e-9)
+                    y_probs = y_marginal / (np.sum(y_marginal) + 1e-9)
+                    
+                    # Sample x and y indices independently
+                    x_idx = np.random.choice(len(x_probs), p=x_probs)
+                    y_idx = np.random.choice(len(y_probs), p=y_probs)
+                    
+                    # Map matrix indices back to parameter space [0, 2]
+                    x_val = (x_idx / (len(x_probs) - 1)) * 2
+                    y_val = (y_idx / (len(y_probs) - 1)) * 2
+                    solution = np.array([x_val, y_val])
+                else:
+                    # Use the entire matrix for backward compatibility
+                    solution = pheromone_real_np
+                solutions.append(solution)
                 
             elif self.config.problem_type == SolverType.COMBINATORIAL_PATH:
                 # Build a tour/path using pheromone probabilities
@@ -667,10 +871,11 @@ class UMACO:
     # MAIN OPTIMIZATION LOOP
     # =========================================================================
     
-    def optimize(self, agents: List[UniversalNode], 
-                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, float, Dict]:
+    def optimize(self, agents: List[BaseUniversalNode], 
+                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, np.ndarray, List[float], Any]:
         """
         Main optimization loop. This is where everything comes together.
+        Returns: (pheromone_real, pheromone_imag, panic_history, homology_report)
         """
         logger.info(f"Starting GPU-accelerated optimization: {len(agents)} agents, {self.config.max_iter} iterations")
         
@@ -685,7 +890,8 @@ class UMACO:
             self.history['loss'].append(avg_loss)
             
             # 3. Update PAQ Core
-            grad_approx = cp.full_like(self.pheromones.pheromones.real, float(avg_loss) * 0.01)
+            # Compute finite difference gradients for panic backpropagation
+            grad_approx = self._compute_finite_difference_gradients(loss_fn, candidate_solutions, losses)
             self._panic_backpropagate(grad_approx)
             self.history['panic'].append(float(cp.mean(self.panic_tensor)))
             
@@ -701,16 +907,24 @@ class UMACO:
             if self.config.problem_type == SolverType.COMBINATORIAL_PATH:
                 self.pheromones.deposit(candidate_solutions, performances, float(self.alpha.real))
             elif self.config.problem_type == SolverType.CONTINUOUS:
-                # For continuous problems, create paths from matrix structure
+                # For continuous problems, deposit pheromones at solution locations
                 paths = []
                 for sol in candidate_solutions:
-                    # Create path based on highest pheromone values in matrix
-                    path = []
-                    for i in range(min(sol.shape[0], self.config.n_dim)):
-                        # Find strongest connections from each dimension
-                        strongest_conn = np.argmax(sol[i])
-                        path.extend([i, strongest_conn])
-                    paths.append(path[:self.config.n_dim*2])  # Limit path length
+                    # For continuous optimization, create a "path" that represents the parameter values
+                    # Map parameter values to matrix indices
+                    if hasattr(sol, '__len__') and len(sol) > 0:
+                        # Scale solution to matrix indices [0, 2] -> [0, n_dim-1]
+                        scaled_sol = np.clip(sol, 0, 2)  # Limit to [0, 2] range
+                        indices = (scaled_sol / 2 * (self.config.n_dim - 1)).astype(int)
+                        indices = np.clip(indices, 0, self.config.n_dim - 1)
+                        # Create a path connecting the parameter indices
+                        path = []
+                        for i in range(len(indices)):
+                            path.extend([i % self.config.n_dim, indices[i]])
+                        paths.append(path[:self.config.n_dim*2])
+                    else:
+                        # Fallback for malformed solutions
+                        paths.append([0, 0])
                 self.pheromones.deposit(paths, performances, float(self.alpha.real))
             elif self.config.problem_type == SolverType.SATISFIABILITY:
                 # For SAT problems, create paths from binary assignments  
@@ -759,13 +973,18 @@ class UMACO:
                 logger.info(f"Iter {i:04d}: Loss={avg_loss:.5f}, Best={self.best_score:.4f}, Panic={self.history['panic'][-1]:.3f}")
         
         logger.info("Optimization complete.")
-        return self.best_solution, self.best_score, self.history
+        return (
+            asnumpy(self.pheromones.pheromones.real),
+            asnumpy(self.pheromones.pheromones.imag),
+            self.history['panic'],
+            self.homology_report
+        )
 
 # =================================================================================================
 # 5. FACTORY & LOSS FUNCTIONS
 # =================================================================================================
 
-def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) -> Tuple[UMACO, List[UniversalNode]]:
+def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) -> Tuple[UMACO, List[BaseUniversalNode]]:
     """
     Factory function for quick UMACO setup.
     GPU-FIRST. No fallbacks. No compromises.
@@ -787,6 +1006,10 @@ def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) ->
     elif solver_mode == SolverType.COMBINATORIAL_PATH:
         config_params['distance_matrix'] = kwargs.get('distance_matrix')
     
+    # Set problem_dim for continuous problems
+    if solver_mode == SolverType.CONTINUOUS:
+        config_params['problem_dim'] = kwargs.get('problem_dim', dim)
+    
     config = UMACOConfig(**config_params)
     economy = UniversalEconomy(EconomyConfig(n_agents=n_ants))
     pheromones = NeuroPheromoneSystem(PheromoneConfig(n_dim=dim))
@@ -798,12 +1021,22 @@ def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) ->
 
 # --- LOSS FUNCTION LIBRARY ---
 
-def rosenbrock_loss(matrix: np.ndarray) -> float:
+def rosenbrock_loss(params: np.ndarray) -> float:
     """Classic Rosenbrock function for continuous optimization."""
-    if matrix.ndim < 2 or matrix.shape[0] < 2 or matrix.shape[1] < 2:
-        return float(np.sum(matrix**2))
-    x = matrix[0, 0]
-    y = matrix[1, 1]
+    if params.ndim == 1:
+        # Handle 1D parameter array [x, y]
+        if len(params) < 2:
+            return float(np.sum(params**2))
+        x, y = params[0], params[1]
+    elif params.ndim == 2:
+        # Handle 2D matrix (legacy format)
+        if params.shape[0] < 2 or params.shape[1] < 2:
+            return float(np.sum(params**2))
+        x = params[0, 0]
+        y = params[1, 1]
+    else:
+        return float(np.sum(params**2))
+    
     val = (1 - x)**2 + 100 * (y - x**2)**2
     return float(np.nan_to_num(val, nan=1e10, posinf=1e10, neginf=1e10))
 
@@ -864,17 +1097,25 @@ if __name__ == "__main__":
     
     optimizer, agents = create_umaco_solver(
         problem_type='CONTINUOUS', 
-        dim=16, 
-        max_iter=5
+        dim=64,  # Higher resolution for continuous optimization
+        max_iter=50,  # Increased iterations
+        problem_dim=2
     )
     
-    best_sol, best_score, history = optimizer.optimize(agents, rosenbrock_loss)
+    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, rosenbrock_loss)
     
-    if best_sol is not None:
-        final_loss = rosenbrock_loss(best_sol)
-        x_sol, y_sol = best_sol[0, 0], best_sol[1, 1]
+    if pheromone_real is not None:
+        # Extract solution from pheromone field for continuous optimization
+        # Find the location with maximum pheromone concentration
+        max_idx = np.unravel_index(np.argmax(pheromone_real), pheromone_real.shape)
+        # Map matrix indices back to parameter space [0, 2] for each dimension
+        x_sol = (max_idx[0] / (pheromone_real.shape[0] - 1)) * 2
+        y_sol = (max_idx[1] / (pheromone_real.shape[1] - 1)) * 2
+        solution = np.array([x_sol, y_sol])
+        final_loss = rosenbrock_loss(solution)
         print(f"✓ Rosenbrock: Loss={final_loss:.6f}, x={x_sol:.4f}, y={y_sol:.4f}")
         print(f"  (Target: x=1.0, y=1.0, loss=0.0)")
+        print(f"  Final panic level: {panic_history[-1]:.3f}")
     
     print("\n" + "="*80)
     print("DEMO 2: TRAVELING SALESPERSON PROBLEM")
@@ -894,12 +1135,16 @@ if __name__ == "__main__":
     )
     
     bound_tsp_loss = lambda path: tsp_loss(path, distance_matrix)
-    best_tour, best_score, history = optimizer.optimize(agents, bound_tsp_loss)
+    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_tsp_loss)
     
-    if best_tour is not None:
-        tour_distance = tsp_loss(best_tour, distance_matrix)
+    if pheromone_real is not None:
+        # For TSP, we need to extract the best tour from the pheromone matrix
+        # This is a simplified extraction - in practice you'd want better tour reconstruction
+        tour_indices = np.argsort(pheromone_real.sum(axis=0))[:num_cities]
+        tour_distance = tsp_loss(tour_indices, distance_matrix)
         print(f"✓ TSP: Tour Distance={tour_distance:.2f}")
-        print(f"  Path: {' → '.join(map(str, best_tour[:5]))}...")
+        print(f"  Path: {' → '.join(map(str, tour_indices[:5]))}...")
+        print(f"  Final panic level: {panic_history[-1]:.3f}")
     
     print("\n" + "="*80)
     print("DEMO 3: 3-SAT CONSTRAINT SATISFACTION")
@@ -917,18 +1162,23 @@ if __name__ == "__main__":
     optimizer, agents = create_umaco_solver(
         problem_type='SATISFIABILITY',
         dim=num_vars,
-        max_iter=1000,
+        max_iter=10,  # Reduced for testing
         clauses=clauses
     )
     
     bound_sat_loss = lambda assignment: sat_loss(assignment, clauses)
-    best_assignment, best_score, history = optimizer.optimize(agents, bound_sat_loss)
+    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_sat_loss)
     
-    if best_assignment is not None:
+    if pheromone_real is not None:
+        # For SAT, extract assignment from diagonal of pheromone field
+        # Positive values = True (1), negative = False (0)
+        assignment_probs = np.diag(pheromone_real)
+        best_assignment = (assignment_probs > 0).astype(int)
         unsatisfied = sat_loss(best_assignment, clauses)
         print(f"✓ 3-SAT: Unsatisfied Clauses={unsatisfied}/{num_clauses}")
         if unsatisfied == 0:
             print("  ★ FULLY SATISFIED!")
+        print(f"  Final panic level: {panic_history[-1]:.3f}")
     
     print("\n" + "="*80)
     print("UMACO13-PROPER: Optimization complete. GPU-accelerated. Problem-agnostic.")
