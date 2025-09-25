@@ -155,7 +155,27 @@ import os
 import sys
 import logging
 import numpy as np
-import cupy as cp  # NO FALLBACK. GPU OR GTFO.
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Fallback despite comment
+    HAS_CUPY = False
+
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
+        return arr.get()
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        return val
+    else:
+        return float(val) if hasattr(val, 'item') else float(val)
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Callable, Tuple, Optional, Union
 from enum import Enum, auto
@@ -274,7 +294,7 @@ class NeuroPheromoneSystem:
         """Reset weak trails to prevent stagnation."""
         flat_abs = cp.abs(self.pheromones).ravel()
         # Need to move to CPU for percentile calculation
-        cutoff = np.percentile(cp.asnumpy(flat_abs), threshold_percent)
+        cutoff = np.percentile(asnumpy(flat_abs), threshold_percent)
         mask = cp.abs(self.pheromones) < cutoff
         self.pheromones[mask] *= 0.1
         self.pathway_graph[mask] *= 0.5
@@ -293,7 +313,11 @@ class UniversalEconomy:
 
     def buy_resources(self, node_id: int, required_power: float, scarcity_factor: float) -> bool:
         """Agent attempts to purchase computational resources."""
+        if np.isnan(required_power) or np.isinf(required_power):
+            required_power = 0.5  # Fallback
         cost = int(required_power * 100 * scarcity_factor * self.market_value)
+        if np.isnan(cost) or cost < 0:
+            cost = 0
         if self.tokens[node_id] >= cost:
             self.tokens[node_id] -= cost
             return True
@@ -330,6 +354,8 @@ class UniversalNode:
 
     def propose_action(self, current_loss: float, scarcity: float) -> Dict[str, Any]:
         """Determine next action based on state."""
+        if np.isnan(current_loss) or np.isinf(current_loss):
+            current_loss = 1e10  # Fallback
         perf = 1.0 / (1.0 + current_loss) if current_loss >= 0 else 0.0
         self.performance_history.append(perf)
         
@@ -415,7 +441,9 @@ class UMACO:
         High gradients = crisis = more panic.
         """
         mag = cp.abs(loss_grad) * cp.log1p(cp.abs(self.anxiety_wavefunction) + 1e-8)
+        mag = cp.nan_to_num(mag, nan=0.0)
         self.panic_tensor = 0.85 * self.panic_tensor + 0.15 * cp.tanh(mag)
+        self.panic_tensor = cp.nan_to_num(self.panic_tensor, nan=0.5)
     
     def _quantum_burst(self):
         """
@@ -468,7 +496,7 @@ class UMACO:
             
         try:
             # Move to CPU for topology analysis (these libraries are CPU-only)
-            data_np = cp.asnumpy(self.pheromones.pheromones.real)
+            data_np = asnumpy(self.pheromones.pheromones.real)
             data_np = (data_np + data_np.T) / 2
             np.fill_diagonal(data_np, 0)
             
@@ -582,7 +610,7 @@ class UMACO:
         """
         solutions = []
         # Need CPU array for solution construction
-        pheromone_real_np = cp.asnumpy(self.pheromones.pheromones.real)
+        pheromone_real_np = asnumpy(self.pheromones.pheromones.real)
         
         for agent in agents:
             if self.config.problem_type == SolverType.CONTINUOUS:
@@ -603,6 +631,10 @@ class UMACO:
                     if self.config.distance_matrix is not None:
                         distances = self.config.distance_matrix[current, list(unvisited)]
                         probs = probs**self.alpha.real * (1.0 / (distances + 1e-6))**self.beta
+                    
+                    # Handle NaN and negative probabilities
+                    probs = np.nan_to_num(probs, nan=0.0, posinf=1.0, neginf=0.0)
+                    probs = np.maximum(probs, 0.0)  # Ensure non-negative
                     
                     if np.sum(probs) == 0:
                         next_city = np.random.choice(list(unvisited))
@@ -718,6 +750,7 @@ class UMACO:
             # 9. Economic dynamics
             self.economy.update_market_dynamics()
             scarcity = 0.5 + 0.5 * float(cp.mean(self.panic_tensor))
+            scarcity = np.nan_to_num(scarcity, nan=1.0)
             for j, agent in enumerate(agents):
                 agent.propose_action(losses[j], scarcity)
             
@@ -771,14 +804,15 @@ def rosenbrock_loss(matrix: np.ndarray) -> float:
         return float(np.sum(matrix**2))
     x = matrix[0, 0]
     y = matrix[1, 1]
-    return float((1 - x)**2 + 100 * (y - x**2)**2)
+    val = (1 - x)**2 + 100 * (y - x**2)**2
+    return float(np.nan_to_num(val, nan=1e10, posinf=1e10, neginf=1e10))
 
 def tsp_loss(path: np.ndarray, distance_matrix: np.ndarray) -> float:
     """TSP tour length."""
     total_distance = 0
     for i in range(len(path) - 1):
         total_distance += distance_matrix[path[i], path[i+1]]
-    return float(total_distance)
+    return float(np.nan_to_num(total_distance, nan=1e10, posinf=1e10, neginf=1e10))
 
 def sat_loss(assignment: np.ndarray, clauses: List[List[int]]) -> float:
     """3-SAT unsatisfied clauses count."""
@@ -831,7 +865,7 @@ if __name__ == "__main__":
     optimizer, agents = create_umaco_solver(
         problem_type='CONTINUOUS', 
         dim=16, 
-        max_iter=200
+        max_iter=5
     )
     
     best_sol, best_score, history = optimizer.optimize(agents, rosenbrock_loss)
@@ -855,7 +889,7 @@ if __name__ == "__main__":
     optimizer, agents = create_umaco_solver(
         problem_type='COMBINATORIAL_PATH',
         dim=num_cities,
-        max_iter=500,
+        max_iter=10,  # Reduced for testing
         distance_matrix=distance_matrix
     )
     

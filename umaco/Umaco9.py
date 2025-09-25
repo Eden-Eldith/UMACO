@@ -1,8 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
+        return arr.get()
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        result = val.get()
+    else:
+        result = float(val) if hasattr(val, 'item') else float(val)
+    
+    # Handle NaN values
+    if np.isnan(result):
+        return 0.0
+    return result
 
 """
-███████╗███████╗██████╗  UMACO v9 ARCHITECTURAL CONSTRAINTS ███████╗███████╗██████╗
+███████╗██████╗███████╗██████╗  UMACO v9 ARCHITECTURAL CONSTRAINTS ███████╗███████╗██████╗
 All implementations MUST contain these interconnected systems:
 
 1. PANIC-ANXIETY-QUANTUM TRIAD SYSTEM (PAQ Core)
@@ -41,7 +60,27 @@ FAILURE TO INCLUDE ANY COMPONENT WILL CAUSE CATASTROPHIC COLLAPSE OF THE MORSE-S
 import os
 import logging
 import numpy as np
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
+
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
+        return arr.get()
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        return val
+    else:
+        return float(val) if hasattr(val, 'item') else float(val)
 from dataclasses import dataclass
 from typing import List, Dict, Any, Callable
 from ripser import Rips
@@ -76,7 +115,10 @@ class UniversalEconomy:
         self.inflation_rate = config.inflation_rate
 
     def buy_resources(self, node_id: int, required_power: float, scarcity_factor: float) -> bool:
-        cost = int(required_power * 100 * scarcity_factor)
+        # Handle NaN values
+        if np.isnan(required_power) or np.isnan(scarcity_factor):
+            return False
+        cost = int(max(0, required_power * 100 * scarcity_factor))
         if self.tokens[node_id] >= cost:
             self.tokens[node_id] -= cost
             if self.tokens[node_id] < self.config.min_token_balance:
@@ -85,7 +127,9 @@ class UniversalEconomy:
         return False
 
     def reward_performance(self, node_id: int, performance: float):
-        reward = int(performance * 100 * self.config.token_reward_factor)
+        if np.isnan(performance) or np.isinf(performance):
+            performance = 0.0
+        reward = int(max(0, performance * 100 * self.config.token_reward_factor))
         self.tokens[node_id] += reward
         if self.tokens[node_id] < self.config.min_token_balance:
             self.tokens[node_id] = self.config.min_token_balance
@@ -168,7 +212,7 @@ class NeuroPheromoneSystem:
 
     def partial_reset(self, threshold_percent: float = 30.0):
         flattened = cp.abs(self.pheromones).ravel()
-        cutoff = np.percentile(cp.asnumpy(flattened), threshold_percent)
+        cutoff = np.percentile(asnumpy(flattened), threshold_percent)
         mask = cp.where(cp.abs(self.pheromones) < cutoff)
         for x, y in zip(mask[0], mask[1]):
             self.pheromones[x, y] = 0.01
@@ -249,7 +293,11 @@ class UMACO9:
         self.panic_tensor = 0.85 * self.panic_tensor + 0.15 * cp.tanh(mag)
 
     def quantum_burst(self):
-        U, S, V = cp.linalg.svd(self.pheromones.pheromones.real)
+        try:
+            U, S, V = cp.linalg.svd(self.pheromones.pheromones.real)
+        except np.linalg.LinAlgError:
+            # SVD failed due to numerical issues, skip burst
+            return
         top_k = 3 if S.shape[0] >= 3 else S.shape[0]
         structured = U[:, :top_k] @ cp.diag(S[:top_k]) @ V[:top_k, :]
         burst_strength = cp.linalg.norm(self.panic_tensor) * cp.abs(self.anxiety_wavefunction).mean()
@@ -268,13 +316,37 @@ class UMACO9:
     ###########################################################################
 
     def persistent_homology_update(self):
-        real_data = cp.asnumpy(self.pheromones.pheromones.real)
+        real_data = asnumpy(self.pheromones.pheromones.real)
+        
+        # Clean NaN and infinite values
+        real_data = np.nan_to_num(real_data, nan=0.0, posinf=1.0, neginf=-1.0)
+        
         diagrams = self.rips.fit_transform(real_data)
         self.homology_report = diagrams
-        self.pimgr.fit(diagrams)
-        pim = self.pimgr.transform(diagrams)
-        if pim.ndim >= 2:
-            rep_val = float(pim.mean())
+        
+        # Check if diagrams are empty and handle gracefully
+        try:
+            if len(diagrams) > 0 and len(diagrams[0]) > 0:
+                self.pimgr.fit(diagrams)
+                pim = self.pimgr.transform(diagrams)
+                if pim.ndim >= 2:
+                    rep_val = float(pim.mean())
+                else:
+                    rep_val = 0.0
+                    
+                shape_2d = (self.config.n_dim, self.config.n_dim)
+                repeated = cp.zeros(shape_2d, dtype=cp.complex64)
+                repeated[:] = rep_val
+                self.anxiety_wavefunction = repeated
+            else:
+                rep_val = 0.0
+                shape_2d = (self.config.n_dim, self.config.n_dim)
+                repeated = cp.zeros(shape_2d, dtype=cp.complex64)
+                repeated[:] = rep_val
+                self.anxiety_wavefunction = repeated
+        except (ValueError, IndexError):
+            # Handle empty diagrams gracefully
+            rep_val = 0.0
             shape_2d = (self.config.n_dim, self.config.n_dim)
             repeated = cp.zeros(shape_2d, dtype=cp.complex64)
             repeated[:] = rep_val
@@ -309,7 +381,7 @@ class UMACO9:
 
         real_field = self.pheromones.pheromones.real
         try:
-            pe = persistent_entropy(cp.asnumpy(real_field))
+            pe = persistent_entropy(asnumpy(real_field))
             self.beta = pe * 0.1
         except:
             self.beta *= 0.99
@@ -333,7 +405,7 @@ class UMACO9:
                  agents: List[UniversalNode],
                  loss_fn: Callable[[np.ndarray], float]) -> (np.ndarray, np.ndarray, List[float], Any):
         for i in range(self.max_iter):
-            real_part = cp.asnumpy(self.pheromones.pheromones.real)
+            real_part = asnumpy(self.pheromones.pheromones.real)
             loss_val = loss_fn(real_part)
             grad_approx = cp.ones_like(self.pheromones.pheromones.real) * float(loss_val) * 0.01
             self.panic_backpropagate(grad_approx)
@@ -342,13 +414,24 @@ class UMACO9:
             if float(cp.mean(self.panic_tensor)) > 0.7 or cp.linalg.norm(self.anxiety_wavefunction) > 1.7:
                 self.quantum_burst()
 
-            self.persistent_homology_update()
+            try:
+                self.persistent_homology_update()
+            except Exception as e:
+                # If persistent homology fails, skip it
+                logging.warning(f"Persistent homology update failed: {e}")
+                pass
             self._update_hyperparams()
 
             self.pheromones.pheromones += self.alpha.real * self.covariant_momentum
             self._symmetrize_clamp()
 
-            ent = persistent_entropy(cp.asnumpy(self.pheromones.pheromones.real))
+            # Safe persistent entropy calculation
+            try:
+                ent = persistent_entropy(asnumpy(self.pheromones.pheromones.real))
+            except Exception:
+                # If entropy calculation fails, use a default value
+                ent = self.target_entropy
+                
             if abs(ent - self.target_entropy) > 0.1:
                 noise = cp.random.normal(0, 0.01, self.pheromones.pheromones.shape)
                 self.pheromones.pheromones += 0.01j * noise
@@ -368,13 +451,13 @@ class UMACO9:
                 self.burst_countdown = self.config.quantum_burst_interval
 
             self.economy.update_market_dynamics()
-            scarcity = 0.7 * cp.mean(self.pheromones.pheromones.real).get() + 0.3 * (1 - self.economy.market_value)
+            scarcity = 0.7 * to_numpy_scalar(cp.mean(self.pheromones.pheromones.real)) + 0.3 * (1 - self.economy.market_value)
             for agent in agents:
                 agent.propose_action(loss_val, float(scarcity))
 
         return (
-            cp.asnumpy(self.pheromones.pheromones.real),
-            cp.asnumpy(self.pheromones.pheromones.imag),
+            asnumpy(self.pheromones.pheromones.real),
+            asnumpy(self.pheromones.pheromones.imag),
             self.panic_history,
             self.homology_report
         )

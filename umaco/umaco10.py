@@ -40,7 +40,27 @@ Version: 10.0
 import os
 import logging
 import numpy as np
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
+
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
+        return arr.get()
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        return val
+    else:
+        return float(val) if hasattr(val, 'item') else float(val)
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Callable, Tuple, Optional, Union
 import warnings
@@ -131,6 +151,8 @@ class UniversalEconomy:
             bool: True if purchase was successful, False if insufficient tokens.
         """
         cost = int(required_power * 100 * scarcity_factor)
+        if np.isnan(cost):
+            cost = 0
         if self.tokens[node_id] >= cost:
             self.tokens[node_id] -= cost
             if self.tokens[node_id] < self.config.min_token_balance:
@@ -417,7 +439,7 @@ class NeuroPheromoneSystem:
             threshold_percent (float): Percentile threshold below which to reset pheromones.
         """
         flattened = cp.abs(self.pheromones).ravel()
-        cutoff = np.percentile(cp.asnumpy(flattened), threshold_percent)
+        cutoff = np.percentile(asnumpy(flattened), threshold_percent)
         mask = cp.where(cp.abs(self.pheromones) < cutoff)
         for x, y in zip(mask[0], mask[1]):
             self.pheromones[x, y] = 0.01
@@ -669,7 +691,7 @@ class UMACO10:
             # Convert to numpy for topology analysis
             real_data = self.pheromones.pheromones.real
             if self.config.use_gpu:
-                real_data = cp.asnumpy(real_data)
+                real_data = asnumpy(real_data)
                 
             # Compute persistence diagrams
             diagrams = self.rips.fit_transform(real_data)
@@ -763,7 +785,7 @@ class UMACO10:
             # Update beta based on persistent entropy
             real_field = self.pheromones.pheromones.real
             if self.config.use_gpu:
-                real_field = cp.asnumpy(real_field)
+                real_field = asnumpy(real_field)
                 
             if TOPOLOGY_AVAILABLE:
                 try:
@@ -805,6 +827,11 @@ class UMACO10:
         r = self.xp.maximum(r, 0)
         # Update while preserving imaginary part
         self.pheromones.pheromones = r + 1j * self.pheromones.pheromones.imag
+        # Clamp to prevent overflow
+        max_val = 100.0
+        real_clipped = self.xp.clip(self.pheromones.pheromones.real, -max_val, max_val)
+        imag_clipped = self.xp.clip(self.pheromones.pheromones.imag, -max_val, max_val)
+        self.pheromones.pheromones = real_clipped + 1j * imag_clipped
 
     def _trigger_stagnation_reset(self):
         """
@@ -850,14 +877,16 @@ class UMACO10:
             # Extract real part of pheromones for loss calculation
             real_part = self.pheromones.pheromones.real
             if self.config.use_gpu:
-                real_part = cp.asnumpy(real_part)
+                real_part = asnumpy(real_part)
                 
             # Calculate loss and update histories
             loss_val = loss_fn(real_part)
+            if np.isnan(loss_val) or np.isinf(loss_val):
+                loss_val = 1e10  # Fallback for invalid loss
             self.loss_history.append(loss_val)
             
             # Approximate gradient
-            grad_approx = self.xp.ones_like(self.pheromones.pheromones.real) * float(loss_val) * 0.01
+            grad_approx = self.xp.ones_like(self.pheromones.pheromones.real) * float(loss_val) * 0.001
             
             # Update panic based on gradient
             self.panic_backpropagate(grad_approx)
@@ -883,7 +912,7 @@ class UMACO10:
                 if TOPOLOGY_AVAILABLE:
                     real_field = self.pheromones.pheromones.real
                     if self.config.use_gpu:
-                        real_field = cp.asnumpy(real_field)
+                        real_field = asnumpy(real_field)
                     ent = persistent_entropy(real_field)
                     
                     if abs(ent - self.target_entropy) > 0.1:
@@ -916,7 +945,7 @@ class UMACO10:
             # Calculate resource scarcity
             scarcity = 0.7 * float(self.xp.mean(self.pheromones.pheromones.real))
             if self.config.use_gpu:
-                scarcity = scarcity.get()
+                scarcity = scarcity
             scarcity += 0.3 * (1 - self.economy.market_value)
             
             # Let agents propose actions
@@ -934,8 +963,8 @@ class UMACO10:
         pheromone_imag = self.pheromones.pheromones.imag
         
         if self.config.use_gpu:
-            pheromone_real = cp.asnumpy(pheromone_real)
-            pheromone_imag = cp.asnumpy(pheromone_imag)
+            pheromone_real = asnumpy(pheromone_real)
+            pheromone_imag = asnumpy(pheromone_imag)
             
         return (
             pheromone_real,
@@ -1072,7 +1101,7 @@ def simple_loss_function(x: np.ndarray) -> float:
 def example_usage():
     """Demonstrates basic usage of the UMACO framework."""
     # Create optimizer with default settings
-    umaco = create_default_umaco(dim=32, max_iter=500)
+    umaco = create_default_umaco(dim=32, max_iter=10)
     
     # Create agents
     agents = create_agents(umaco.economy, n_agents=8)

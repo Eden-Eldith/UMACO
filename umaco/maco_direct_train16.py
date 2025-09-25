@@ -22,7 +22,27 @@ import os
 import logging
 import numpy as np
 import torch
-import cupy as cp
+try:
+    import cupy as cp
+    HAS_CUPY = True
+except ImportError:
+    import numpy as cp  # Use numpy as fallback
+    HAS_CUPY = False
+
+# Compatibility layer for cupy functions
+def asnumpy(arr):
+    """Convert cupy array to numpy array, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has  method
+        return arr
+    else:
+        return arr  # Already numpy or numpy-compatible
+
+def to_numpy_scalar(val):
+    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
+    if HAS_CUPY and hasattr(val, 'get'):
+        return val
+    else:
+        return float(val) if hasattr(val, 'item') else float(val)
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple, Union, Any
 from torch.utils.data import DataLoader
@@ -770,7 +790,7 @@ class NeuroPheromoneSystem:
             sum_strength = cp.sum(combined_strength)
             if sum_strength > 0:
                 probs = combined_strength / sum_strength
-                probs_np = cp.asnumpy(probs)
+                probs_np = asnumpy(probs)
                 next_pos = np.random.choice(self.dimensions, p=probs_np)
             else:
                 next_pos = np.random.randint(0, self.dimensions)
@@ -800,7 +820,7 @@ class NeuroPheromoneSystem:
             col = int(idx) % self.dimensions
             self.pheromone_tensor[row, col] = self.config.initial_pheromone * (0.5 + 0.5 * cp.random.random())
         # Reduce weak pathways
-        pathway_array = cp.asnumpy(self.pathway_graph)
+        pathway_array = asnumpy(self.pathway_graph)
         threshold = np.percentile(pathway_array, 30)
         weak_pathways = cp.where(self.pathway_graph < threshold)
         self.pathway_graph[weak_pathways] *= 0.5
