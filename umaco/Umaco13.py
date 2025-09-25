@@ -335,7 +335,7 @@ class NeuroPheromoneSystem(BaseNeuroPheromoneSystem):
             deposit_amt = intensity * (performance ** 2)
             for i in range(len(path) - 1):
                 a, b = path[i], path[i+1]
-                if 0 <= a < self.config.n_dim and 0 <= b < self.config.n_dim:
+                if 0 <= int(a) < int(self.config.n_dim) and 0 <= int(b) < int(self.config.n_dim):
                     self.pheromones[a, b] += deposit_amt
                     self.pathway_graph[a, b] += 0.1 * performance
 
@@ -635,38 +635,52 @@ class UMACO:
             np.fill_diagonal(data_np, 0)
             
             # Compute persistence diagrams
-            diagrams = self.rips(data_np, distance_matrix=True)
+            diagrams_result = self.rips(data_np, distance_matrix=True)
+            diagrams = diagrams_result['dgms']  # Extract the actual diagrams list
             self.homology_report = diagrams
             
-            # Check if diagrams are empty and handle gracefully
+            # Filter out infinite values and prepare diagrams for PersistenceImager
+            filtered_diagrams = []
+            for dgm in diagrams:
+                if len(dgm) > 0:
+                    # Remove points with infinite death times
+                    finite_mask = np.isfinite(dgm[:, 1])
+                    if np.any(finite_mask):
+                        filtered_dgm = dgm[finite_mask]
+                        filtered_diagrams.append(filtered_dgm)
+            
+            # Try to use PersistenceImager, but fall back to simple statistics if it fails
             try:
-                if len(diagrams) > 0 and len(diagrams[0]) > 0:
-                    self.pimgr.fit(diagrams)
-                    pim = self.pimgr.transform(diagrams)
+                if len(filtered_diagrams) > 0 and len(filtered_diagrams[0]) > 0:
+                    self.pimgr.fit(filtered_diagrams)
+                    pim = self.pimgr.transform(filtered_diagrams)
                     if pim.ndim >= 2:
                         rep_val = float(pim.mean())
                     else:
                         rep_val = 0.0
-                        
-                    shape_like = self.anxiety_wavefunction.shape
-                    repeated = cp.zeros(shape_like, dtype=cp.complex64)
-                    repeated[:] = rep_val
-                    self.anxiety_wavefunction = repeated
                 else:
                     rep_val = 0.0
-                    shape_like = self.anxiety_wavefunction.shape
-                    repeated = cp.zeros(shape_like, dtype=cp.complex64)
-                    repeated[:] = rep_val
-                    self.anxiety_wavefunction = repeated
-            except (ValueError, IndexError):
-                # Handle empty diagrams gracefully
-                rep_val = 0.0
-                shape_like = self.anxiety_wavefunction.shape
-                repeated = cp.zeros(shape_like, dtype=cp.complex64)
-                repeated[:] = rep_val
-                self.anxiety_wavefunction = repeated
-            else:
-                self.anxiety_wavefunction = cp.zeros_like(self.anxiety_wavefunction)
+            except Exception as e:
+                logger.debug(f"PersistenceImager failed: {e}. Using diagram statistics.")
+                # Fallback: use statistics from the diagrams directly
+                if len(filtered_diagrams) > 0:
+                    all_persistences = []
+                    for dgm in filtered_diagrams:
+                        if len(dgm) > 0:
+                            pers = dgm[:, 1] - dgm[:, 0]  # persistence = death - birth
+                            all_persistences.extend(pers)
+                    if all_persistences:
+                        rep_val = float(np.mean(all_persistences))
+                    else:
+                        rep_val = 0.0
+                else:
+                    rep_val = 0.0
+                    
+            # Update anxiety wavefunction with the representative value
+            shape_like = self.anxiety_wavefunction.shape
+            repeated = cp.zeros(shape_like, dtype=cp.complex64)
+            repeated[:] = rep_val
+            self.anxiety_wavefunction = repeated
 
             lifetimes = []
             for d in diagrams:
@@ -792,31 +806,40 @@ class UMACO:
         
         for agent in agents:
             if self.config.problem_type == SolverType.CONTINUOUS:
-                # For continuous optimization, sample x,y coordinates independently from marginal distributions
-                if self.config.problem_dim is not None and self.config.problem_dim != self.config.n_dim:
-                    # Compute marginal distributions for x and y
-                    x_marginal = np.sum(pheromone_real_np, axis=1)  # Sum over y for each x
-                    y_marginal = np.sum(pheromone_real_np, axis=0)  # Sum over x for each y
-                    
-                    # Add small noise to avoid deterministic sampling
+                # For continuous optimization, sample parameters from pheromone distributions
+                if self.config.problem_dim is not None:
+                    # Sample problem_dim parameters from the pheromone matrix
+                    solution = np.zeros(self.config.problem_dim)
+                    for i in range(self.config.problem_dim):
+                        # Use row i of the pheromone matrix as probability distribution
+                        row_probs = pheromone_real_np[i % self.config.n_dim, :]
+                        # Clean the row: replace NaN/inf with small positive values
+                        row_probs = np.nan_to_num(row_probs, nan=1e-6, posinf=1.0, neginf=1e-6)
+                        # Ensure non-negative
+                        row_probs = np.maximum(row_probs, 1e-6)
+                        # Normalize to probabilities
+                        row_probs = row_probs / (np.sum(row_probs) + 1e-9)
+                        # Ensure no NaN in final probabilities
+                        row_probs = np.nan_to_num(row_probs, nan=1.0/self.config.n_dim)
+                        row_probs = row_probs / np.sum(row_probs)
+                        
+                        # Sample index and map to parameter value [0, 2]
+                        idx = np.random.choice(len(row_probs), p=row_probs)
+                        param_val = (idx / (len(row_probs) - 1)) * 2
+                        solution[i] = param_val
+                else:
+                    # Fallback: use 2D solution
+                    x_marginal = np.sum(pheromone_real_np, axis=1)
+                    y_marginal = np.sum(pheromone_real_np, axis=0)
                     x_marginal = np.maximum(x_marginal + np.random.normal(0, 0.01, size=x_marginal.shape), 0)
                     y_marginal = np.maximum(y_marginal + np.random.normal(0, 0.01, size=y_marginal.shape), 0)
-                    
-                    # Normalize to probabilities
                     x_probs = x_marginal / (np.sum(x_marginal) + 1e-9)
                     y_probs = y_marginal / (np.sum(y_marginal) + 1e-9)
-                    
-                    # Sample x and y indices independently
                     x_idx = np.random.choice(len(x_probs), p=x_probs)
                     y_idx = np.random.choice(len(y_probs), p=y_probs)
-                    
-                    # Map matrix indices back to parameter space [0, 2]
                     x_val = (x_idx / (len(x_probs) - 1)) * 2
                     y_val = (y_idx / (len(y_probs) - 1)) * 2
                     solution = np.array([x_val, y_val])
-                else:
-                    # Use the entire matrix for backward compatibility
-                    solution = pheromone_real_np
                 solutions.append(solution)
                 
             elif self.config.problem_type == SolverType.COMBINATORIAL_PATH:
@@ -870,10 +893,10 @@ class UMACO:
     # =========================================================================
     
     def optimize(self, agents: List[BaseUniversalNode], 
-                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, np.ndarray, List[float], Any]:
+                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, np.ndarray, List[float], List[float], Any]:
         """
         Main optimization loop. This is where everything comes together.
-        Returns: (pheromone_real, pheromone_imag, panic_history, homology_report)
+        Returns: (pheromone_real, pheromone_imag, panic_history, loss_history, homology_report)
         """
         logger.info(f"Starting GPU-accelerated optimization: {len(agents)} agents, {self.config.max_iter} iterations")
         
@@ -975,6 +998,7 @@ class UMACO:
             asnumpy(self.pheromones.pheromones.real),
             asnumpy(self.pheromones.pheromones.imag),
             self.history['panic'],
+            self.history['loss'],  # Return loss history for visualization
             self.homology_report
         )
 
@@ -1003,6 +1027,8 @@ def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) ->
         config_params['num_clauses'] = len(kwargs.get('clauses', []))
     elif solver_mode == SolverType.COMBINATORIAL_PATH:
         config_params['distance_matrix'] = kwargs.get('distance_matrix')
+    elif solver_mode == SolverType.CONTINUOUS:
+        config_params['problem_dim'] = kwargs.get('problem_dim', 2)  # Default to 2D for continuous
     
     # Set problem_dim for continuous problems
     if solver_mode == SolverType.CONTINUOUS:
