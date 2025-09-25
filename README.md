@@ -15,7 +15,10 @@
 
 
 
-### ** UPDATE**: UMACO has evolved into **UMACO13**, a unified, production-ready optimization framework with comprehensive testing, benchmarking, and visualization capabilities.
+###  UPDATE: 
+
+UMACO has evolved into **UMACO13**, a unified, production-ready optimization framework with comprehensive testing, benchmarking, and visualization capabilities.
+
 ### 25/09/2025
 
 I have ensured all if not most files run as intended, however I either require help getting it all working, or need to learn more myself and get this finished, any help would be much appreciated. 
