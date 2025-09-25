@@ -5,13 +5,14 @@
 ![UMACO Logo](https://github.com/user-attachments/assets/11a19c53-e374-497b-8903-30a9c20ddf91)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-10.0-blue)](https://github.com/EdenEldith/umaco)
+[![Version](https://img.shields.io/badge/version-15.0-blue)](https://github.com/EdenEldith/umaco)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Created By](https://img.shields.io/badge/created%20by-Eden%20Eldith-purple)](https://github.com/EdenEldith)
 ![AI-First Framework](https://img.shields.io/badge/AI--First-Framework-blueviolet)
 
 </div>
-
+#### *25/09/2025*
+I have ensured all if not most files run as intended, however I either require help getting it all working, or need to leanr more myself and get this finished, any help would be much appreciated. 
 ## What is UMACO?
 
 UMACO (Universal Multi-Agent Cognitive Optimization) is an AI-first framework specifically designed to be refactored and adapted by Large Language Models (LLMs) to solve domain-specific optimization problems. Unlike traditional libraries that you install and use directly, UMACO serves as a template that LLMs can understand and modify to address your unique optimization challenges.
