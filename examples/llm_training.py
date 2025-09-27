@@ -33,16 +33,27 @@ from maco_direct_train16 import (
     EnhancedCognitiveNode, NeuroPheromoneSystem
 )
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("maco_llm_training.log"),
-        logging.StreamHandler()
-    ]
-)
 logger = logging.getLogger(__name__)
+
+
+def _configure_logger() -> None:
+    if logger.handlers:
+        return
+
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    file_handler = logging.FileHandler("maco_llm_training.log")
+    file_handler.setFormatter(formatter)
+
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
 
 def collate_fn(batch_texts, tokenizer, max_length=256):
     """Prepare batches for training."""
@@ -51,6 +62,7 @@ def collate_fn(batch_texts, tokenizer, max_length=256):
     return enc
 
 def main():
+    _configure_logger()
     parser = argparse.ArgumentParser(description="MACO-LLM Training Script")
     parser.add_argument("--config", type=str, default=None, help="Path to config JSON file")
     parser.add_argument("--model_name", type=str, default="microsoft/phi-2", help="Model to fine-tune")

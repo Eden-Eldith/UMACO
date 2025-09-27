@@ -33,15 +33,6 @@ import umaco_gpu_utils as gpu_utils
 cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 import matplotlib.pyplot as plt
 
-# ----------------------
-#   LOGGING CONFIG
-# ----------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S"
-)
-
 
 # ----------------------
 #   CONFIG CLASS
@@ -426,6 +417,11 @@ void build_paths(
 #       MAIN
 # ----------------------
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        datefmt="%H:%M:%S"
+    )
     # Example usage with default config
     config = ProteinFoldingConfig(
         grid_size=100,
