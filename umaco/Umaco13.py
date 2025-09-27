@@ -200,11 +200,6 @@ except ImportError:
     TOPOLOGY_AVAILABLE = False
     print("Warning: Topology packages not found. Install with: pip install ripser persim")
 
-# Configure Logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
 logger = logging.getLogger("UMACO13-PROPER")
 
 

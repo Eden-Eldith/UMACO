@@ -60,12 +60,8 @@ except ImportError:
                  "pip install ripser persim", ImportWarning)
     TOPOLOGY_AVAILABLE = False
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger("UMACO")
+
+logger = logging.getLogger(__name__)
 
 ###############################################################################
 #                         UNIVERSAL ECONOMY & AGENTS                          #
@@ -1106,4 +1102,8 @@ def example_usage():
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
     example_usage()
