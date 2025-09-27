@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "umaco"
+dynamic = ["version", "description", "readme", "dependencies", "optional-dependencies"]
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [{ name = "Eden Eldith", email = "pcobrien@hotmail.co.uk" }]
+urls = {
+  Documentation = "https://github.com/Eden-Eldith/UMACO#readme",
+  Source = "https://github.com/Eden-Eldith/UMACO",
+  Tracker = "https://github.com/Eden-Eldith/UMACO/issues"
+}
+
+[tool.setuptools]
+include-package-data = true
+py-modules = ["Umaco13", "universal_solver", "umaco_gpu_utils"]
+
+[tool.setuptools.packages.find]
+include = ["umaco", "umaco.*"]

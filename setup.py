@@ -1,11 +1,37 @@
-from setuptools import setup, find_packages
+from pathlib import Path
+from typing import Dict
 
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+from setuptools import find_packages, setup
+
+
+BASE_DIR = Path(__file__).parent
+
+
+def read_long_description() -> str:
+    with open(BASE_DIR / "README.md", "r", encoding="utf-8") as fh:
+        return fh.read()
+
+
+def read_version() -> str:
+    version_ns: Dict[str, str] = {}
+    init_path = BASE_DIR / "umaco" / "__init__.py"
+    with open(init_path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            if line.strip().startswith("__version__"):
+                exec(line, version_ns)
+                break
+    version = version_ns.get("__version__")
+    if not version:
+        raise RuntimeError("Unable to determine package version from umaco/__init__.py")
+    return version
+
+
+long_description = read_long_description()
+version = read_version()
 
 setup(
     name="umaco",
-    version="0.1.0",
+    version=version,
     author="Eden Eldith",
     author_email="pcobrien@hotmail.co.uk",
     description="Universal Multi-Agent Cognitive Optimization",
@@ -14,7 +40,9 @@ setup(
     url="https://github.com/Eden-Eldith/UMACO",
     license="MIT",
     license_files=("LICENSE",),
-    packages=find_packages(),
+    packages=find_packages(include=("umaco", "umaco.*")),
+    py_modules=["Umaco13", "universal_solver", "umaco_gpu_utils"],
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -28,6 +56,9 @@ setup(
         "matplotlib>=3.5.0",
         "ripser>=0.6.0",
         "persim>=0.3.0",
+        "scipy>=1.7.0",
+        "cma>=3.1.0",
+        "networkx>=2.6.0",
     ],
     extras_require={
         "llm": [
@@ -39,5 +70,10 @@ setup(
             "bitsandbytes>=0.41.0",
         ],
         "gpu": ["cupy-cuda11x>=11.0.0"],
-    }
+    },
+    project_urls={
+        "Documentation": "https://github.com/Eden-Eldith/UMACO#readme",
+        "Source": "https://github.com/Eden-Eldith/UMACO",
+        "Tracker": "https://github.com/Eden-Eldith/UMACO/issues",
+    },
 )

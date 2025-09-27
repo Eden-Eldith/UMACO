@@ -215,39 +215,64 @@ void evaluate_assignments_kernel(
     const int num_ants,
     const int* assignments,
     const float* clause_weights,
-    float* out_quality
+    float* satisfied_out,
+    float* weight_out
 )
 {
-    int ant_id = blockDim.x * blockIdx.x + threadIdx.x;
-    if (ant_id >= num_ants) return;
+    int ant_id = blockIdx.x;
+    int clause_idx = blockIdx.y * blockDim.x + threadIdx.x;
 
-    float sum_weights = 0.0f;
-    float sum_satisfied = 0.0f;
+    if (ant_id >= num_ants) {
+        return;
+    }
 
-    for (int c = 0; c < num_clauses; c++) {
-        float w = clause_weights[c];
+    extern __shared__ float shared[];
+    float* weight_shared = shared;
+    float* satisfied_shared = shared + blockDim.x;
+
+    float weight_val = 0.0f;
+    float satisfied_val = 0.0f;
+
+    if (clause_idx < num_clauses) {
+        float w = clause_weights[clause_idx];
+        weight_val = w;
+
         bool clause_satisfied = false;
-
+        int base = clause_idx * max_clause_size;
         for (int j = 0; j < max_clause_size; j++) {
-            int lit = clause_array[c * max_clause_size + j];
+            int lit = clause_array[base + j];
             if (lit == 0) break;
 
-            int var_idx = abs(lit) - 1;
-            bool assigned_true = (assignments[ant_id * num_vars + var_idx] == 1);
-
-            if ((lit > 0 && assigned_true) || (lit < 0 && !assigned_true)) {
+            int var_idx = (lit > 0 ? lit : -lit) - 1;
+            int assigned_true = assignments[ant_id * num_vars + var_idx];
+            bool literal_satisfied = (lit > 0 && assigned_true == 1) || (lit < 0 && assigned_true == 0);
+            if (literal_satisfied) {
                 clause_satisfied = true;
                 break;
             }
         }
 
-        sum_weights += w;
         if (clause_satisfied) {
-            sum_satisfied += w;
+            satisfied_val = w;
         }
     }
 
-    out_quality[ant_id] = (sum_weights > 1e-9f) ? (sum_satisfied / sum_weights) : 0.0f;
+    weight_shared[threadIdx.x] = weight_val;
+    satisfied_shared[threadIdx.x] = satisfied_val;
+    __syncthreads();
+
+    for (int stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) {
+            weight_shared[threadIdx.x] += weight_shared[threadIdx.x + stride];
+            satisfied_shared[threadIdx.x] += satisfied_shared[threadIdx.x + stride];
+        }
+        __syncthreads();
+    }
+
+    if (threadIdx.x == 0) {
+        atomicAdd(&weight_out[ant_id], weight_shared[0]);
+        atomicAdd(&satisfied_out[ant_id], satisfied_shared[0]);
+    }
 }
 ''', 'evaluate_assignments_kernel')
 
@@ -282,26 +307,48 @@ void pheromone_update_kernel(
     const int num_ants
 )
 {
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    if (idx >= num_ants) return;
+    int var = blockIdx.x;
+    if (var >= num_vars) {
+        return;
+    }
 
-    float q = qualities[idx];
-    float scaledQ = powf(q, 1.5f);
+    int ant_idx = blockIdx.y * blockDim.x + threadIdx.x;
 
-    // Each thread processes exactly one ant. We still need to update all variables for that ant.
-    // This is a partial approach. If performance is an issue, consider a 2D kernel. 
-    for (int v = 0; v < num_vars; v++) {
-        int chosen_val = assignments[idx * num_vars + v];
+    extern __shared__ float shared[];
+    float* false_buf = shared;
+    float* true_buf = shared + blockDim.x;
 
-        // Calculate deposit amount
-        float deposit = alpha * scaledQ;
+    float deposit_false = 0.0f;
+    float deposit_true = 0.0f;
 
-        // Atomic deposit - thread-safe pheromone updates
+    if (ant_idx < num_ants) {
+        float q = qualities[ant_idx];
+        float scaled_q = powf(q, 1.5f);
+        float deposit = alpha * scaled_q;
+
+        int chosen_val = assignments[ant_idx * num_vars + var];
         if (chosen_val == 1) {
-            atomicAdd(&pheromones[v*2 + 1], deposit);
+            deposit_true = deposit;
         } else {
-            atomicAdd(&pheromones[v*2 + 0], deposit);
+            deposit_false = deposit;
         }
+    }
+
+    false_buf[threadIdx.x] = deposit_false;
+    true_buf[threadIdx.x] = deposit_true;
+    __syncthreads();
+
+    for (int stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) {
+            false_buf[threadIdx.x] += false_buf[threadIdx.x + stride];
+            true_buf[threadIdx.x] += true_buf[threadIdx.x + stride];
+        }
+        __syncthreads();
+    }
+
+    if (threadIdx.x == 0) {
+        atomicAdd(&pheromones[var * 2 + 0], false_buf[0]);
+        atomicAdd(&pheromones[var * 2 + 1], true_buf[0]);
     }
 }
 ''', 'pheromone_update_kernel')
@@ -365,13 +412,18 @@ void gpu_local_search_kernel(
     const int max_clause_size,
     const int num_vars,
     const int num_ants,
+    const int num_selected,
     const int max_flips,
     const float temperature,
+    const int* selected_indices,
     int* assignments
 )
 {
-    int ant_id = blockDim.x * blockIdx.x + threadIdx.x;
-    if (ant_id >= num_ants) return;
+    int local_idx = blockDim.x * blockIdx.x + threadIdx.x;
+    if (local_idx >= num_selected) return;
+
+    int ant_id = selected_indices[local_idx];
+    if (ant_id < 0 || ant_id >= num_ants) return;
 
     unsigned long long rng = 88172645463325252ULL ^ ((unsigned long long)(ant_id+1) * 1099511628211ULL);
 
@@ -501,27 +553,52 @@ void coverage_count_kernel(
     int* coverage_count
 )
 {
-    // One thread per (ant,clause) pair
-    int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    if (idx >= num_ants * num_clauses) return;
-
-    int ant_id = idx / num_clauses;
-    int c      = idx % num_clauses;
-
-    bool satisfied = false;
-    for (int j = 0; j < max_clause_size; j++) {
-        int lit = clause_array[c * max_clause_size + j];
-        if (lit == 0) break;
-
-        int var_idx = abs(lit) - 1;
-        bool assigned_true = (assignments[ant_id * num_vars + var_idx] == 1);
-        if ((lit > 0 && assigned_true) || (lit < 0 && !assigned_true)) {
-            satisfied = true;
-            break;
-        }
+    int clause_idx = blockIdx.x;
+    if (clause_idx >= num_clauses) {
+        return;
     }
-    if (satisfied) {
-        atomicAdd(&coverage_count[c], 1);
+
+    int ant_idx = blockIdx.y * blockDim.x + threadIdx.x;
+
+    extern __shared__ int shared[];
+    int* clause_shared = shared;
+    int* satisfied_shared = shared + max_clause_size;
+
+    for (int j = threadIdx.x; j < max_clause_size; j += blockDim.x) {
+        clause_shared[j] = clause_array[clause_idx * max_clause_size + j];
+    }
+    __syncthreads();
+
+    int satisfied = 0;
+    if (ant_idx < num_ants) {
+        bool clause_sat = false;
+        for (int j = 0; j < max_clause_size; j++) {
+            int lit = clause_shared[j];
+            if (lit == 0) break;
+
+            int var_idx = (lit > 0 ? lit : -lit) - 1;
+            int assigned_true = assignments[ant_idx * num_vars + var_idx];
+            bool literal_satisfied = (lit > 0 && assigned_true == 1) || (lit < 0 && assigned_true == 0);
+            if (literal_satisfied) {
+                clause_sat = true;
+                break;
+            }
+        }
+        satisfied = clause_sat ? 1 : 0;
+    }
+
+    satisfied_shared[threadIdx.x] = satisfied;
+    __syncthreads();
+
+    for (int stride = blockDim.x >> 1; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) {
+            satisfied_shared[threadIdx.x] += satisfied_shared[threadIdx.x + stride];
+        }
+        __syncthreads();
+    }
+
+    if (threadIdx.x == 0) {
+        atomicAdd(&coverage_count[clause_idx], satisfied_shared[0]);
     }
 }
 ''', 'coverage_count_kernel')
@@ -581,6 +658,9 @@ class MACOSystem:
         self.clause_lr = config.conflict_driven_learning_rate
         self.clause_weight_momentum = config.clause_weight_momentum
 
+        self._entropy_ema: Optional[float] = None
+        self.adaptation_history: List[Dict[str, float]] = []
+
         device_id = config.gpu_device_id
         if GPU_AVAILABLE:
             cp.cuda.Device(device_id).use()
@@ -600,6 +680,7 @@ class MACOSystem:
         self.pheromones_gpu: Optional[Any] = None
         self.assignments_gpu: Optional[Any] = None
         self.qualities_gpu: Optional[Any] = None
+        self.quality_weight_gpu: Optional[Any] = None
         self.coverage_count_gpu: Optional[Any] = None
 
         self.best_quality_so_far = 0.0
@@ -626,6 +707,7 @@ class MACOSystem:
         # Ant assignments and qualities
         self.assignments_gpu = cp.zeros((self.config.n_ants, self.num_vars), dtype=cp.int32)
         self.qualities_gpu = cp.zeros((self.num_ants,), dtype=cp.float32)
+        self.quality_weight_gpu = cp.zeros((self.num_ants,), dtype=cp.float32)
 
         # coverage counts for GPU-based clause coverage
         self.coverage_count_gpu = cp.zeros((self.num_clauses,), dtype=cp.int32)
@@ -759,42 +841,74 @@ class MACOSystem:
         - Periodic sinusoidal variation in beta
         """
         current_entropy = self._compute_entropy()
-        ent_diff = self.config.target_entropy - current_entropy
+
+        smoothing = 0.2
+        if self._entropy_ema is None:
+            self._entropy_ema = current_entropy
+        else:
+            self._entropy_ema = smoothing * current_entropy + (1.0 - smoothing) * self._entropy_ema
+
+        smoothed_entropy = self._entropy_ema
+        ent_diff = self.config.target_entropy - smoothed_entropy
+
+        noise_delta = max(-0.02, min(0.02, -0.01 * ent_diff))
+        alpha_delta = max(-0.2, min(0.2, 0.02 * ent_diff))
+        rho_delta = max(-0.05, min(0.05, -0.01 * ent_diff))
 
         # Noise adjusts inversely with entropy difference
-        self.config.noise_std = max(0.01, min(0.1, self.config.noise_std + 0.01 * (-ent_diff)))
+        self.config.noise_std = max(0.01, min(0.1, self.config.noise_std + noise_delta))
 
         # alpha and rho shift based on ent_diff
-        self.alpha = max(2.0, min(6.0, self.alpha + 0.02 * ent_diff))
-        self.rho   = max(0.01, min(0.5, self.rho - 0.01 * ent_diff))
+        self.alpha = max(2.0, min(6.0, self.alpha + alpha_delta))
+        self.rho = max(0.01, min(0.5, self.rho + rho_delta))
 
         # Beta modulated by iteration-based sine wave
         cycle = 2.0 * math.pi * (float(iteration) / self.config.max_iterations)
         sin_mod = 0.5 + 0.5 * math.sin(cycle)
         self.beta = max(1.0, min(3.0, 1.8 + 0.2 * sin_mod))
 
+        self.adaptation_history.append(
+            {
+                "iteration": iteration,
+                "entropy": float(current_entropy),
+                "entropy_ema": float(smoothed_entropy),
+                "alpha": float(self.alpha),
+                "rho": float(self.rho),
+                "noise_std": float(self.config.noise_std),
+            }
+        )
+
+        logging.debug(
+            "Adapt step | iter=%d | entropy=%.4f | ema=%.4f | alpha=%.3f | rho=%.3f | noise=%.3f",
+            iteration,
+            current_entropy,
+            smoothed_entropy,
+            self.alpha,
+            self.rho,
+            self.config.noise_std,
+        )
+
     def _apply_partial_pheromone_reset(self) -> None:
         """
         Partially resets pheromones below a certain quantile, per ZVSS logic.
         """
-        ph = self.pheromones_gpu.ravel()
-        ph_cpu = ph
-        cutoff_idx = int(len(ph_cpu) * 0.05)
-        cutoff_idx = max(1, cutoff_idx)
+        flat_ph = self.pheromones_gpu.ravel()
+        total = flat_ph.size
+        if total == 0:
+            return
 
-        sorted_ph = np.sort(ph_cpu)[::-1]
-        if cutoff_idx <= len(sorted_ph):
-            cutoff_val = sorted_ph[cutoff_idx - 1]
-        else:
-            cutoff_val = 0.0
+        cutoff_idx = max(1, int(total * 0.05))
+        sorted_vals = cp.sort(flat_ph)
+        cutoff_val = sorted_vals[-cutoff_idx]
 
-        rng = np.random.default_rng()
-        for i in range(len(ph_cpu)):
-            if ph_cpu[i] < cutoff_val:
-                ph_cpu[i] = 0.01 + 0.01 * rng.random()
+        mask = flat_ph < cutoff_val
+        mask_count = int(mask.sum().item())
+        if mask_count == 0:
+            return
 
-        ph = cp.asarray(ph_cpu).reshape(self.pheromones_gpu.shape)
-        self.pheromones_gpu = ph
+        rng = cp.random.RandomState()
+        noise = rng.random(mask_count, dtype=flat_ph.dtype)
+        flat_ph[mask] = 0.01 + 0.01 * noise
 
     def _check_quantum_burst(self, iteration: int, best_q: float) -> None:
         """
@@ -835,11 +949,14 @@ class MACOSystem:
 
     def _launch_evaluation(self) -> Tuple[float, float, int]:
         block_size = 128
-        grid_size = (self.num_ants + block_size - 1) // block_size
+        clause_grid = (self.num_clauses + block_size - 1) // block_size
+        clause_grid = max(1, clause_grid)
+
         self.qualities_gpu.fill(0)
+        self.quality_weight_gpu.fill(0)
 
         evaluate_kernel(
-            (grid_size,), (block_size,),
+            (self.num_ants, clause_grid, 1), (block_size,),
             (
                 self.clause_array_gpu,
                 np.int32(self.num_clauses),
@@ -848,10 +965,18 @@ class MACOSystem:
                 np.int32(self.num_ants),
                 self.assignments_gpu,
                 self.clause_weights_gpu,
-                self.qualities_gpu
-            )
+                self.qualities_gpu,
+                self.quality_weight_gpu
+            ),
+            shared_mem=block_size * 2 * cp.dtype(cp.float32).itemsize
         )
         cp.cuda.Stream.null.synchronize()
+
+        cp.divide(
+            self.qualities_gpu,
+            cp.maximum(self.quality_weight_gpu, 1e-9),
+            out=self.qualities_gpu
+        )
 
         qualities_cpu = self.qualities_gpu
         avg_q = float(np.mean(qualities_cpu))
@@ -873,11 +998,12 @@ class MACOSystem:
         )
         cp.cuda.Stream.null.synchronize()
         
-        # Then deposit pheromones atomically
-        block_size = 64
-        grid_size = (self.num_ants + block_size - 1) // block_size
+        # Then deposit pheromones using block-local reductions
+        block_size = 128
+        ant_grid = (self.num_ants + block_size - 1) // block_size
+        ant_grid = max(1, ant_grid)
         pheromone_update_kernel(
-            (grid_size,), (block_size,),
+            (self.num_vars, ant_grid, 1), (block_size,),
             (
                 self.pheromones_gpu,
                 self.qualities_gpu,
@@ -886,7 +1012,8 @@ class MACOSystem:
                 np.float32(self.rho),
                 np.int32(self.num_vars),
                 np.int32(self.num_ants)
-            )
+            ),
+            shared_mem=block_size * 2 * cp.dtype(cp.float32).itemsize
         )
         cp.cuda.Stream.null.synchronize()
 
@@ -899,10 +1026,20 @@ class MACOSystem:
         Applies a conflict-driven local search to the top fraction of solutions
         (based on the current GPU qualities). No examples provided.
         """
-        # For simplicity, we run the local search across all ants. 
-        # If you only want top fraction, gather their indices in CPU or do a more advanced 2D kernel.
+        if self.num_ants == 0:
+            return
+
+        k = max(1, int(top_fraction * self.num_ants))
+        k = min(k, self.num_ants)
+
+        if k == self.num_ants:
+            selected_indices = cp.arange(self.num_ants, dtype=cp.int32)
+        else:
+            partition = cp.argpartition(self.qualities_gpu, self.num_ants - k)[-k:]
+            selected_indices = cp.sort(partition.astype(cp.int32, copy=False))
+
         block_size = 128
-        grid_size = (self.num_ants + block_size - 1) // block_size
+        grid_size = (k + block_size - 1) // block_size
         gpu_local_search_kernel(
             (grid_size,), (block_size,),
             (
@@ -912,8 +1049,10 @@ class MACOSystem:
                 np.int32(self.max_clause_size),
                 np.int32(self.num_vars),
                 np.int32(self.num_ants),
+                np.int32(k),
                 np.int32(self.local_search_flips),
                 np.float32(temperature),
+                selected_indices,
                 self.assignments_gpu
             )
         )
@@ -931,13 +1070,12 @@ class MACOSystem:
         # 1) Zero coverage_count
         self.coverage_count_gpu.fill(0)
 
-        # 2) coverage_count_kernel
-        #    Each thread checks (ant, clause) and does an atomicAdd if satisfied
-        total_pairs = self.num_ants * self.num_clauses
+        # 2) coverage_count_kernel with 2D launch
         block_size = 256
-        grid_size = (total_pairs + block_size - 1) // block_size
+        ant_grid = (self.num_ants + block_size - 1) // block_size
+        ant_grid = max(1, ant_grid)
         coverage_count_kernel(
-            (grid_size,), (block_size,),
+            (self.num_clauses, ant_grid, 1), (block_size,),
             (
                 self.clause_array_gpu,
                 np.int32(self.num_clauses),
@@ -946,7 +1084,8 @@ class MACOSystem:
                 np.int32(self.num_ants),
                 self.assignments_gpu,
                 self.coverage_count_gpu
-            )
+            ),
+            shared_mem=(self.max_clause_size + block_size) * cp.dtype(cp.int32).itemsize
         )
         cp.cuda.Stream.null.synchronize()
 
@@ -1078,19 +1217,5 @@ def main() -> None:
     else:
         logging.info(f"Classical Solver (MiniSat): UNKNOWN status in {classical_time:.2f} seconds.")
 
-    rc = 1
+    _ = classical_status  # retain for potential downstream integrations
     if classical_status == "SAT":
-        rc = 10
-    elif classical_status == "UNSAT":
-        rc = 20
-    elif classical_status == "TIMEOUT":
-        rc = 124
-    elif classical_status == "ERROR":
-        rc = 2
-
-    logging.info(f"Return code: {rc}")
-    # input("Press Enter to exit...")  # comment out to avoid pause on some shells
-
-
-if __name__ == "__main__":
-    main()

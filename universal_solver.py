@@ -88,11 +88,6 @@ __all__ = ["ProblemSpecificationError", "UMacoSolver"]
 
 
 logger = logging.getLogger("UMacoSolver")
-if not logger.handlers:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    )
 
 
 class ProblemSpecificationError(ValueError):
@@ -201,11 +196,13 @@ class UMacoSolver:
     ) -> None:
         self._validate_gpu_presence()
 
+        self._validate_custom_loss(custom_loss)
         self._raw_distance_matrix = self._normalize_distance_matrix(distance_matrix)
         self._raw_clauses = self._normalize_clauses(clauses)
-        self._loss_kwargs: Dict[str, Any] = dict(loss_kwargs or {})
+        self._loss_kwargs = self._prepare_loss_kwargs(loss_kwargs)
 
-        self.problem_type = self._resolve_problem_type(problem_type, custom_loss)
+        problem_hints = self._gather_problem_hints(custom_loss)
+        self.problem_type = self._resolve_problem_type(problem_type, problem_hints, custom_loss)
         self.problem_dim = self._resolve_problem_dim(problem_dim)
         self.loss_fn = self._build_loss_function(custom_loss, objective)
 
@@ -320,55 +317,117 @@ class UMacoSolver:
         if device_count < 1:  # pragma: no cover - environment-specific
             raise RuntimeError("UMACO requires at least one CUDA-capable GPU")
 
+    def _gather_problem_hints(
+        self, custom_loss: Optional[Callable[[Any], float]]
+    ) -> List[SolverType]:
+        hints: List[SolverType] = []
+        if self._raw_distance_matrix is not None:
+            hints.append(SolverType.COMBINATORIAL_PATH)
+        if self._raw_clauses is not None:
+            hints.append(SolverType.SATISFIABILITY)
+        if custom_loss is not None:
+            hints.append(SolverType.CONTINUOUS)
+        return hints
+
     def _resolve_problem_type(
         self,
         explicit: Optional[str],
+        hints: Sequence[SolverType],
         custom_loss: Optional[Callable[[Any], float]],
     ) -> SolverType:
         if explicit is not None:
             try:
                 solver_type = SolverType[explicit.upper()]
             except KeyError as exc:  # pragma: no cover - defensive
+                valid = ", ".join(e.name.lower() for e in SolverType)
                 raise ProblemSpecificationError(
-                    f"Unknown problem_type '{explicit}'. Valid options: {[e.name.lower() for e in SolverType]}"
+                    f"Unknown problem_type '{explicit}'. Valid options: {valid}"
                 ) from exc
-            self._validate_type_consistency(solver_type)
+            self._validate_type_consistency(solver_type, hints, custom_loss)
             return solver_type
 
-        if self._raw_distance_matrix is not None:
-            solver_type = SolverType.COMBINATORIAL_PATH
-        elif self._raw_clauses is not None:
-            solver_type = SolverType.SATISFIABILITY
+        unique_hints = sorted(set(hints), key=lambda st: st.value)
+        if len(unique_hints) > 1:
+            names = ", ".join(st.name.lower() for st in unique_hints)
+            raise ProblemSpecificationError(
+                "Ambiguous problem specification: received conflicting hints for "
+                f"{names}. Provide problem_type=... to disambiguate or remove the extra inputs."
+            )
+
+        if unique_hints:
+            solver_type = unique_hints[0]
         elif custom_loss is not None:
             solver_type = SolverType.CONTINUOUS
         else:
             solver_type = SolverType.CONTINUOUS
 
-        self._validate_type_consistency(solver_type)
+        self._validate_type_consistency(solver_type, hints, custom_loss)
         return solver_type
 
-    def _validate_type_consistency(self, solver_type: SolverType) -> None:
+    def _validate_type_consistency(
+        self,
+        solver_type: SolverType,
+        hints: Sequence[SolverType],
+        custom_loss: Optional[Callable[[Any], float]],
+    ) -> None:
+        hinted_types = set(hints)
+
         if solver_type == SolverType.COMBINATORIAL_PATH and self._raw_distance_matrix is None:
-            raise ProblemSpecificationError("COMBINATORIAL_PATH problems require a distance_matrix")
+            raise ProblemSpecificationError(
+                "COMBINATORIAL_PATH problems require a distance_matrix. Provide distance_matrix=..."
+            )
         if solver_type == SolverType.SATISFIABILITY and self._raw_clauses is None:
-            raise ProblemSpecificationError("SATISFIABILITY problems require clauses")
-        if solver_type == SolverType.SIMULATION and not any((self._raw_distance_matrix, self._raw_clauses)):
-            # Simulation requires an explicit custom loss
-            return
+            raise ProblemSpecificationError(
+                "SATISFIABILITY problems require clauses. Supply clauses=[...] or change problem_type."
+            )
+        if SolverType.COMBINATORIAL_PATH in hinted_types and solver_type != SolverType.COMBINATORIAL_PATH:
+            raise ProblemSpecificationError(
+                "distance_matrix was provided but problem_type resolved to "
+                f"{solver_type.name.lower()}. Remove distance_matrix or set problem_type='combinatorial_path'."
+            )
+        if SolverType.SATISFIABILITY in hinted_types and solver_type != SolverType.SATISFIABILITY:
+            raise ProblemSpecificationError(
+                "clauses were provided but problem_type resolved to "
+                f"{solver_type.name.lower()}. Remove clauses or set problem_type='satisfiability'."
+            )
+        if SolverType.CONTINUOUS in hinted_types and solver_type != SolverType.CONTINUOUS:
+            raise ProblemSpecificationError(
+                "custom_loss was supplied, which implies a continuous problem. "
+                "Either remove custom_loss or set problem_type='continuous' to proceed."
+            )
+        if solver_type == SolverType.SIMULATION and custom_loss is None:
+            raise ProblemSpecificationError(
+                "SIMULATION mode requires a custom_loss describing system evolution."
+            )
 
     def _resolve_problem_dim(self, supplied: Optional[int]) -> int:
         if self.problem_type == SolverType.COMBINATORIAL_PATH:
             assert self._raw_distance_matrix is not None  # for mypy
-            return int(self._raw_distance_matrix.shape[0])
+            inferred = int(self._raw_distance_matrix.shape[0])
+            if supplied is not None and int(supplied) != inferred:
+                raise ProblemSpecificationError(
+                    "problem_dim does not match the provided distance_matrix. "
+                    f"distance_matrix implies {inferred} cities while problem_dim={supplied}. "
+                    "Remove problem_dim or ensure it matches the distance matrix size."
+                )
+            return inferred
 
         if self.problem_type == SolverType.SATISFIABILITY:
             assert self._raw_clauses is not None  # for mypy
-            return self._infer_variable_count(self._raw_clauses)
+            inferred = self._infer_variable_count(self._raw_clauses)
+            if supplied is not None and int(supplied) != inferred:
+                raise ProblemSpecificationError(
+                    "problem_dim does not match the provided clauses. "
+                    f"Clauses imply {inferred} boolean variables while problem_dim={supplied}. "
+                    "Remove problem_dim or ensure it matches the inferred variable count."
+                )
+            return inferred
 
         if supplied is None:
             if self.problem_type == SolverType.CONTINUOUS:
                 raise ProblemSpecificationError(
-                    "problem_dim must be provided for continuous problems when it cannot be inferred"
+                    "problem_dim must be provided for continuous problems. "
+                    "Pass problem_dim=... or provide a distance matrix/clauses for automatic inference."
                 )
             raise ProblemSpecificationError("problem_dim is required for the selected problem type")
 
@@ -414,6 +473,19 @@ class UMacoSolver:
 
         wrapped.__name__ = getattr(loss_fn, "__name__", loss_fn.__class__.__name__)
         return wrapped
+
+    def _prepare_loss_kwargs(
+        self, loss_kwargs: Optional[Mapping[str, Any]]
+    ) -> Dict[str, Any]:
+        if loss_kwargs is None:
+            return {}
+        if not isinstance(loss_kwargs, Mapping):
+            raise ProblemSpecificationError("loss_kwargs must be a mapping of keyword arguments")
+        return dict(loss_kwargs)
+
+    def _validate_custom_loss(self, custom_loss: Optional[Callable[[Any], float]]) -> None:
+        if custom_loss is not None and not callable(custom_loss):
+            raise ProblemSpecificationError("custom_loss must be a callable that accepts a candidate solution")
 
     def _build_tsp_loss(self, distance_matrix: np.ndarray) -> Callable[[np.ndarray], float]:
         def loss(path: np.ndarray) -> float:
@@ -517,6 +589,8 @@ class UMacoSolver:
             raise ProblemSpecificationError("distance_matrix must describe at least two nodes")
         if np.any(matrix < 0):
             raise ProblemSpecificationError("distance_matrix cannot contain negative distances")
+        if not np.all(np.isfinite(matrix)):
+            raise ProblemSpecificationError("distance_matrix must contain only finite values")
         if not np.allclose(matrix, matrix.T, atol=1e-8):
             logger.warning("Distance matrix is not symmetric; proceeding but optimization may struggle")
         return matrix
