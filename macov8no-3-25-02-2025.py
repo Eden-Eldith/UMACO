@@ -159,9 +159,13 @@ def run_classical_solver(
     """
     Invokes a classical SAT solver for final cross-check. Use with caution.
     """
-    dimacs_file = "temp_problem.cnf"
-    write_dimacs(clauses, variables, dimacs_file)
+    import tempfile
+
     start_time = time.time()
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".cnf", delete=False) as tmp:
+        dimacs_file = tmp.name
+        write_dimacs(clauses, variables, dimacs_file)
+
     try:
         cmd = [solver_path, dimacs_file]
         result = subprocess.run(cmd, capture_output=True, text=True, check=False, timeout=timeout)

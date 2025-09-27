@@ -76,6 +76,7 @@ from Umaco13 import (
     SolverType,
     UMACO,
     UniversalNode,
+    OptimizationResult,
     create_umaco_solver,
     rastrigin_loss,
     rosenbrock_loss,
@@ -256,10 +257,19 @@ class UMacoSolver:
         if active_loss is None:
             raise ProblemSpecificationError("A loss function must be defined before optimization")
 
-        best_solution, score, history = self.optimizer.optimize(self.agents, active_loss)
+        opt_result: OptimizationResult = self.optimizer.optimize(self.agents, active_loss)
+        history = {
+            "panic": list(opt_result.panic_history),
+            "loss": list(opt_result.loss_history),
+            "alpha": list(self.optimizer.history.get("alpha", [])),
+            "beta": list(self.optimizer.history.get("beta", [])),
+            "rho": list(self.optimizer.history.get("rho", [])),
+            "quantum_bursts": list(self.optimizer.history.get("quantum_bursts", [])),
+            "homology_entropy": list(self.optimizer.history.get("homology_entropy", [])),
+        }
         return SolverResult(
-            best_solution=best_solution,
-            score=float(score),
+            best_solution=opt_result.best_solution,
+            score=float(opt_result.best_score),
             history=history,
             optimizer=self.optimizer,
             agents=self.agents,
