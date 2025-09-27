@@ -61,16 +61,48 @@ best solution, score, history, and configuration context for downstream use.
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Use numpy as fallback
-    HAS_CUPY = False
 import numpy as np
+
+
+def _resolve_gpu_backend(module_name: str = "universal_solver"):
+    """Resolve the GPU backend, defaulting to CuPy while respecting the project-wide CPU override."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "universal_solver requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
 
 from Umaco13 import (
     SolverType,
@@ -304,6 +336,12 @@ class UMacoSolver:
 
     def _validate_gpu_presence(self) -> None:
         """Ensure a CUDA-capable GPU is visible before continuing."""
+
+        if not GPU_AVAILABLE:
+            logger.warning(
+                "GPU validation skipped: running in CPU compatibility mode because UMACO_ALLOW_CPU=1."
+            )
+            return
 
         try:
             device_count = cp.cuda.runtime.getDeviceCount()

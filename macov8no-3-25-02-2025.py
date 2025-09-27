@@ -30,17 +30,47 @@ import logging
 import subprocess
 import os
 from dataclasses import dataclass
-from typing import List, Tuple, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import networkx as nx
 
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Use numpy as fallback
-    HAS_CUPY = False
+
+def _resolve_gpu_backend(module_name: str = "macov8no-3-25-02-2025"):
+    """Resolve the GPU backend, enforcing CuPy unless the global override is enabled."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "macov8no-3-25-02-2025 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
 
 # =============================================================================
 # Configuration Dataclass
@@ -584,20 +614,25 @@ class MACOSystem:
         self.clause_weight_momentum = config.clause_weight_momentum
 
         device_id = config.gpu_device_id
-        cp.cuda.Device(device_id).use()
+        if GPU_AVAILABLE:
+            cp.cuda.Device(device_id).use()
+        else:
+            logging.warning(
+                "GPU backend unavailable; proceeding in CPU compatibility mode because UMACO_ALLOW_CPU=1."
+            )
 
         # Graph placeholders (kept for legacy)
         self.graph = nx.DiGraph()
         self.pheromone_matrix: Dict[Tuple[str, str], float] = {}
 
         # GPU arrays for the problem
-        self.clause_array_gpu: Optional[cp.ndarray] = None
-        self.clause_weights_gpu: Optional[cp.ndarray] = None
-        self.clause_stubbornness_gpu: Optional[cp.ndarray] = None
-        self.pheromones_gpu: Optional[cp.ndarray] = None
-        self.assignments_gpu: Optional[cp.ndarray] = None
-        self.qualities_gpu: Optional[cp.ndarray] = None
-        self.coverage_count_gpu: Optional[cp.ndarray] = None
+        self.clause_array_gpu: Optional[Any] = None
+        self.clause_weights_gpu: Optional[Any] = None
+        self.clause_stubbornness_gpu: Optional[Any] = None
+        self.pheromones_gpu: Optional[Any] = None
+        self.assignments_gpu: Optional[Any] = None
+        self.qualities_gpu: Optional[Any] = None
+        self.coverage_count_gpu: Optional[Any] = None
 
         self.best_quality_so_far = 0.0
         self.best_assignment = None
