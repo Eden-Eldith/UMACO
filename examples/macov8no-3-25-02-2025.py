@@ -35,42 +35,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 import networkx as nx
 
+import umaco_gpu_utils as gpu_utils
+from umaco_gpu_utils import asnumpy, to_numpy_scalar
 
-def _resolve_gpu_backend(module_name: str = "macov8no-3-25-02-2025"):
-    """Resolve the GPU backend, enforcing CuPy unless the global override is enabled."""
-    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
-    module_logger = logging.getLogger(module_name)
-
-    try:
-        import cupy as _cp  # type: ignore
-    except ImportError as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "macov8no-3-25-02-2025 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
-            ) from exc
-        module_logger.warning(
-            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
-        )
-        return np, False
-
-    try:
-        _cp.cuda.runtime.getDeviceCount()
-        _cp.cuda.nvrtc.getVersion()
-    except Exception as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
-            ) from exc
-        module_logger.warning(
-            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
-            exc,
-        )
-        return np, False
-
-    return _cp, True
-
-
-cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
+cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 
 # =============================================================================
 # Configuration Dataclass

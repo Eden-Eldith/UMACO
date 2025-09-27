@@ -28,42 +28,9 @@ from typing import Optional, Tuple
 import numpy as np
 import os
 
+import umaco_gpu_utils as gpu_utils
 
-def _resolve_gpu_backend(module_name: str = "ultimate_pf_simulator"):
-    """Resolve the GPU backend, preferring CuPy and honoring explicit CPU override."""
-    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
-    module_logger = logging.getLogger(module_name)
-
-    try:
-        import cupy as _cp  # type: ignore
-    except ImportError as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "ultimate_pf_simulator-v2-n1 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
-            ) from exc
-        module_logger.warning(
-            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
-        )
-        return np, False
-
-    try:
-        _cp.cuda.runtime.getDeviceCount()
-        _cp.cuda.nvrtc.getVersion()
-    except Exception as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
-            ) from exc
-        module_logger.warning(
-            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
-            exc,
-        )
-        return np, False
-
-    return _cp, True
-
-
-cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
+cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 import matplotlib.pyplot as plt
 
 # ----------------------

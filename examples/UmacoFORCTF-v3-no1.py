@@ -28,49 +28,10 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Any, List, Optional, Tuple
 
+import umaco_gpu_utils as gpu_utils
+from umaco_gpu_utils import asnumpy
 
-def _resolve_gpu_backend(module_name: str = "UmacoFORCTF"):
-    """Resolve the GPU backend, enforcing CuPy except when an explicit override is set."""
-    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
-    module_logger = logging.getLogger(module_name)
-
-    try:
-        import cupy as _cp  # type: ignore
-    except ImportError as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "UmacoFORCTF-v3-no1 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
-            ) from exc
-        module_logger.warning(
-            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
-        )
-        return np, False
-
-    try:
-        _cp.cuda.runtime.getDeviceCount()
-        _cp.cuda.nvrtc.getVersion()
-    except Exception as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
-            ) from exc
-        module_logger.warning(
-            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
-            exc,
-        )
-        return np, False
-
-    return _cp, True
-
-
-cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
-
-
-def asnumpy(arr):
-    """Convert a CuPy array to a NumPy array when required."""
-    if GPU_AVAILABLE and hasattr(arr, "get"):
-        return arr.get()
-    return np.asarray(arr)
+cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 
 # =============================================================================
 # Configuration Dataclass
