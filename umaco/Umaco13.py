@@ -827,50 +827,39 @@ class UMACO:
         Generate candidate solutions based on problem type.
         This is where UMACO's universality shines - same framework, different interpretations.
         """
-        solutions = []
-        # Need CPU array for solution construction
-        pheromone_real_np = asnumpy(self.pheromones.pheromones.real)
+        solutions: List[np.ndarray] = []
+        pheromone_real_gpu = self.pheromones.pheromones.real
+        pheromone_real_np: Optional[np.ndarray] = None
+        problem_dim = self.config.problem_dim or 2
         
         for agent in agents:
             if self.config.problem_type == SolverType.CONTINUOUS:
                 # For continuous optimization, sample parameters from pheromone distributions
-                if self.config.problem_dim is not None:
-                    # Sample problem_dim parameters from the pheromone matrix
-                    solution = np.zeros(self.config.problem_dim)
-                    for i in range(self.config.problem_dim):
-                        # Use row i of the pheromone matrix as probability distribution
-                        row_probs = pheromone_real_np[i % self.config.n_dim, :]
-                        # Clean the row: replace NaN/inf with small positive values
-                        row_probs = np.nan_to_num(row_probs, nan=1e-6, posinf=1.0, neginf=1e-6)
-                        # Ensure non-negative
-                        row_probs = np.maximum(row_probs, 1e-6)
-                        # Normalize to probabilities
-                        row_probs = row_probs / (np.sum(row_probs) + 1e-9)
-                        # Ensure no NaN in final probabilities
-                        row_probs = np.nan_to_num(row_probs, nan=1.0/self.config.n_dim)
-                        row_probs = row_probs / np.sum(row_probs)
-                        
-                        # Sample index and map to parameter value [0, 2]
-                        idx = np.random.choice(len(row_probs), p=row_probs)
-                        param_val = (idx / (len(row_probs) - 1)) * 2
-                        solution[i] = param_val
-                else:
-                    # Fallback: use 2D solution
-                    x_marginal = np.sum(pheromone_real_np, axis=1)
-                    y_marginal = np.sum(pheromone_real_np, axis=0)
-                    x_marginal = np.maximum(x_marginal + np.random.normal(0, 0.01, size=x_marginal.shape), 0)
-                    y_marginal = np.maximum(y_marginal + np.random.normal(0, 0.01, size=y_marginal.shape), 0)
-                    x_probs = x_marginal / (np.sum(x_marginal) + 1e-9)
-                    y_probs = y_marginal / (np.sum(y_marginal) + 1e-9)
-                    x_idx = np.random.choice(len(x_probs), p=x_probs)
-                    y_idx = np.random.choice(len(y_probs), p=y_probs)
-                    x_val = (x_idx / (len(x_probs) - 1)) * 2
-                    y_val = (y_idx / (len(y_probs) - 1)) * 2
-                    solution = np.array([x_val, y_val])
-                solutions.append(solution)
+                solution_gpu = cp.empty(problem_dim, dtype=cp.float32)
+                for i in range(problem_dim):
+                    row_probs = pheromone_real_gpu[i % self.config.n_dim, :].astype(cp.float32)
+                    row_probs = cp.nan_to_num(row_probs, nan=1e-6, posinf=1.0, neginf=1e-6)
+                    row_probs = cp.maximum(row_probs, 1e-6)
+                    total = float(row_probs.sum())
+                    if total <= 0 or not np.isfinite(total):
+                        idx = int(cp.random.randint(row_probs.size).item())
+                    else:
+                        normalized = row_probs / total
+                        normalized = cp.nan_to_num(normalized, nan=1.0 / self.config.n_dim)
+                        norm_sum = float(normalized.sum())
+                        if norm_sum <= 0 or not np.isfinite(norm_sum):
+                            idx = int(cp.random.randint(row_probs.size).item())
+                        else:
+                            normalized = normalized / norm_sum
+                            idx = int(cp.random.choice(row_probs.size, size=1, p=normalized)[0].item())
+                    denom = max(row_probs.size - 1, 1)
+                    solution_gpu[i] = float(idx) / denom * 2.0
+                solutions.append(cp.asnumpy(solution_gpu))
                 
             elif self.config.problem_type == SolverType.COMBINATORIAL_PATH:
                 # Build a tour/path using pheromone probabilities
+                if pheromone_real_np is None:
+                    pheromone_real_np = asnumpy(pheromone_real_gpu)
                 tour = [np.random.randint(self.config.n_dim)]
                 unvisited = set(range(self.config.n_dim))
                 unvisited.remove(tour[0])
@@ -902,6 +891,8 @@ class UMACO:
                 
             elif self.config.problem_type == SolverType.SATISFIABILITY:
                 # Binary assignment based on pheromone values
+                if pheromone_real_np is None:
+                    pheromone_real_np = asnumpy(pheromone_real_gpu)
                 assignment = np.zeros(self.config.n_dim, dtype=int)
                 # Use diagonal for variable probabilities
                 true_probs = np.diag(pheromone_real_np)
