@@ -29,12 +29,47 @@ except ImportError as e:
     print("ERROR: NumPy is required.\n", e)
     sys.exit(1)
 
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    cp = np  # type: ignore
-    HAS_CUPY = False
+
+def _resolve_gpu_backend(module_name: str = "ultimate_zvss"):
+    """Resolve the GPU backend, requiring CuPy unless an explicit override is provided."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "ultimate_zvss-v4-n1 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
+
+if not GPU_AVAILABLE:
+    raise RuntimeError(
+        "ultimate_zvss-v4-n1 cannot run without a CUDA-capable GPU. Set UMACO_ALLOW_CPU=1 only if you intentionally accept CPU compatibility."
+    )
 
 try:
     import networkx as nx
@@ -222,7 +257,7 @@ class MACOZVSSSystem:
         self.logging_interval = 10
         self.noise_std = config.noise_std
 
-        if not HAS_CUPY:
+        if not GPU_AVAILABLE:
             raise RuntimeError("CuPy is required for MACO-ZVSS GPU acceleration")
 
         device_id = config.gpu_device_id

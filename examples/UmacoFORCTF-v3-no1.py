@@ -21,17 +21,56 @@ Optimized for solving the CryptoCTF SPEEDY-7-192 cipher challenge with 5.7 BTC p
 import sys
 import math
 import time
+import os
 import argparse
 import logging
 import numpy as np
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Use numpy as fallback
-    HAS_CUPY = False
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import Any, List, Optional, Tuple
+
+
+def _resolve_gpu_backend(module_name: str = "UmacoFORCTF"):
+    """Resolve the GPU backend, enforcing CuPy except when an explicit override is set."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "UmacoFORCTF-v3-no1 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
+
+
+def asnumpy(arr):
+    """Convert a CuPy array to a NumPy array when required."""
+    if GPU_AVAILABLE and hasattr(arr, "get"):
+        return arr.get()
+    return np.asarray(arr)
 
 # =============================================================================
 # Configuration Dataclass
@@ -95,16 +134,16 @@ class MACOCryptoOptimizer:
         self.logging_interval = 50
 
         device_id = config.gpu_device_id
-        if HAS_CUPY:
+        if GPU_AVAILABLE:
             try:
                 cp.cuda.Device(device_id).use()
             except cp.cuda.runtime.CUDARuntimeError as exc:
                 raise RuntimeError("Requested CUDA device is unavailable") from exc
 
         # Initialize GPU arrays
-        self.pheromones_gpu: Optional[cp.ndarray] = None
-        self.assignments_gpu: Optional[cp.ndarray] = None
-        self.qualities_gpu: Optional[cp.ndarray] = None
+        self.pheromones_gpu: Optional[Any] = None
+        self.assignments_gpu: Optional[Any] = None
+        self.qualities_gpu: Optional[Any] = None
         self.best_assignment: Optional[np.ndarray] = None
         self.best_quality: float = 0.0
 
@@ -147,7 +186,7 @@ class MACOCryptoOptimizer:
         logging.info(f"Optimization completed in {total_time:.2f} seconds")
         best_assignment = None
         if self.best_assignment is not None:
-            best_assignment = cp.asnumpy(self.best_assignment) if HAS_CUPY else np.array(self.best_assignment)
+            best_assignment = asnumpy(self.best_assignment)
 
         return best_assignment, float(self.best_quality)
 
