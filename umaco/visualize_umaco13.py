@@ -377,9 +377,12 @@ def run_live_visualization(problem_name: str = 'rosenbrock', max_iter: int = 50)
         break
 
     # Run full optimization
-    pheromone_real, pheromone_imag, panic_history, loss_history, homology_report = solver.optimize(
-        agents, loss_func
-    )
+    result = solver.optimize(agents, loss_func)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    loss_history = result.loss_history
+    homology_report = result.homology_report
 
     # Create visualizations
     fig1 = viz.plot_optimization_progress(panic_history,

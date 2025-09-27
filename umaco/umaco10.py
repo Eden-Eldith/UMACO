@@ -58,9 +58,11 @@ def asnumpy(arr):
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
     if HAS_CUPY and hasattr(val, 'get'):
-        return val
-    else:
-        return float(val) if hasattr(val, 'item') else float(val)
+        return float(val.get())
+    try:
+        return float(val.item())
+    except AttributeError:
+        return float(val)
 from dataclasses import dataclass, field
 from typing import List, Dict, Any, Callable, Tuple, Optional, Union
 import warnings

@@ -22,6 +22,8 @@ import os
 import logging
 import numpy as np
 import torch
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 try:
     import cupy as cp
     HAS_CUPY = True
@@ -32,17 +34,18 @@ except ImportError:
 # Compatibility layer for cupy functions
 def asnumpy(arr):
     """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has  method
-        return arr
-    else:
-        return arr  # Already numpy or numpy-compatible
+    if HAS_CUPY and hasattr(arr, 'get'):
+        return arr.get()
+    return np.asarray(arr)
 
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
     if HAS_CUPY and hasattr(val, 'get'):
-        return val
-    else:
-        return float(val) if hasattr(val, 'item') else float(val)
+        return float(val.get())
+    try:
+        return float(val.item())
+    except AttributeError:
+        return float(val)
 from Umaco13 import BaseEconomy, BaseNeuroPheromoneSystem, BaseUniversalNode
 from torch.utils.data import DataLoader
 from functools import partial

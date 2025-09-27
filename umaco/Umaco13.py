@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -20,7 +19,11 @@ Matrix multiplication on CPU is like mining Bitcoin with a calculator.
 =================================================================================================
 META-INSTRUCTIONS FOR AI DEVELOPERS
 =============================================================    bound_sat_loss = lambda assignment: sat_loss(assignment, clauses)
-    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_sat_loss)
+    result = optimizer.optimize(agents, bound_sat_loss)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    homology_report = result.homology_report
     
     if pheromone_real is not None:
         # For SAT, extract binary assignment from diagonal
@@ -80,11 +83,14 @@ def sat_loss(assignment):
 ```python
 optimizer, agents = create_umaco_solver(
     problem_type='CONTINUOUS',  # or 'COMBINATORIAL_PATH', 'SATISFIABILITY'
-    dim=50,                      # Problem dimensionality
+    dim=50,                     # Pheromone lattice resolution
     max_iter=1000,              # Iterations (be patient)
     n_ants=8                    # More ants = more exploration
 )
-best_solution, score, history = optimizer.optimize(agents, my_loss)
+result = optimizer.optimize(agents, my_loss)
+pheromone_real = result.pheromone_real
+panic_history = result.panic_history
+loss_history = result.loss_history
 ```
 
 ### TUNING GUIDE
@@ -303,6 +309,27 @@ class UMACOConfig:
     num_clauses: int = 0
     clauses: Optional[List[List[int]]] = None
     distance_matrix: Optional[np.ndarray] = None
+
+# Result container for optimization runs
+@dataclass
+class OptimizationResult:
+    """Structured result produced by :meth:`UMACO.optimize`."""
+
+    pheromone_real: np.ndarray
+    pheromone_imag: np.ndarray
+    panic_history: List[float]
+    loss_history: List[float]
+    homology_report: Any
+    best_solution: Any
+    best_score: float
+
+    def __iter__(self):
+        """Allow backward-compatible unpacking into four core artefacts."""
+        yield self.pheromone_real
+        yield self.pheromone_imag
+        yield self.panic_history
+        yield self.homology_report
+
 
 # =================================================================================================
 # 3. CORE COMPONENTS - ALL GPU-NATIVE
@@ -893,10 +920,10 @@ class UMACO:
     # =========================================================================
     
     def optimize(self, agents: List[BaseUniversalNode], 
-                loss_fn: Callable[[Any], float]) -> Tuple[np.ndarray, np.ndarray, List[float], List[float], Any]:
+                loss_fn: Callable[[Any], float]) -> OptimizationResult:
         """
         Main optimization loop. This is where everything comes together.
-        Returns: (pheromone_real, pheromone_imag, panic_history, loss_history, homology_report)
+        Returns an :class:`OptimizationResult` containing core artefacts and diagnostics.
         """
         logger.info(f"Starting GPU-accelerated optimization: {len(agents)} agents, {self.config.max_iter} iterations")
         
@@ -994,12 +1021,14 @@ class UMACO:
                 logger.info(f"Iter {i:04d}: Loss={avg_loss:.5f}, Best={self.best_score:.4f}, Panic={self.history['panic'][-1]:.3f}")
         
         logger.info("Optimization complete.")
-        return (
-            asnumpy(self.pheromones.pheromones.real),
-            asnumpy(self.pheromones.pheromones.imag),
-            self.history['panic'],
-            self.history['loss'],  # Return loss history for visualization
-            self.homology_report
+        return OptimizationResult(
+            pheromone_real=asnumpy(self.pheromones.pheromones.real),
+            pheromone_imag=asnumpy(self.pheromones.pheromones.imag),
+            panic_history=self.history['panic'],
+            loss_history=self.history['loss'],
+            homology_report=self.homology_report,
+            best_solution=self.best_solution,
+            best_score=float(self.best_score)
         )
 
 # =================================================================================================
@@ -1126,7 +1155,12 @@ if __name__ == "__main__":
         problem_dim=2
     )
     
-    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, rosenbrock_loss)
+    result = optimizer.optimize(agents, rosenbrock_loss)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    loss_history = result.loss_history
+    homology_report = result.homology_report
     
     if pheromone_real is not None:
         # Extract solution from pheromone field for continuous optimization
@@ -1159,7 +1193,12 @@ if __name__ == "__main__":
     )
     
     bound_tsp_loss = lambda path: tsp_loss(path, distance_matrix)
-    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_tsp_loss)
+    result = optimizer.optimize(agents, bound_tsp_loss)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    loss_history = result.loss_history
+    homology_report = result.homology_report
     
     if pheromone_real is not None:
         # For TSP, we need to extract the best tour from the pheromone matrix
@@ -1191,7 +1230,11 @@ if __name__ == "__main__":
     )
     
     bound_sat_loss = lambda assignment: sat_loss(assignment, clauses)
-    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(agents, bound_sat_loss)
+    result = optimizer.optimize(agents, bound_sat_loss)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    homology_report = result.homology_report
     
     if pheromone_real is not None:
         # For SAT, extract assignment from diagonal of pheromone field

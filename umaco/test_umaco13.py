@@ -112,9 +112,9 @@ class TestOptimizationLoops(unittest.TestCase):
         )
 
         # Run optimization
-        pheromone_real, pheromone_imag, panic_history, homology_report = solver.optimize(
-            agents, rosenbrock_loss
-        )
+        result = solver.optimize(agents, rosenbrock_loss)
+        pheromone_real = result.pheromone_real
+        panic_history = result.panic_history
 
         # Check results
         self.assertIsInstance(pheromone_real, np.ndarray)
@@ -146,9 +146,9 @@ class TestOptimizationLoops(unittest.TestCase):
             distance_matrix=distance_matrix
         )
 
-        pheromone_real, pheromone_imag, panic_history, homology_report = solver.optimize(
-            agents, tsp_loss
-        )
+        result = solver.optimize(agents, tsp_loss)
+        pheromone_real = result.pheromone_real
+        panic_history = result.panic_history
 
         self.assertIsInstance(pheromone_real, np.ndarray)
         self.assertEqual(len(panic_history), 5)
@@ -179,9 +179,9 @@ class TestOptimizationLoops(unittest.TestCase):
             clauses=clauses
         )
 
-        pheromone_real, pheromone_imag, panic_history, homology_report = solver.optimize(
-            agents, sat_loss
-        )
+        result = solver.optimize(agents, sat_loss)
+        pheromone_real = result.pheromone_real
+        panic_history = result.panic_history
 
         self.assertIsInstance(pheromone_real, np.ndarray)
         self.assertEqual(len(panic_history), 5)
@@ -264,9 +264,8 @@ class TestPerformance(unittest.TestCase):
         )
 
         start_time = time.time()
-        pheromone_real, pheromone_imag, panic_history, homology_report = solver.optimize(
-            agents, rosenbrock_loss
-        )
+        result = solver.optimize(agents, rosenbrock_loss)
+        panic_history = result.panic_history
         end_time = time.time()
 
         # Should complete in reasonable time
@@ -291,9 +290,7 @@ class TestPerformance(unittest.TestCase):
 
         # Should not crash due to memory issues
         try:
-            pheromone_real, pheromone_imag, panic_history, homology_report = solver.optimize(
-                agents, rosenbrock_loss
-            )
+            result = solver.optimize(agents, rosenbrock_loss)
             memory_test_passed = True
         except MemoryError:
             memory_test_passed = False

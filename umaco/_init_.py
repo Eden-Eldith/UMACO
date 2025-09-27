@@ -18,8 +18,8 @@ __version__ = "0.1.0"
 
 # Make imports available at package level if needed
 try:
-    from .Umaco9 import (
-        UMACO9, UMACO9Config,
+    from .Umaco13 import (
+        UMACO, UMACOConfig,
         UniversalEconomy, EconomyConfig,
         UniversalNode, NodeConfig,
         NeuroPheromoneSystem, PheromoneConfig
@@ -27,6 +27,20 @@ try:
     HAS_CORE = True
 except ImportError:
     HAS_CORE = False
+
+__all__ = ["__version__", "HAS_CORE", "HAS_LLM_SUPPORT"]
+
+if HAS_CORE:
+    __all__.extend([
+        "UMACO",
+        "UMACOConfig",
+        "UniversalEconomy",
+        "EconomyConfig",
+        "UniversalNode",
+        "NodeConfig",
+        "NeuroPheromoneSystem",
+        "PheromoneConfig",
+    ])
 
 # Make LLM components optional to avoid requiring those dependencies
 try:

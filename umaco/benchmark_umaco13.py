@@ -126,9 +126,9 @@ class UMACO13Optimizer:
             n_ants=12       # More agents for better exploration
         )
 
-        pheromone_real, pheromone_imag, panic_history, loss_history, homology_report = solver.optimize(
-            agents, loss_func
-        )
+        result = solver.optimize(agents, loss_func)
+        pheromone_real = result.pheromone_real
+        panic_history = result.panic_history
 
         end_time = time.time()
 
