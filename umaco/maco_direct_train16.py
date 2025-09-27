@@ -25,60 +25,10 @@ import torch
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+import umaco_gpu_utils as gpu_utils
+from umaco_gpu_utils import asnumpy, to_numpy_scalar
 
-def _resolve_gpu_backend(module_name: str = "maco_direct_train16"):
-    """Return the CuPy module when GPU is available, otherwise handle the configured fallback."""
-    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
-    module_logger = logging.getLogger(module_name)
-
-    try:
-        import cupy as _cp  # type: ignore
-    except ImportError as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "maco_direct_train16 requires CuPy for GPU execution. "
-                "Install cupy-cudaXX (matching your CUDA version) or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
-            ) from exc
-        module_logger.warning(
-            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
-        )
-        return np, False
-
-    try:
-        _cp.cuda.runtime.getDeviceCount()
-        _cp.cuda.nvrtc.getVersion()
-    except Exception as exc:
-        if not allow_cpu:
-            raise RuntimeError(
-                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or device). "
-                "Install the matching CUDA toolkit or set UMACO_ALLOW_CPU=1 to override."
-            ) from exc
-        module_logger.warning(
-            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
-            exc,
-        )
-        return np, False
-
-    return _cp, True
-
-
-cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
-
-# Compatibility layer for cupy functions
-def asnumpy(arr):
-    """Convert cupy array to numpy array, or pass through if already numpy"""
-    if GPU_AVAILABLE and hasattr(arr, 'get'):
-        return arr.get()
-    return np.asarray(arr)
-
-def to_numpy_scalar(val):
-    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
-    if GPU_AVAILABLE and hasattr(val, 'get'):
-        return float(val.get())
-    try:
-        return float(val.item())
-    except AttributeError:
-        return float(val)
+cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 from Umaco13 import BaseEconomy, BaseNeuroPheromoneSystem, BaseUniversalNode
 from torch.utils.data import DataLoader
 from functools import partial
