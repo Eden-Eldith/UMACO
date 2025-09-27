@@ -5,7 +5,7 @@
 ![UMACO Logo](https://github.com/user-attachments/assets/11a19c53-e374-497b-8903-30a9c20ddf91)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-16.0-blue)](https://github.com/EdenEldith/umaco)
+[![Version](https://img.shields.io/badge/version-17.0-red)](https://github.com/EdenEldith/umaco)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Created By](https://img.shields.io/badge/created%20by-Eden%20Eldith-purple)](https://github.com/EdenEldith)
 ![AI-First Framework](https://img.shields.io/badge/AI--First-Framework-blueviolet)
