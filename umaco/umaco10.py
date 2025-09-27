@@ -40,24 +40,57 @@ Version: 10.0
 import os
 import logging
 import numpy as np
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Use numpy as fallback
-    HAS_CUPY = False
+
+
+def _resolve_gpu_backend(module_name: str = "umaco10"):
+    """Resolve the GPU backend with CuPy, honoring the explicit CPU override when set."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "umaco10 requires CuPy for GPU execution. Install cupy-cudaXX or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or CUDA device). Install the matching toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
+
 
 # Compatibility layer for cupy functions
 def asnumpy(arr):
     """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
+    if GPU_AVAILABLE and hasattr(arr, 'get'):  # CuPy array has .get() method
         return arr.get()
     else:
         return arr  # Already numpy or numpy-compatible
 
+
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(val, 'get'):
+    if GPU_AVAILABLE and hasattr(val, 'get'):
         return float(val.get())
     try:
         return float(val.item())
@@ -603,7 +636,7 @@ class UMACO10:
     #                            PAQ CORE METHODS                             #
     ###########################################################################
 
-    def panic_backpropagate(self, loss_grad: Union[np.ndarray, cp.ndarray]):
+    def panic_backpropagate(self, loss_grad: Union[np.ndarray, Any]):
         """
         Update panic tensor based on loss gradient and anxiety.
         
@@ -612,7 +645,7 @@ class UMACO10:
         which in turn influence exploration strategies.
         
         Args:
-            loss_grad (Union[np.ndarray, cp.ndarray]): Gradient of the loss function.
+            loss_grad (Union[np.ndarray, Any]): Gradient of the loss function.
         """
         # Ensure gradient is on the correct device
         if isinstance(loss_grad, np.ndarray) and self.config.use_gpu:

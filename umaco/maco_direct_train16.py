@@ -24,23 +24,56 @@ import numpy as np
 import torch
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
-try:
-    import cupy as cp
-    HAS_CUPY = True
-except ImportError:
-    import numpy as cp  # Use numpy as fallback
-    HAS_CUPY = False
+
+
+def _resolve_gpu_backend(module_name: str = "maco_direct_train16"):
+    """Return the CuPy module when GPU is available, otherwise handle the configured fallback."""
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+    module_logger = logging.getLogger(module_name)
+
+    try:
+        import cupy as _cp  # type: ignore
+    except ImportError as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "maco_direct_train16 requires CuPy for GPU execution. "
+                "Install cupy-cudaXX (matching your CUDA version) or set UMACO_ALLOW_CPU=1 to acknowledge CPU fallback."
+            ) from exc
+        module_logger.warning(
+            "CuPy is not installed; running in NumPy compatibility mode because UMACO_ALLOW_CPU=1."
+        )
+        return np, False
+
+    try:
+        _cp.cuda.runtime.getDeviceCount()
+        _cp.cuda.nvrtc.getVersion()
+    except Exception as exc:
+        if not allow_cpu:
+            raise RuntimeError(
+                "CuPy is installed but CUDA runtime is unhealthy (missing nvrtc or device). "
+                "Install the matching CUDA toolkit or set UMACO_ALLOW_CPU=1 to override."
+            ) from exc
+        module_logger.warning(
+            "CUDA runtime issue detected (%s); running in NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        return np, False
+
+    return _cp, True
+
+
+cp, GPU_AVAILABLE = _resolve_gpu_backend(__name__)
 
 # Compatibility layer for cupy functions
 def asnumpy(arr):
     """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):
+    if GPU_AVAILABLE and hasattr(arr, 'get'):
         return arr.get()
     return np.asarray(arr)
 
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(val, 'get'):
+    if GPU_AVAILABLE and hasattr(val, 'get'):
         return float(val.get())
     try:
         return float(val.item())
@@ -755,7 +788,7 @@ class NeuroPheromoneSystem(BaseNeuroPheromoneSystem):
         smoothing_factor = cp.tanh(cp.abs(self.anxiety_wavefunction.imag) * self.config.linalool_factor)
         self.pheromone_tensor.imag *= smoothing_factor
 
-    def _generate_quantum_burst(self) -> cp.ndarray:
+    def _generate_quantum_burst(self) -> Any:
         burst = cp.random.normal(0, 0.1, (self.dimensions, self.dimensions)) + \
                 1j * cp.random.normal(0, 0.1, (self.dimensions, self.dimensions))
         try:

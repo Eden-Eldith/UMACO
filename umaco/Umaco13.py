@@ -171,19 +171,31 @@ import os
 import sys
 import logging
 import numpy as np
-import cupy as cp  # GPU-FIRST. No fallbacks. Get a GPU if you don't have one.
+
+try:  # Prefer CuPy but allow CPU fallback when runtime components are missing
+    import cupy as _cupy
+    _cupy_available = True
+except ImportError:  # pragma: no cover - depends on environment
+    _cupy = None
+    _cupy_available = False
+
+# These globals are mutated by _ensure_cupy_runtime_ready when CUDA is missing
+cp = _cupy if _cupy_available else np
+GPU_AVAILABLE = bool(_cupy_available)
 
 # Compatibility layer for cupy functions
 def asnumpy(arr):
     """Convert cupy array to numpy array"""
-    return arr.get()
+    if hasattr(arr, "get"):
+        return arr.get()
+    return np.array(arr)
 
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar"""
     return float(val) if hasattr(val, 'item') else float(val)
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Callable, Tuple, Optional, Union
+from typing import List, Dict, Any, Callable, Tuple, Optional, Union, TYPE_CHECKING
 from enum import Enum, auto
 
 # Topology packages (with fallback for these since they're CPU-only anyway)
@@ -202,6 +214,50 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger("UMACO13-PROPER")
+
+
+if TYPE_CHECKING:
+    import cupy as cupy_typing
+    NdArray = Union[np.ndarray, cupy_typing.ndarray]
+else:
+    NdArray = np.ndarray
+
+
+def _ensure_cupy_runtime_ready() -> None:
+    global cp, GPU_AVAILABLE
+
+    allow_cpu = os.getenv("UMACO_ALLOW_CPU", "0") == "1"
+
+    if not GPU_AVAILABLE:
+        if allow_cpu:
+            logger.warning(
+                "CuPy is unavailable; running in CPU compatibility mode because UMACO_ALLOW_CPU=1."
+            )
+            return
+        raise RuntimeError(
+            "UMACO13 requires CuPy for GPU execution. Install cupy-cudaXX (matching your CUDA version)"
+            " or set UMACO_ALLOW_CPU=1 explicitly if you want to run in CPU compatibility mode."
+        )
+
+    try:
+        device_count = cp.cuda.runtime.getDeviceCount()
+        if device_count < 1:
+            raise RuntimeError("No CUDA-capable device detected")
+        # NVRTC is required for CuPy elementwise kernels. If unavailable, switch to CPU mode.
+        cp.cuda.nvrtc.getVersion()
+    except Exception as exc:  # pragma: no cover - environment dependent
+        if not allow_cpu:
+            raise RuntimeError(
+                "UMACO13 detected a CUDA runtime issue (missing nvrtc64_xxx.dll)."
+                " Install the matching CUDA toolkit or add its bin directory to PATH."
+                " To override and permit CPU execution, export UMACO_ALLOW_CPU=1."
+            ) from exc
+        logger.warning(
+            "CuPy runtime issue detected (%s); falling back to NumPy compatibility mode because UMACO_ALLOW_CPU=1.",
+            exc,
+        )
+        cp = np
+        GPU_AVAILABLE = False
 
 # =================================================================================================
 # ABSTRACT BASE CLASSES FOR EXTENSIBILITY
@@ -585,7 +641,7 @@ class UMACO:
         
         return grad_approx
     
-    def _panic_backpropagate(self, loss_grad: cp.ndarray):
+    def _panic_backpropagate(self, loss_grad: NdArray):
         """
         Update panic based on loss landscape difficulty.
         High gradients = crisis = more panic.
@@ -1031,6 +1087,7 @@ def create_umaco_solver(problem_type: str, dim: int, max_iter: int, **kwargs) ->
     Factory function for quick UMACO setup.
     GPU-FIRST. No fallbacks. No compromises.
     """
+    _ensure_cupy_runtime_ready()
     solver_mode = SolverType[problem_type.upper()]
     n_ants = kwargs.get('n_ants', 8)
     
@@ -1126,14 +1183,17 @@ if __name__ == "__main__":
     print("="*80)
     
     # Check GPU availability
-    try:
-        gpu_props = cp.cuda.runtime.getDeviceProperties(0)
-        print(f"GPU DETECTED: {gpu_props['name'].decode()}")
-        print(f"Memory: {gpu_props['totalGlobalMem'] / 1e9:.1f} GB")
-        print(f"Compute Capability: {gpu_props['major']}.{gpu_props['minor']}")
-    except:
-        print("WARNING: No GPU detected! UMACO is GPU-FIRST!")
-        print("Get a GPU or expect terrible performance!")
+    if GPU_AVAILABLE:
+        try:
+            gpu_props = cp.cuda.runtime.getDeviceProperties(0)
+            print(f"GPU DETECTED: {gpu_props['name'].decode()}")
+            print(f"Memory: {gpu_props['totalGlobalMem'] / 1e9:.1f} GB")
+            print(f"Compute Capability: {gpu_props['major']}.{gpu_props['minor']}")
+        except Exception as exc:
+            print(f"WARNING: Unable to query GPU properties ({exc})")
+    else:
+        print("WARNING: No CuPy GPU backend detected. Running in CPU compatibility mode.")
+        print("Install a matching CUDA toolkit + CuPy wheel to restore GPU acceleration.")
     
     print("\n" + "="*80)
     print("DEMO 1: CONTINUOUS OPTIMIZATION (ROSENBROCK)")
