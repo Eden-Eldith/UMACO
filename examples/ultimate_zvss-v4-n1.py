@@ -25,15 +25,21 @@ from typing import List, Tuple, Dict, Optional
 
 try:
     import numpy as np
-    try:
+except ImportError as e:
+    print("ERROR: NumPy is required.\n", e)
+    sys.exit(1)
+
+try:
     import cupy as cp
     HAS_CUPY = True
 except ImportError:
-    import numpy as cp  # Use numpy as fallback
+    cp = np  # type: ignore
     HAS_CUPY = False
+
+try:
     import networkx as nx
 except ImportError as e:
-    print("ERROR: NumPy, CuPy, and NetworkX required.\n", e)
+    print("ERROR: NetworkX is required.\n", e)
     sys.exit(1)
 
 try:
@@ -216,12 +222,15 @@ class MACOZVSSSystem:
         self.logging_interval = 10
         self.noise_std = config.noise_std
 
+        if not HAS_CUPY:
+            raise RuntimeError("CuPy is required for MACO-ZVSS GPU acceleration")
+
         device_id = config.gpu_device_id
         cp.cuda.Device(device_id).use()
 
-        self.pheromones_gpu: Optional[cp.ndarray] = None
-        self.assignments_gpu: Optional[cp.ndarray] = None
-        self.qualities_gpu: Optional[cp.ndarray] = None
+        self.pheromones_gpu = None
+        self.assignments_gpu = None
+        self.qualities_gpu = None
         self.max_clause_size = 1
         self.last_improvement_iter = 0
 

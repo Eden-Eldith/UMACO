@@ -12,18 +12,25 @@ except ImportError:
 # Compatibility layer for cupy functions
 def asnumpy(arr):
     """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has  method
-        return arr
-    else:
-        return arr  # Already numpy or numpy-compatible
+    if HAS_CUPY and hasattr(arr, 'get'):
+        return arr.get()
+    return np.asarray(arr)
 
 def to_numpy_scalar(val):
     """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
     if HAS_CUPY and hasattr(val, 'get'):
-        return val
-    else:
-        return float(val) if hasattr(val, 'item') else float(val)
-from cupy.cuda import MemoryPool
+        return float(val.get())
+    try:
+        return float(val.item())
+    except AttributeError:
+        return float(val)
+
+if HAS_CUPY:
+    from cupy.cuda import MemoryPool
+else:  # CPU fallback
+    class MemoryPool:  # type: ignore
+        def __init__(self, *args, **kwargs):
+            pass
 from persim import PersistenceImager
 from ripser import Rips
 from persim.persistent_entropy import persistent_entropy

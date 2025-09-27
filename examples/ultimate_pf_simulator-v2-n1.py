@@ -90,7 +90,11 @@ class ProteinFoldingOptimizer:
         if self.cfg.random_seed is not None:
             random.seed(self.cfg.random_seed)
             np.random.seed(self.cfg.random_seed)
-            cp.random.seed(self.cfg.random_seed)
+            if HAS_CUPY:
+                cp.random.seed(self.cfg.random_seed)
+
+        if not HAS_CUPY:
+            raise RuntimeError("CuPy is required for the protein folding simulator")
 
         # GPU device
         cp.cuda.Device(self.cfg.gpu_device).use()

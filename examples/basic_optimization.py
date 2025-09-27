@@ -27,9 +27,11 @@ def main():
     
     # Run optimization
     print("Starting optimization...")
-    pheromone_real, pheromone_imag, panic_history, homology_report = optimizer.optimize(
-        agents, rosenbrock_loss
-    )
+    result = optimizer.optimize(agents, rosenbrock_loss)
+    pheromone_real = result.pheromone_real
+    pheromone_imag = result.pheromone_imag
+    panic_history = result.panic_history
+    homology_report = result.homology_report
     
     # Extract solution from pheromone field for continuous optimization
     if pheromone_real is not None:

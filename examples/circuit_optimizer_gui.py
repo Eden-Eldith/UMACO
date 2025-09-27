@@ -53,33 +53,21 @@ def loss_function(params: np.ndarray) -> float:
     return cost
 
 # ---------------------------------------------------------------
+# ---------------------------------------------------------------
 # Helper to extract coordinates after optimization
 # ---------------------------------------------------------------
 
-def extract_coords(pheromone_real: np.ndarray) -> list:
-    """Extract component coordinates from pheromone matrix using marginal distributions."""
-    # Use the same marginal distribution approach as the algorithm
-    # For 8D problem (4 components * 2 coords), we need to extract 8 coordinates
+def extract_coords_from_params(params: np.ndarray) -> list:
+    """Convert flattened parameter vector back into grid coordinates."""
     coords = []
+    if params is None or len(params) < len(COMPONENTS) * 2:
+        return [(0, 0)] * len(COMPONENTS)
 
-    # For simplicity, we'll take the expected values from marginals
-    # This is a simplified extraction - in practice you might want more sophisticated decoding
-    for i in range(4):  # 4 components
-        # Extract x coordinate marginal
-        x_marginal = np.sum(pheromone_real, axis=1)  # Sum over y dimensions
-        x_probs = x_marginal / (np.sum(x_marginal) + 1e-9)
-        x_indices = np.arange(len(x_probs))
-        x_expected = np.sum(x_indices * x_probs)
-
-        # Extract y coordinate marginal
-        y_marginal = np.sum(pheromone_real, axis=0)  # Sum over x dimensions
-        y_probs = y_marginal / (np.sum(y_marginal) + 1e-9)
-        y_indices = np.arange(len(y_probs))
-        y_expected = np.sum(y_indices * y_probs)
-
-        # Scale from [0, matrix_size-1] to [0, GRID_SIZE-1]
-        x = int(np.clip(x_expected * (GRID_SIZE - 1) / (pheromone_real.shape[0] - 1), 0, GRID_SIZE - 1))
-        y = int(np.clip(y_expected * (GRID_SIZE - 1) / (pheromone_real.shape[1] - 1), 0, GRID_SIZE - 1))
+    for i in range(0, len(COMPONENTS) * 2, 2):
+        x_param = np.clip(params[i], 0.0, 2.0)
+        y_param = np.clip(params[i + 1], 0.0, 2.0)
+        x = int(np.round(x_param * (GRID_SIZE - 1) / 2))
+        y = int(np.round(y_param * (GRID_SIZE - 1) / 2))
         coords.append((x, y))
 
     return coords
@@ -138,21 +126,22 @@ class CircuitOptimizerGUI:
         self.run_button.config(state=tk.DISABLED)
 
         # Run optimization
-        pheromone_real, _, _, _ = self.solver.optimize(self.agents, loss_function)
+        result = self.solver.optimize(self.agents, loss_function)
+        best_params = np.asarray(result.best_solution) if result.best_solution is not None else None
+        coords = extract_coords_from_params(best_params)
 
-        # Extract solution from pheromone matrix
-        coords = extract_coords(pheromone_real)
+        # Fallback to pheromone interpretation if best solution unavailable
+        if best_params is None:
+            coords = extract_coords_from_params(result.pheromone_real.flatten()[: len(COMPONENTS) * 2])
 
         # Calculate final cost using the extracted coordinates
         # Convert coords back to parameter array for loss calculation
         params = []
         for x, y in coords:
-            # Convert back to [0, 2] range
             x_param = x * 2 / (GRID_SIZE - 1)
             y_param = y * 2 / (GRID_SIZE - 1)
             params.extend([x_param, y_param])
-        params = np.array(params)
-        total_cost = loss_function(params)
+        total_cost = loss_function(np.array(params))
 
         self._draw_grid(coords)
         messagebox.showinfo("Optimization Complete", f"Final cost: {total_cost:.2f}")

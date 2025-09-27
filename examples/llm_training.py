@@ -14,6 +14,8 @@ import os
 import argparse
 import json
 import logging
+import random
+import numpy as np
 import torch
 from datasets import load_dataset
 from functools import partial
@@ -58,7 +60,18 @@ def main():
     parser.add_argument("--learning_rate", type=float, default=2e-4, help="Initial learning rate")
     parser.add_argument("--n_agents", type=int, default=8, help="Number of MACO agents")
     parser.add_argument("--use_wandb", action="store_true", help="Use Weights & Biases for logging")
+    parser.add_argument("--seed", type=int, default=42, help="Global random seed")
     args = parser.parse_args()
+
+    # Basic reproducibility
+    import random
+    import numpy as np
+
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
     
     # Load or create configuration
     if args.config and os.path.isfile(args.config):
@@ -80,6 +93,9 @@ def main():
     
     # Create output directory
     os.makedirs(config.output_dir, exist_ok=True)
+
+    if not os.path.isfile(config.training_data_file):
+        raise FileNotFoundError(f"Training data file not found: {config.training_data_file}")
     
     # Initialize Weights & Biases if requested
     if args.use_wandb:

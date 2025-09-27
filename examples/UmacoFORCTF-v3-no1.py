@@ -71,7 +71,7 @@ def parse_speeddy_ciphers(filename: str) -> List[int]:
     with open(filename, 'r') as f:
         # Parse the ciphertext data (example)
         # Return a list or array with cipher information to be used in cryptanalysis
-        pass  # Implement this depending on how the ciphertext is formatted
+        raise NotImplementedError("Parser for SPEEDY-7-192 cipher data is not implemented")
 
 # =============================================================================
 # Main System for Solving Cryptanalysis with MACO
@@ -95,7 +95,11 @@ class MACOCryptoOptimizer:
         self.logging_interval = 50
 
         device_id = config.gpu_device_id
-        cp.cuda.Device(device_id).use()
+        if HAS_CUPY:
+            try:
+                cp.cuda.Device(device_id).use()
+            except cp.cuda.runtime.CUDARuntimeError as exc:
+                raise RuntimeError("Requested CUDA device is unavailable") from exc
 
         # Initialize GPU arrays
         self.pheromones_gpu: Optional[cp.ndarray] = None
@@ -113,6 +117,9 @@ class MACOCryptoOptimizer:
     def solve(self) -> Tuple[Optional[np.ndarray], float]:
         logging.info("=== Starting MACO Cryptanalysis for SPEEDY-7-192 ===")
         start_time = time.time()
+
+        if self.pheromones_gpu is None:
+            self.initialize_search_space()
 
         # Main loop for solving using MACO
         for it in range(self.config.max_iterations):
@@ -138,7 +145,11 @@ class MACOCryptoOptimizer:
 
         total_time = time.time() - start_time
         logging.info(f"Optimization completed in {total_time:.2f} seconds")
-        return self.best_assignment, self.best_quality
+        best_assignment = None
+        if self.best_assignment is not None:
+            best_assignment = cp.asnumpy(self.best_assignment) if HAS_CUPY else np.array(self.best_assignment)
+
+        return best_assignment, float(self.best_quality)
 
     def _adapt_parameters(self, iteration: int) -> None:
         entropy = self._compute_entropy()
@@ -179,7 +190,7 @@ class MACOCryptoOptimizer:
         for flip in range(self.local_search_flips):
             candidate = self.best_assignment.copy()
             candidate_flip = cp.random.choice(self.num_vars)
-            candidate[0, candidate_flip] = 1 - candidate[0, candidate_flip]
+            candidate[candidate_flip] = 1 - candidate[candidate_flip]
             candidate_quality = self._evaluate_candidate(candidate)
             if candidate_quality > self.best_quality:
                 self.best_quality = candidate_quality
