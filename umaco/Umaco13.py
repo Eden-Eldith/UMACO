@@ -172,8 +172,8 @@ import sys
 import logging
 import numpy as np
 
-import umaco_gpu_utils as gpu_utils
-from umaco_gpu_utils import asnumpy, to_numpy_scalar
+from . import umaco_gpu_utils as gpu_utils
+from .umaco_gpu_utils import asnumpy, to_numpy_scalar
 
 cp = gpu_utils.cp
 
