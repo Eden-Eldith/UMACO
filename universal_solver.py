@@ -67,11 +67,11 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Seque
 
 import numpy as np
 
-import umaco_gpu_utils as gpu_utils
+import umaco.umaco_gpu_utils as gpu_utils
 
 cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 
-from Umaco13 import (
+from umaco.Umaco13 import (
     SolverType,
     UMACO,
     UniversalNode,
