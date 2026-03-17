@@ -603,7 +603,7 @@ If you use this code in your research, please cite:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the RCL License - see the [LICENSE](LICENSE) file for details.
 
 > **Entanglement Notice:**
 > Any use, inspiration, or derivative work from this repo, in whole or in part, is subject to the Recursive Entanglement Doctrine (RED.md) and Recursive Cognitive License (RCL.md).
