@@ -15,7 +15,7 @@
 
 ## A Note on P vs NP
 
-Yes, this repo contains a paper arguing that MACO exhibits polynomial-time scaling on NP-complete SAT instances. It's in [`benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md`](benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md). The benchmarks backing it up — 5,183 runs across 27.1 GPU-hours — are in [`benchmarks/`](benchmarks/).
+Yes, this repo contains a paper arguing that MACO exhibits polynomial-time scaling on NP-complete SAT instances. It's in [`benchmarks/benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md`](benchmarks/benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md). The benchmark logs backing it up — 5,183 runs across 27.1 GPU-hours — are in [`benchmarks/`](benchmarks/).
 
 The data shows polynomial scaling (R² = 0.897) where exponential is expected, and MACO outperforming MiniSat by 4.6x on hard instances. I believe the results are real. The code is verified. The evaluation is correct at every layer.
 
