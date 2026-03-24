@@ -29,6 +29,7 @@ import numpy as np
 import os
 
 import umaco_gpu_utils as gpu_utils
+from umaco_gpu_utils import asnumpy
 
 cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 import matplotlib.pyplot as plt
@@ -302,7 +303,7 @@ void build_paths(
             deposit = deposit_amounts[ant_idx]
             # We'll do the deposit in pure Python to keep it simpler,
             # though it's not the most efficient for large n_ants:
-            host_path = path_xy  # shape (protein_length, 2)
+            host_path = asnumpy(path_xy)  # shape (protein_length, 2)
             val = float(deposit)
             for (x, y) in host_path:
                 pheromone_update[x, y] += val
@@ -387,8 +388,8 @@ void build_paths(
             return
 
         # Convert to CPU
-        energy_map = self.energy_grid
-        best_path = self.best_path
+        energy_map = asnumpy(self.energy_grid)
+        best_path = asnumpy(self.best_path)
 
         plt.figure(figsize=(12, 6))
 

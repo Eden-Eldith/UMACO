@@ -1,0 +1,63 @@
+[Run 49] Start Time:  8:04:48.75 
+[Run 49] Running MACO with generated instance 
+08:12:59 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+08:12:59 [INFO] === Starting GPU-MACO SAT Solver ===
+08:12:59 [INFO] Variables: 50, Clauses: 200, Ants: 512, Max Iterations: 1000
+08:12:59 [INFO] [Iter 0] best_q=0.9450, avg_q=0.8755, entropy=0.632, alpha=3.594, rho=0.143, noise_std=0.0630
+08:12:59 [INFO] >>> Entering finishing phase at iteration 4
+08:12:59 [INFO] >>> Entering finishing phase at iteration 5
+08:12:59 [INFO] >>> Entering finishing phase at iteration 6
+08:12:59 [INFO] >>> Entering finishing phase at iteration 7
+08:12:59 [INFO] >>> Entering finishing phase at iteration 8
+08:12:59 [INFO] >>> Entering finishing phase at iteration 9
+08:12:59 [INFO] >>> Entering finishing phase at iteration 10
+08:13:00 [INFO] >>> Entering finishing phase at iteration 11
+08:13:00 [INFO] >>> Entering finishing phase at iteration 12
+08:13:00 [INFO] >>> Entering finishing phase at iteration 13
+08:13:00 [INFO] >>> Entering finishing phase at iteration 14
+08:13:00 [INFO] >>> Entering finishing phase at iteration 15
+08:13:00 [INFO] >>> Entering finishing phase at iteration 16
+08:13:00 [INFO] >>> Entering finishing phase at iteration 17
+08:13:00 [INFO] >>> Entering finishing phase at iteration 18
+08:13:00 [INFO] >>> Full or near-full SAT found. Exiting.
+08:13:00 [INFO] === Finished in 1.08 seconds ===
+08:13:00 [INFO] Best quality found (GPU-MACO): 1.0000
+08:13:00 [INFO] Sample of best assignment (first 50 vars): 1 1 1 0 1 1 1 0 1 1 1 0 1 1 0 1 1 1 0 1 1 0 1 0 0 1 0 0 0 1 0 1 1 1 1 0 0 1 1 0 0 0 1 0 1 0 0 1 0 1
+08:13:00 [INFO] [FULL SOLUTION] 1 1 1 0 1 1 1 0 1 1 1 0 1 1 0 1 1 1 0 1 1 0 1 0 0 1 0 0 0 1 0 1 1 1 1 0 0 1 1 0 0 0 1 0 1 0 0 1 0 1
+08:13:00 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+08:13:00 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+08:13:00 [INFO] Classical Solver (MiniSat): SAT in 0.01 seconds.
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 96             (13714 /sec)
+decisions             : 129            (0.00 % random) (18429 /sec)
+propagations          : 1419           (202714 /sec)
+conflict literals     : 442            (18.15 % deleted)
+CPU time              : 0.007 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 49] End Time:  8:04:48.75 
+ 

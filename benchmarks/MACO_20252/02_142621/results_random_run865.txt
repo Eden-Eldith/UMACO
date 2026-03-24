@@ -1,0 +1,53 @@
+[Run 865] Start Time: 14:26:21.50 
+[Run 865] Running MACO with generated instance 
+17:00:31 [INFO] Running MACO with generated instance
+17:00:31 [INFO] Generated random 3-SAT instance:
+17:00:31 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+17:00:31 [INFO] === Starting MACO Ultimate Edition ===
+17:00:31 [INFO] === Starting GPU-MACO SAT Solver ===
+17:00:31 [INFO] Variables: 50, Clauses: 200, Ants: 512, Max Iterations: 1000
+17:00:31 [INFO] [Iter 0] best_q=0.9350, avg_q=0.8752, entropy=0.644, alpha=3.594, rho=0.143, noise_std=0.0730
+17:00:33 [INFO] >>> Entering finishing phase at iteration 44
+17:00:33 [INFO] >>> Full or near-full SAT found. Exiting.
+17:00:33 [INFO] === Finished in 2.43 seconds ===
+17:00:33 [INFO] Best quality found (GPU-MACO): 1.0000
+17:00:33 [INFO] Sample of best assignment (first 50 vars): 0 1 1 1 1 0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 1 0 0 1 1 0 0 0 1 1 0 0 0 0 1 0 1 1 0 1 0 0 0 0 0 0 1 1 0 0
+17:00:33 [INFO] [FULL SOLUTION] 0 1 1 1 1 0 0 0 0 0 0 1 0 1 1 1 1 1 1 1 1 0 0 1 1 0 0 0 1 1 0 0 0 0 1 0 1 1 0 1 0 0 0 0 0 0 1 1 0 0
+17:00:33 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+17:00:33 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+17:00:33 [INFO] Classical Solver (MiniSat): UNSAT in 0.01 seconds.
+17:00:33 [INFO] Return code: 20
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 8              (1143 /sec)
+decisions             : 25             (0.00 % random) (3571 /sec)
+propagations          : 101            (14429 /sec)
+conflict literals     : 41             (4.65 % deleted)
+CPU time              : 0.007 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 865] End Time: 14:26:21.50 
+ 

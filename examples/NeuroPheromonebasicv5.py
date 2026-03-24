@@ -376,17 +376,17 @@ class SelfOptimizingBrainModel:
                         self.graph.add_edge(region3_nodes[i], region3_nodes[j])
         
         # Add cross-region connections
-        max_cross_connections = min(15, self.num_neurons // 2.5)
+        max_cross_connections = min(15, int(self.num_neurons // 2.5))
         for _ in range(max_cross_connections):
             if region1_nodes and region3_nodes:  # Connect region 1 and 3
                 source = random.choice(region1_nodes)
                 target = random.choice(region3_nodes)
                 self.graph.add_edge(source, target)
                 
-            if region2_nodes and region3_nodes:  # Connect region 1 and 3
-                        source = random.choice(region2_nodes)
-                        target = random.choice(region3_nodes)
-                        self.graph.add_edge(source, target)
+            if region2_nodes and region3_nodes:  # Connect region 2 and 3
+                source = random.choice(region2_nodes)
+                target = random.choice(region3_nodes)
+                self.graph.add_edge(source, target)
 
     def pheromone_update(self, activated_neurons):
         """Update pheromones based on Hebbian learning."""
@@ -504,8 +504,9 @@ def real_loss_function(pheromones):
         print(f"Error in loss function: {e}")
         return 100.0  # Return high but finite loss
 
-# Instantiate and run the self-optimizing brain model
-brain_model = SelfOptimizingBrainModel(num_neurons=2000)  # Explicitly set num_neurons to 2000
-best_loss = brain_model.run(real_loss_function)  # Run optimization with real loss function
-brain_model.visualize()  # Visualize the self-optimized brain
-print(f"Optimization finished with best loss: {best_loss}")
+if __name__ == "__main__":
+    # Instantiate and run the self-optimizing brain model
+    brain_model = SelfOptimizingBrainModel(num_neurons=2000)  # Explicitly set num_neurons to 2000
+    best_loss = brain_model.run(real_loss_function)  # Run optimization with real loss function
+    brain_model.visualize()  # Visualize the self-optimized brain
+    print(f"Optimization finished with best loss: {best_loss}")

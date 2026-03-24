@@ -1,0 +1,12 @@
+[Run 2] Start Time:  0:20:24.77 
+[Run 2] Running MACO with generated instance 
+00:20:26 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 806, in <module>
+    main()
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 774, in main
+    solver = MACOSystem(config=config, clauses=clauses, num_vars=num_vars) # Pass config and problem to solver
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: MACOSystem.__init__() got an unexpected keyword argument 'clauses'
+[Run 2] End Time:  0:20:24.77 
+ 

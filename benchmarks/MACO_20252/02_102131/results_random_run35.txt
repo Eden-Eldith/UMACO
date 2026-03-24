@@ -1,0 +1,13 @@
+[Run 35] Start Time: 10:21:31.37 
+[Run 35] Running MACO Ultimate Edition with generated instance 
+10:32:20 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+10:32:20 [INFO] === Starting MACO Ultimate Edition ===
+10:32:20 [INFO] [Iter 0] best_q=0.9250, avg_q=0.8746, entropy=0.781, alpha=3.594, rho=0.143, noise_std=0.0730
+10:32:20 [INFO] >>> Near-full SAT found. Exiting.
+10:32:20 [INFO] === Finished in 0.13 seconds ===
+10:32:20 [INFO] Best Quality Found: 1.0000
+10:32:20 [INFO] True Variables in Best Assignment: 25 / 50
+10:32:20 [INFO] Satisfied Clauses: 200/200 (100.00%)
+10:32:20 [INFO] Classical Solver Status: SAT, Time: 0.02s
+[Run 35] End Time: 10:21:31.37 
+ 

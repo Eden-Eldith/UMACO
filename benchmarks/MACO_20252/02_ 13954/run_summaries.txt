@@ -1,0 +1,39 @@
+📊 MACO Test Run 1 – Summary
+  ✔ Best Quality: 1.0
+  ✔ Final Quality: 1.0
+  ✔ Average Quality: 0.8754
+  ✔ Entropy Evolution: 0.836
+  ✔ Alpha Growth: 3.6
+  ✔ Rho Stability: 0.143
+  ✔ Noise_std Effect: 0.100
+  ✔ Partial Reset Triggers: None
+  ✔ MiniSat Verdict: SAT
+  ✔ MiniSat Conflicts: 13
+  ✔ MiniSat Propagations: 205
+
+📊 MACO Test Run 2 – Summary
+  ✔ Best Quality: 1.0
+  ✔ Final Quality: 1.0
+  ✔ Average Quality: 0.8762
+  ✔ Entropy Evolution: 0.898
+  ✔ Alpha Growth: 3.6
+  ✔ Rho Stability: 0.143
+  ✔ Noise_std Effect: 0.100
+  ✔ Partial Reset Triggers: None
+  ✔ MiniSat Verdict: SAT
+  ✔ MiniSat Conflicts: 11
+  ✔ MiniSat Propagations: 178
+
+📊 MACO Test Run 3 – Summary
+  ✔ Best Quality: 1.0
+  ✔ Final Quality: 1.0
+  ✔ Average Quality: 0.8756
+  ✔ Entropy Evolution: 0.884
+  ✔ Alpha Growth: 3.6
+  ✔ Rho Stability: 0.143
+  ✔ Noise_std Effect: 0.100
+  ✔ Partial Reset Triggers: None
+  ✔ MiniSat Verdict: SAT
+  ✔ MiniSat Conflicts: 15
+  ✔ MiniSat Propagations: 248
+

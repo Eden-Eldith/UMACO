@@ -1,0 +1,54 @@
+[Run 2] Start Time:  3:45:36.38 
+[Run 2] Running MACO with generated instance 
+03:57:31 [INFO] Generated random 4-SAT instance: 1000 vars, 4300 clauses.
+03:57:31 [INFO] === Starting GPU-MACO SAT Solver ===
+03:57:31 [INFO] Variables: 1000, Clauses: 4300, Ants: 256, Max Iterations: 1000
+03:57:32 [INFO] [Iter 0] best_q=0.9477, avg_q=0.9379, entropy=0.830, alpha=1.997, rho=0.036, noise_std=0.0000
+03:57:55 [INFO] Partial reset triggered at iteration 31.
+03:58:08 [INFO] [Iter 50] best_q=0.9545, avg_q=0.8513, entropy=0.278, alpha=2.148, rho=0.010, noise_std=0.0083
+03:58:18 [INFO] Partial reset triggered at iteration 63.
+03:58:40 [INFO] Partial reset triggered at iteration 93.
+03:58:45 [INFO] [Iter 100] best_q=0.9545, avg_q=0.9067, entropy=0.382, alpha=2.326, rho=0.010, noise_std=0.0060
+03:59:01 [INFO] Partial reset triggered at iteration 123.
+03:59:20 [INFO] [Iter 150] best_q=0.9568, avg_q=0.8231, entropy=0.205, alpha=2.526, rho=0.010, noise_std=0.0098
+03:59:23 [INFO] Partial reset triggered at iteration 155.
+03:59:45 [INFO] Partial reset triggered at iteration 185.
+03:59:55 [INFO] [Iter 200] best_q=0.9568, avg_q=0.8411, entropy=0.225, alpha=2.725, rho=0.010, noise_std=0.0094
+04:00:06 [INFO] Partial reset triggered at iteration 215.
+04:00:28 [INFO] Partial reset triggered at iteration 245.
+04:00:31 [INFO] [Iter 250] best_q=0.9568, avg_q=0.9203, entropy=0.348, alpha=2.930, rho=0.010, noise_std=0.0064
+04:00:49 [INFO] Partial reset triggered at iteration 275.
+04:01:07 [INFO] [Iter 300] best_q=0.9568, avg_q=0.7940, entropy=0.182, alpha=3.148, rho=0.010, noise_std=0.0103
+04:01:11 [INFO] Partial reset triggered at iteration 305.
+04:01:32 [INFO] Partial reset triggered at iteration 335.
+04:01:43 [INFO] [Iter 350] best_q=0.9568, avg_q=0.8482, entropy=0.210, alpha=3.351, rho=0.010, noise_std=0.0097
+04:01:54 [INFO] Partial reset triggered at iteration 365.
+04:02:15 [INFO] Partial reset triggered at iteration 395.
+04:02:18 [INFO] [Iter 400] best_q=0.9573, avg_q=0.9176, entropy=0.318, alpha=3.566, rho=0.010, noise_std=0.0071
+04:02:37 [INFO] Partial reset triggered at iteration 426.
+04:02:54 [INFO] [Iter 450] best_q=0.9573, avg_q=0.8174, entropy=0.160, alpha=3.798, rho=0.010, noise_std=0.0107
+04:02:59 [INFO] Partial reset triggered at iteration 456.
+04:03:20 [INFO] Partial reset triggered at iteration 486.
+04:03:30 [INFO] [Iter 500] best_q=0.9573, avg_q=0.8408, entropy=0.199, alpha=4.015, rho=0.010, noise_std=0.0099
+04:03:41 [INFO] Partial reset triggered at iteration 516.
+04:04:02 [INFO] Partial reset triggered at iteration 546.
+04:04:06 [INFO] [Iter 550] best_q=0.9573, avg_q=0.9255, entropy=0.313, alpha=4.241, rho=0.010, noise_std=0.0070
+04:04:25 [INFO] Partial reset triggered at iteration 576.
+04:04:43 [INFO] [Iter 600] best_q=0.9573, avg_q=0.7994, entropy=0.159, alpha=4.475, rho=0.010, noise_std=0.0108
+04:04:48 [INFO] Partial reset triggered at iteration 606.
+04:05:10 [INFO] Partial reset triggered at iteration 636.
+04:05:20 [INFO] [Iter 650] best_q=0.9573, avg_q=0.8470, entropy=0.196, alpha=4.699, rho=0.010, noise_std=0.0100
+04:05:32 [INFO] Partial reset triggered at iteration 666.
+04:05:53 [INFO] Partial reset triggered at iteration 696.
+04:05:56 [INFO] [Iter 700] best_q=0.9573, avg_q=0.9065, entropy=0.290, alpha=4.928, rho=0.010, noise_std=0.0074
+04:06:15 [INFO] Partial reset triggered at iteration 726.
+04:06:32 [INFO] [Iter 750] best_q=0.9573, avg_q=0.7935, entropy=0.149, alpha=5.170, rho=0.010, noise_std=0.0110
+04:06:37 [INFO] Partial reset triggered at iteration 756.
+04:06:59 [INFO] Partial reset triggered at iteration 786.
+04:07:09 [INFO] [Iter 800] best_q=0.9573, avg_q=0.8263, entropy=0.149, alpha=5.415, rho=0.010, noise_std=0.0110
+04:07:21 [INFO] Partial reset triggered at iteration 816.
+04:07:43 [INFO] Partial reset triggered at iteration 846.
+04:07:46 [INFO] [Iter 850] best_q=0.9573, avg_q=0.8220, entropy=0.143, alpha=5.680, rho=0.010, noise_std=0.0110
+04:08:05 [INFO] Partial reset triggered at iteration 876.
+04:08:22 [INFO] [Iter 900] best_q=0.9573, avg_q=0.7889, entropy=0.099, alpha=5.965, rho=0.010, noise_std=0.0120
+04:08:27 [INFO] Partial reset triggered at iteration 906.

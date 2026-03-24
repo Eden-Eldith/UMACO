@@ -1,0 +1,18 @@
+[Run 6] Start Time: 10:57:47.36 
+[Run 6] Running MACO with generated instance 
+10:59:44 [INFO] Running MACO with generated instance
+10:59:44 [INFO] Generated random 3-SAT instance:
+10:59:44 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+10:59:44 [INFO] === Starting GPU-MACO SAT Solver ===
+10:59:44 [INFO] === Starting GPU-MACO SAT Solver ===
+10:59:44 [INFO] [Iter 0] best_q=0.9500, avg_q=0.8753, entropy=0.634, alpha=3.594, rho=0.143, noise_std=0.0730
+10:59:44 [INFO] >>> Near-full SAT found. Exiting.
+10:59:44 [INFO] === Finished in 0.14 seconds ===
+10:59:44 [INFO] [SOLUTION ANALYSIS] Best Quality Found (GPU-MACO): 1.0000
+10:59:44 [INFO] True Variables in Best Assignment: 26 / 50
+10:59:44 [INFO] [SOLUTION ANALYSIS] 200/200 (100.00%)
+10:59:44 [INFO] Classical Solver Status: SAT, Time: 0.01s
+10:59:44 [INFO] Return code: 10
+Return code: 10
+[Run 6] End Time: 10:57:47.36 
+ 

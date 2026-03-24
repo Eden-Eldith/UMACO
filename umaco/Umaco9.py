@@ -1,25 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# Compatibility layer for cupy functions
-def asnumpy(arr):
-    """Convert cupy array to numpy array, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(arr, 'get'):  # CuPy array has .get() method
-        return arr.get()
-    else:
-        return arr  # Already numpy or numpy-compatible
-
-def to_numpy_scalar(val):
-    """Convert cupy scalar to numpy scalar, or pass through if already numpy"""
-    if HAS_CUPY and hasattr(val, 'get'):
-        result = val.get()
-    else:
-        result = float(val) if hasattr(val, 'item') else float(val)
-    
-    # Handle NaN values
-    if np.isnan(result):
-        return 0.0
-    return result
-
 """
 ███████╗██████╗███████╗██████╗  UMACO v9 ARCHITECTURAL CONSTRAINTS ███████╗███████╗██████╗
 All implementations MUST contain these interconnected systems:
@@ -255,7 +235,7 @@ class UMACO9:
             raise ValueError("panic_seed must match (n_dim, n_dim).")
         self.panic_tensor = cp.array(config.panic_seed, dtype=cp.float32)
         self.anxiety_wavefunction = cp.zeros((config.n_dim, config.n_dim), dtype=cp.complex64)
-        self.anxiety_wavefunction *= config.trauma_factor
+        self.anxiety_wavefunction += config.trauma_factor
 
         # TSF
         self.pheromones = pheromones
@@ -351,8 +331,6 @@ class UMACO9:
             repeated = cp.zeros(shape_2d, dtype=cp.complex64)
             repeated[:] = rep_val
             self.anxiety_wavefunction = repeated
-        else:
-            self.anxiety_wavefunction = cp.zeros_like(self.anxiety_wavefunction)
 
         lifetimes = []
         for d in diagrams:

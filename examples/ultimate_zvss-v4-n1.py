@@ -70,7 +70,7 @@ class MACOZVSSConfig:
     finishing_threshold: float = float(0.99900)
     partial_reset_stagnation: int = 20
     noise_std: float = float(0.10000)
-    quantum_burst_interval: float = (0.5)
+    quantum_burst_interval: int = 100
     parallel_ants: bool = True
     num_workers: int = 8
     gpu_device_id: int = 0
@@ -222,8 +222,6 @@ class MACOZVSSSystem:
         self.local_search_flips = 10
         self.partial_reset_stagnation = config.partial_reset_stagnation
         self.logging_interval = 10
-        self.noise_std = config.noise_std
-
         if not GPU_AVAILABLE:
             raise RuntimeError("CuPy is required for MACO-ZVSS GPU acceleration")
 
@@ -320,7 +318,7 @@ class MACOZVSSSystem:
         Partially resets low-value pheromones to a small random value. Useful to escape local minima.
         """
         ph = self.pheromones_gpu.ravel()
-        ph_cpu = ph
+        ph_cpu = asnumpy(ph)
         cutoff_idx = int(len(ph_cpu) * 0.05)
         if cutoff_idx < 1:
             cutoff_idx = 1
@@ -426,11 +424,11 @@ class MACOZVSSSystem:
         """
         if (iteration % self.config.quantum_burst_interval) == (self.config.quantum_burst_interval - 1):
             if best_q < 0.999:
-                old_noise = self.noise_std
-                self.noise_std = min(0.5, self.noise_std * 3.0)
+                old_noise = self.config.noise_std
+                self.config.noise_std = min(0.5, self.config.noise_std * 3.0)
                 self.alpha = max(1.0, self.alpha * 0.7)
                 logging.info(
-                    f"Quantum burst triggered: noise_std from {old_noise:.3f} to {self.noise_std:.3f}, "
+                    f"Quantum burst triggered: noise_std from {old_noise:.3f} to {self.config.noise_std:.3f}, "
                     f"alpha now {self.alpha:.3f}"
                 )
 
@@ -848,7 +846,7 @@ def run_zvss_pygame(best_params: Dict[str, float]) -> None:
     running = True
     step = 0
     while running:
-        for event in pygame.to_numpy_scalar(event):
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
@@ -858,7 +856,7 @@ def run_zvss_pygame(best_params: Dict[str, float]) -> None:
             add_noise_pygame(player_x, player_y, intensity=500)
         move_zombies_pygame()
         draw_scene_pygame()
-        step += 0.5
+        step += 1
         clock.tick(10)
 
     pygame.quit()

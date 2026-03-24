@@ -1,0 +1,11 @@
+[Run 3] Start Time: 23:52:02.47 
+[Run 3] Running MACO with generated instance 
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 379, in <module>
+    class MACOSystem:
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 384, in MACOSystem
+    def __init__(self, config: MACOConfig):
+                               ^^^^^^^^^^
+NameError: name 'MACOConfig' is not defined
+[Run 3] End Time: 23:52:02.47 
+ 

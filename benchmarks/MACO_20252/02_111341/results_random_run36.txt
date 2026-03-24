@@ -1,0 +1,9 @@
+[Run 36] Start Time: 11:13:41.48 
+[Run 36] Running MACO with generated instance 
+usage: macov6no-5-23-02-2025.py [-h] [--cnf CNF] [--num_ants NUM_ANTS]
+                                [--max_iter MAX_ITER]
+                                [--log_level {DEBUG,INFO,WARNING,ERROR}]
+                                [--device DEVICE] [--solver_path SOLVER_PATH]
+macov6no-5-23-02-2025.py: error: unrecognized arguments: --compat
+[Run 36] End Time: 11:13:41.48 
+ 

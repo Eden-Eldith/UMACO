@@ -1,0 +1,135 @@
+[Run 2] Start Time:  5:28:13.19 
+[Run 2] Running MACO with generated instance 
+05:29:07 [INFO] Generated random 3-SAT instance: 75 vars, 325 clauses.
+05:29:07 [INFO] === Starting GPU-MACO SAT Solver ===
+05:29:07 [INFO] Variables: 75, Clauses: 325, Ants: 256, Max Iterations: 1000
+05:29:07 [INFO] [Iter 0] best_q=0.9292, avg_q=0.8759, entropy=0.343, alpha=3.997, rho=0.036, noise_std=0.0000
+05:29:09 [INFO] >>> Entering finishing phase at iteration 48
+05:29:10 [INFO] >>> Entering finishing phase at iteration 49
+05:29:10 [INFO] >>> Entering finishing phase at iteration 50
+05:29:10 [INFO] [Iter 50] best_q=0.9973, avg_q=0.9585, entropy=0.503, alpha=4.095, rho=0.010, noise_std=0.0040
+05:29:10 [INFO] >>> Entering finishing phase at iteration 51
+05:29:10 [INFO] >>> Entering finishing phase at iteration 52
+05:29:10 [INFO] >>> Entering finishing phase at iteration 53
+05:29:10 [INFO] >>> Entering finishing phase at iteration 54
+05:29:10 [INFO] >>> Entering finishing phase at iteration 55
+05:29:10 [INFO] >>> Entering finishing phase at iteration 56
+05:29:10 [INFO] >>> Entering finishing phase at iteration 57
+05:29:10 [INFO] >>> Entering finishing phase at iteration 58
+05:29:10 [INFO] >>> Entering finishing phase at iteration 59
+05:29:10 [INFO] >>> Entering finishing phase at iteration 60
+05:29:10 [INFO] >>> Entering finishing phase at iteration 61
+05:29:10 [INFO] >>> Entering finishing phase at iteration 62
+05:29:10 [INFO] >>> Entering finishing phase at iteration 63
+05:29:10 [INFO] >>> Entering finishing phase at iteration 64
+05:29:10 [INFO] >>> Entering finishing phase at iteration 65
+05:29:10 [INFO] >>> Entering finishing phase at iteration 66
+05:29:10 [INFO] >>> Entering finishing phase at iteration 67
+05:29:11 [INFO] >>> Entering finishing phase at iteration 68
+05:29:11 [INFO] >>> Entering finishing phase at iteration 69
+05:29:11 [INFO] >>> Entering finishing phase at iteration 70
+05:29:11 [INFO] >>> Entering finishing phase at iteration 71
+05:29:11 [INFO] >>> Entering finishing phase at iteration 72
+05:29:11 [INFO] >>> Entering finishing phase at iteration 73
+05:29:11 [INFO] >>> Entering finishing phase at iteration 74
+05:29:11 [INFO] >>> Entering finishing phase at iteration 75
+05:29:11 [INFO] >>> Entering finishing phase at iteration 76
+05:29:11 [INFO] >>> Entering finishing phase at iteration 77
+05:29:11 [INFO] >>> Entering finishing phase at iteration 78
+05:29:11 [INFO] Partial reset triggered at iteration 78.
+05:29:11 [INFO] >>> Entering finishing phase at iteration 79
+05:29:11 [INFO] >>> Entering finishing phase at iteration 80
+05:29:11 [INFO] >>> Entering finishing phase at iteration 81
+05:29:11 [INFO] >>> Entering finishing phase at iteration 82
+05:29:11 [INFO] >>> Entering finishing phase at iteration 83
+05:29:11 [INFO] >>> Entering finishing phase at iteration 84
+05:29:11 [INFO] >>> Entering finishing phase at iteration 85
+05:29:11 [INFO] >>> Entering finishing phase at iteration 86
+05:29:12 [INFO] >>> Entering finishing phase at iteration 87
+05:29:12 [INFO] >>> Entering finishing phase at iteration 88
+05:29:12 [INFO] >>> Entering finishing phase at iteration 89
+05:29:12 [INFO] >>> Entering finishing phase at iteration 90
+05:29:12 [INFO] >>> Entering finishing phase at iteration 91
+05:29:12 [INFO] >>> Entering finishing phase at iteration 92
+05:29:12 [INFO] >>> Entering finishing phase at iteration 93
+05:29:12 [INFO] >>> Entering finishing phase at iteration 94
+05:29:12 [INFO] >>> Entering finishing phase at iteration 95
+05:29:12 [INFO] >>> Entering finishing phase at iteration 96
+05:29:12 [INFO] >>> Entering finishing phase at iteration 97
+05:29:12 [INFO] >>> Entering finishing phase at iteration 98
+05:29:12 [INFO] >>> Entering finishing phase at iteration 99
+05:29:12 [INFO] >>> Entering finishing phase at iteration 100
+05:29:12 [INFO] [Iter 100] best_q=0.9973, avg_q=0.9547, entropy=0.457, alpha=4.212, rho=0.010, noise_std=0.0047
+05:29:12 [INFO] >>> Entering finishing phase at iteration 101
+05:29:12 [INFO] >>> Entering finishing phase at iteration 102
+05:29:12 [INFO] >>> Entering finishing phase at iteration 103
+05:29:12 [INFO] >>> Entering finishing phase at iteration 104
+05:29:12 [INFO] >>> Entering finishing phase at iteration 105
+05:29:13 [INFO] >>> Entering finishing phase at iteration 106
+05:29:13 [INFO] >>> Entering finishing phase at iteration 107
+05:29:13 [INFO] >>> Entering finishing phase at iteration 108
+05:29:13 [INFO] Partial reset triggered at iteration 108.
+05:29:13 [INFO] >>> Entering finishing phase at iteration 109
+05:29:13 [INFO] >>> Entering finishing phase at iteration 110
+05:29:13 [INFO] >>> Entering finishing phase at iteration 111
+05:29:13 [INFO] >>> Entering finishing phase at iteration 112
+05:29:13 [INFO] >>> Entering finishing phase at iteration 113
+05:29:13 [INFO] >>> Entering finishing phase at iteration 114
+05:29:13 [INFO] >>> Entering finishing phase at iteration 115
+05:29:13 [INFO] >>> Entering finishing phase at iteration 116
+05:29:13 [INFO] >>> Entering finishing phase at iteration 117
+05:29:13 [INFO] >>> Entering finishing phase at iteration 118
+05:29:13 [INFO] >>> Entering finishing phase at iteration 119
+05:29:13 [INFO] >>> Entering finishing phase at iteration 120
+05:29:13 [INFO] >>> Entering finishing phase at iteration 121
+05:29:13 [INFO] >>> Entering finishing phase at iteration 122
+05:29:13 [INFO] >>> Entering finishing phase at iteration 123
+05:29:13 [INFO] >>> Entering finishing phase at iteration 124
+05:29:14 [INFO] >>> Entering finishing phase at iteration 125
+05:29:14 [INFO] >>> Entering finishing phase at iteration 126
+05:29:14 [INFO] >>> Entering finishing phase at iteration 127
+05:29:14 [INFO] >>> Entering finishing phase at iteration 128
+05:29:14 [INFO] >>> Entering finishing phase at iteration 129
+05:29:14 [INFO] >>> Entering finishing phase at iteration 130
+05:29:14 [INFO] >>> Entering finishing phase at iteration 131
+05:29:14 [INFO] >>> Entering finishing phase at iteration 132
+05:29:14 [INFO] >>> Entering finishing phase at iteration 133
+05:29:14 [INFO] >>> Entering finishing phase at iteration 134
+05:29:14 [INFO] >>> Entering finishing phase at iteration 135
+05:29:14 [INFO] >>> Entering finishing phase at iteration 136
+05:29:14 [INFO] >>> Entering finishing phase at iteration 137
+05:29:14 [INFO] >>> Entering finishing phase at iteration 138
+05:29:14 [INFO] Partial reset triggered at iteration 138.
+05:29:14 [INFO] >>> Entering finishing phase at iteration 139
+05:29:14 [INFO] >>> Entering finishing phase at iteration 140
+05:29:14 [INFO] >>> Entering finishing phase at iteration 141
+05:29:14 [INFO] >>> Entering finishing phase at iteration 142
+05:29:14 [INFO] >>> Entering finishing phase at iteration 143
+05:29:15 [INFO] >>> Entering finishing phase at iteration 144
+05:29:15 [INFO] >>> Entering finishing phase at iteration 145
+05:29:15 [INFO] >>> Entering finishing phase at iteration 146
+05:29:15 [INFO] >>> Entering finishing phase at iteration 147
+05:29:15 [INFO] >>> Entering finishing phase at iteration 148
+05:29:15 [INFO] >>> Entering finishing phase at iteration 149
+05:29:15 [INFO] >>> Entering finishing phase at iteration 150
+05:29:15 [INFO] [Iter 150] best_q=0.9973, avg_q=0.9615, entropy=0.371, alpha=4.348, rho=0.010, noise_std=0.0066
+05:29:15 [INFO] >>> Entering finishing phase at iteration 151
+05:29:15 [INFO] >>> Entering finishing phase at iteration 152
+05:29:15 [INFO] >>> Entering finishing phase at iteration 153
+05:29:15 [INFO] >>> Entering finishing phase at iteration 154
+05:29:15 [INFO] >>> Entering finishing phase at iteration 155
+05:29:15 [INFO] >>> Entering finishing phase at iteration 156
+05:29:15 [INFO] >>> Entering finishing phase at iteration 157
+05:29:15 [INFO] >>> Entering finishing phase at iteration 158
+05:29:15 [INFO] >>> Entering finishing phase at iteration 159
+05:29:15 [INFO] >>> Entering finishing phase at iteration 160
+05:29:15 [INFO] >>> Entering finishing phase at iteration 161
+05:29:15 [INFO] >>> Entering finishing phase at iteration 162
+05:29:15 [INFO] >>> Entering finishing phase at iteration 163
+05:29:16 [INFO] >>> Entering finishing phase at iteration 164
+05:29:16 [INFO] >>> Entering finishing phase at iteration 165
+05:29:16 [INFO] >>> Entering finishing phase at iteration 166
+05:29:16 [INFO] >>> Entering finishing phase at iteration 167
+05:29:16 [INFO] >>> Entering finishing phase at iteration 168
+05:29:16 [INFO] Partial reset triggered at iteration 168.
+05:29:16 [INFO] >>> Entering finishing phase at iteration 169

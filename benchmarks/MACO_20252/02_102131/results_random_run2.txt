@@ -1,0 +1,65 @@
+[Run 2] Start Time: 10:21:31.37 
+[Run 2] Running MACO Ultimate Edition with generated instance 
+10:21:33 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+10:21:33 [INFO] === Starting MACO Ultimate Edition ===
+10:21:33 [INFO] [Iter 0] best_q=0.9500, avg_q=0.8755, entropy=0.650, alpha=3.594, rho=0.143, noise_std=0.0730
+10:21:35 [INFO] Partial reset triggered at iteration 41.
+10:21:35 [INFO] [Iter 50] best_q=0.9950, avg_q=0.9950, entropy=0.029, alpha=4.209, rho=0.010, noise_std=0.0100
+10:21:37 [INFO] Partial reset triggered at iteration 81.
+10:21:38 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.408
+10:21:38 [INFO] [Iter 100] best_q=0.9950, avg_q=0.9950, entropy=0.023, alpha=3.422, rho=0.010, noise_std=0.0232
+10:21:39 [INFO] Partial reset triggered at iteration 121.
+10:21:40 [INFO] [Iter 150] best_q=0.9950, avg_q=0.9950, entropy=0.025, alpha=4.095, rho=0.010, noise_std=0.0100
+10:21:41 [INFO] Partial reset triggered at iteration 161.
+10:21:43 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.329
+10:21:43 [INFO] [Iter 200] best_q=0.9950, avg_q=0.9950, entropy=0.024, alpha=3.342, rho=0.010, noise_std=0.0232
+10:21:43 [INFO] Partial reset triggered at iteration 201.
+10:21:45 [INFO] Partial reset triggered at iteration 241.
+10:21:46 [INFO] [Iter 250] best_q=0.9950, avg_q=0.9950, entropy=0.028, alpha=4.015, rho=0.010, noise_std=0.0100
+10:21:47 [INFO] Partial reset triggered at iteration 281.
+10:21:48 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.272
+10:21:48 [INFO] [Iter 300] best_q=0.9950, avg_q=0.9950, entropy=0.026, alpha=3.286, rho=0.010, noise_std=0.0233
+10:21:49 [INFO] Partial reset triggered at iteration 321.
+10:21:51 [INFO] [Iter 350] best_q=0.9950, avg_q=0.9950, entropy=0.025, alpha=3.959, rho=0.010, noise_std=0.0100
+10:21:51 [INFO] Partial reset triggered at iteration 361.
+10:21:53 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.233
+10:21:53 [INFO] [Iter 400] best_q=0.9950, avg_q=0.9950, entropy=0.024, alpha=3.247, rho=0.010, noise_std=0.0232
+10:21:53 [INFO] Partial reset triggered at iteration 401.
+10:21:56 [INFO] Partial reset triggered at iteration 441.
+10:21:56 [INFO] [Iter 450] best_q=0.9950, avg_q=0.9950, entropy=0.028, alpha=3.919, rho=0.010, noise_std=0.0100
+10:21:58 [INFO] Partial reset triggered at iteration 481.
+10:21:59 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.205
+10:21:59 [INFO] [Iter 500] best_q=0.9950, avg_q=0.9950, entropy=0.027, alpha=3.219, rho=0.010, noise_std=0.0233
+10:22:00 [INFO] Partial reset triggered at iteration 521.
+10:22:01 [INFO] [Iter 550] best_q=0.9950, avg_q=0.9950, entropy=0.025, alpha=3.892, rho=0.010, noise_std=0.0100
+10:22:02 [INFO] Partial reset triggered at iteration 561.
+10:22:04 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.186
+10:22:04 [INFO] [Iter 600] best_q=0.9950, avg_q=0.9950, entropy=0.024, alpha=3.200, rho=0.010, noise_std=0.0232
+10:22:04 [INFO] Partial reset triggered at iteration 601.
+10:22:06 [INFO] Partial reset triggered at iteration 641.
+10:22:06 [INFO] [Iter 650] best_q=0.9950, avg_q=0.9950, entropy=0.028, alpha=3.873, rho=0.010, noise_std=0.0100
+10:22:08 [INFO] Partial reset triggered at iteration 681.
+10:22:09 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.173
+10:22:09 [INFO] [Iter 700] best_q=0.9950, avg_q=0.9950, entropy=0.026, alpha=3.186, rho=0.010, noise_std=0.0233
+10:22:10 [INFO] Partial reset triggered at iteration 721.
+10:22:11 [INFO] [Iter 750] best_q=0.9950, avg_q=0.9950, entropy=0.025, alpha=3.859, rho=0.010, noise_std=0.0100
+10:22:12 [INFO] Partial reset triggered at iteration 761.
+10:22:14 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.161
+10:22:14 [INFO] [Iter 800] best_q=0.9950, avg_q=0.9950, entropy=0.039, alpha=3.175, rho=0.010, noise_std=0.0234
+10:22:14 [INFO] Partial reset triggered at iteration 801.
+10:22:16 [INFO] Partial reset triggered at iteration 841.
+10:22:17 [INFO] [Iter 850] best_q=0.9950, avg_q=0.9950, entropy=0.032, alpha=3.839, rho=0.010, noise_std=0.0100
+10:22:18 [INFO] Partial reset triggered at iteration 881.
+10:22:19 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.148
+10:22:19 [INFO] [Iter 900] best_q=0.9950, avg_q=0.9950, entropy=0.028, alpha=3.161, rho=0.010, noise_std=0.0233
+10:22:20 [INFO] Partial reset triggered at iteration 921.
+10:22:22 [INFO] [Iter 950] best_q=0.9950, avg_q=0.9950, entropy=0.025, alpha=3.834, rho=0.010, noise_std=0.0100
+10:22:22 [INFO] Partial reset triggered at iteration 961.
+10:22:24 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.146
+10:22:24 [INFO] === Finished in 51.76 seconds ===
+10:22:24 [INFO] Best Quality Found: 0.9950
+10:22:24 [INFO] True Variables in Best Assignment: 29 / 50
+10:22:24 [INFO] Satisfied Clauses: 199/200 (99.50%)
+10:22:24 [INFO] Classical Solver Status: SAT, Time: 0.02s
+[Run 2] End Time: 10:21:31.37 
+ 

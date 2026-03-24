@@ -1,0 +1,43 @@
+UMACO BENCHMARK ANALYSIS REPORT
+============================================================
+Total logs found: 5468
+Successfully parsed: 5183
+Failed/errored: 285
+
+CONFIGURATIONS:
+  5 vars, 50 clauses, 1024 ants: 20 runs, mean_time=32.74s, mean_sat=96.00%
+  30 vars, 70 clauses, 512 ants: 102 runs, mean_time=0.06s, mean_sat=100.00%
+  50 vars, 200 clauses, ? ants: 75 runs, mean_time=13.33s, mean_sat=0.00%
+  50 vars, 200 clauses, 256 ants: 228 runs, mean_time=5.68s, mean_sat=99.92%
+  50 vars, 200 clauses, 512 ants: 2206 runs, mean_time=8.73s, mean_sat=99.93%
+  50 vars, 200 clauses, 1024 ants: 2367 runs, mean_time=14.53s, mean_sat=99.93%
+  75 vars, 325 clauses, 256 ants: 2 runs, mean_time=52.34s, mean_sat=99.69%
+  100 vars, 227 clauses, 256 ants: 3 runs, mean_time=0.11s, mean_sat=100.00%
+  100 vars, 227 clauses, 1024 ants: 3 runs, mean_time=0.40s, mean_sat=100.00%
+  100 vars, 369 clauses, 256 ants: 3 runs, mean_time=0.82s, mean_sat=100.00%
+  100 vars, 369 clauses, 1024 ants: 3 runs, mean_time=8.40s, mean_sat=100.00%
+  500 vars, 330 clauses, 256 ants: 3 runs, mean_time=0.13s, mean_sat=100.00%
+  500 vars, 330 clauses, 1024 ants: 3 runs, mean_time=0.39s, mean_sat=100.00%
+  500 vars, 2500 clauses, 512 ants: 34 runs, mean_time=701.11s, mean_sat=94.57%
+  500 vars, 2500 clauses, 2048 ants: 4 runs, mean_time=2476.48s, mean_sat=95.30%
+  500 vars, 2500 clauses, 3072 ants: 10 runs, mean_time=749.14s, mean_sat=95.50%
+  1000 vars, 4300 clauses, 256 ants: 14 runs, mean_time=738.44s, mean_sat=95.59%
+
+SCALING:
+  5 vars: 11 runs, mean_time=32.74s, mean_sat=96.00%
+  30 vars: 102 runs, mean_time=0.06s, mean_sat=100.00%
+  50 vars: 4871 runs, mean_time=11.47s, mean_sat=99.93%
+  75 vars: 1 runs, mean_time=52.34s, mean_sat=99.69%
+  100 vars: 12 runs, mean_time=2.43s, mean_sat=100.00%
+  500 vars: 50 runs, mean_time=697.63s, mean_sat=95.43%
+  1000 vars: 8 runs, mean_time=738.44s, mean_sat=95.59%
+
+  Log-log slope: 1.055 (R²=0.3180)
+  Empirical complexity: O(n^1.06)
+
+SUMMARY:
+  Total valid runs: 5183
+  Mean satisfaction: 99.87%
+  100% satisfied: 4278/4982
+  >=95% satisfied: 4951/4982
+  Total GPU compute: 27.1 hours

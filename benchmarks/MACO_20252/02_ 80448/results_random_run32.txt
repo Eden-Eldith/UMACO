@@ -1,0 +1,50 @@
+[Run 32] Start Time:  8:04:48.75 
+[Run 32] Running MACO with generated instance 
+08:10:35 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+08:10:35 [INFO] === Starting GPU-MACO SAT Solver ===
+08:10:35 [INFO] Variables: 50, Clauses: 200, Ants: 512, Max Iterations: 1000
+08:10:35 [INFO] [Iter 0] best_q=0.9450, avg_q=0.8735, entropy=0.460, alpha=3.594, rho=0.143, noise_std=0.0630
+08:10:35 [INFO] >>> Entering finishing phase at iteration 2
+08:10:35 [INFO] >>> Entering finishing phase at iteration 3
+08:10:35 [INFO] >>> Full or near-full SAT found. Exiting.
+08:10:35 [INFO] === Finished in 0.25 seconds ===
+08:10:35 [INFO] Best quality found (GPU-MACO): 1.0000
+08:10:35 [INFO] Sample of best assignment (first 50 vars): 1 0 1 0 0 1 1 0 1 1 1 1 1 0 0 0 0 0 1 0 1 1 0 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0 0 1 0 1 0 1 0 0 0 1 1
+08:10:35 [INFO] [FULL SOLUTION] 1 0 1 0 0 1 1 0 1 1 1 1 1 0 0 0 0 0 1 0 1 1 0 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0 0 1 0 1 0 1 0 0 0 1 1
+08:10:35 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+08:10:35 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+08:10:35 [INFO] Classical Solver (MiniSat): SAT in 0.02 seconds.
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 3              (300 /sec)
+decisions             : 17             (0.00 % random) (1700 /sec)
+propagations          : 106            (10600 /sec)
+conflict literals     : 18             (5.26 % deleted)
+CPU time              : 0.01 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 32] End Time:  8:04:48.75 
+ 

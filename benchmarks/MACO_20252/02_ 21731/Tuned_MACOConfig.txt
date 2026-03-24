@@ -1,0 +1,12 @@
+Tuned MACOConfig Parameters:
+alpha = 3.59900
+beta = 1.90000
+rho = 0.14300
+initial_pheromone = 0.17005
+clause_lr = 0.20000
+conflict_driven_learning_rate = 0.26926
+clause_weight_momentum = 0.89999
+target_entropy = 0.69891
+finishing_threshold = 0.99900
+noise_std = 0.10000
+quantum_burst_interval = 100.00000

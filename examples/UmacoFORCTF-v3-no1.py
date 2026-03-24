@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
- WARNING: This script is intended purely for educational purposes and is not meant to be used for any unauthorized cryptanalysis or malicious activities. Use at your own risk. Always respect privacy and encryption laws.
+ WARNING: This script is intended purely for educational purposes and is not meant to be used
+ for any unauthorized cryptanalysis or malicious activities. Use at your own risk.
+ Always respect privacy and encryption laws.
+
+THE EVALUATION FUNCTIONS (_evaluate_solutions, _evaluate_candidate) ARE STUBS AND ARE
+NOT IMPLEMENTED ON PURPOSE. IF YOU WANT TO IMPLEMENT THEM YOURSELF, BE IT ON YOUR HEAD
+NOT MINE. CRYPTANALYSIS TOOLING IS A SENSITIVE AREA AND THIS FILE EXISTS PURELY AS A
+DEMONSTRATION OF HOW MACO CAN BE STRUCTURED FOR SUCH A PROBLEM DOMAIN.
 
 Optimized MACO Cryptanalysis for SPEEDY-7-192 Cipher
 =======================================================
-This implementation applies the Modified Ant Colony Optimization (MACO) framework to solve the SPEEDY-7-192 cipher challenge. 
+This implementation applies the Modified Ant Colony Optimization (MACO) framework to solve the
+SPEEDY-7-192 cipher challenge. The framework (pheromone adaptation, quantum bursts, local search)
+is fully functional, but the actual cipher-specific evaluation logic is intentionally left as stubs.
 
 Features:
 1. Entropy-based parameter adaptation.
@@ -14,8 +23,6 @@ Features:
 4. Key bit importance weighting.
 5. Selective pheromone reset.
 6. Robust checkpointing for resumption.
-
-Optimized for solving the CryptoCTF SPEEDY-7-192 cipher challenge with 5.7 BTC prize.
 """
 
 import sys
@@ -52,7 +59,7 @@ class MACOConfig:
     finishing_threshold: float = 0.99663
     partial_reset_stagnation: int = 40
     noise_std: float = 0.11266
-    quantum_burst_interval: float = 100.59397
+    quantum_burst_interval: int = 100
 
     # GPU settings
     gpu_device_id: int = 0
@@ -78,8 +85,10 @@ def parse_speeddy_ciphers(filename: str) -> List[int]:
 # =============================================================================
 
 class MACOCryptoOptimizer:
-    def __init__(self, config: MACOConfig):
+    def __init__(self, config: MACOConfig, ciphertext: bytes = b"", known_plaintext: bytes = b""):
         self.config = config
+        self.ciphertext = ciphertext
+        self.known_plaintext = known_plaintext
         self.num_vars = 192  # Assuming a 192-bit key for SPEEDY-7-192
         self.num_ants = config.n_ants
         self.max_iter = config.max_iterations
@@ -246,7 +255,7 @@ def main() -> None:
     ciphertext = bytes.fromhex(args.ciphertext)
     known_plaintext = bytes(args.known_plaintext, 'ascii')
 
-    solver = MACOCryptoOptimizer(config)
+    solver = MACOCryptoOptimizer(config, ciphertext=ciphertext, known_plaintext=known_plaintext)
     solver.initialize_search_space()  # Initialization for cryptanalysis
     best_assignment, best_quality = solver.solve()
 

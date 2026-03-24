@@ -772,7 +772,7 @@ class MACOSystem:
             # Track best
             if best_q > best_global_quality:
                 best_global_quality = best_q
-                best_assignment = self.assignments_gpu[best_idx, :]
+                best_assignment = self.assignments_gpu[best_idx, :].get()
                 best_global_assignment = best_assignment
                 self.last_improvement_iter = it
 
@@ -792,7 +792,7 @@ class MACOSystem:
                 _, final_q, best_idx2 = self._launch_evaluation()
                 if final_q > best_global_quality:
                     best_global_quality = final_q
-                    best_assignment = self.assignments_gpu[best_idx2, :]
+                    best_assignment = self.assignments_gpu[best_idx2, :].get()
                     best_global_assignment = best_assignment
                 if final_q >= 0.999999:
                     logging.info(">>> Full or near-full SAT found. Exiting.")
@@ -906,8 +906,7 @@ class MACOSystem:
         if mask_count == 0:
             return
 
-        rng = cp.random.RandomState()
-        noise = rng.random(mask_count, dtype=flat_ph.dtype)
+        noise = cp.random.random(mask_count, dtype=flat_ph.dtype)
         flat_ph[mask] = 0.01 + 0.01 * noise
 
     def _check_quantum_burst(self, iteration: int, best_q: float) -> None:
@@ -920,11 +919,11 @@ class MACOSystem:
 
         if (iteration % qb_interval) == (qb_interval - 1):
             if best_q < 0.999:
-                old_noise = self.noise_std
-                self.noise_std = min(0.5, self.noise_std * 3.0)
+                old_noise = self.config.noise_std
+                self.config.noise_std = min(0.5, self.config.noise_std * 3.0)
                 self.alpha = max(1.0, self.alpha * 0.7)
                 logging.info(f"Quantum burst triggered: noise_std from {old_noise:.3f} "
-                             f"to {self.noise_std:.3f}, alpha now {self.alpha:.3f}")
+                             f"to {self.config.noise_std:.3f}, alpha now {self.alpha:.3f}")
 
     # -------------------------------------------------------------------------
     # Core ACO Steps (Build, Evaluate, Update)
@@ -978,7 +977,7 @@ class MACOSystem:
             out=self.qualities_gpu
         )
 
-        qualities_cpu = self.qualities_gpu
+        qualities_cpu = self.qualities_gpu.get()
         avg_q = float(np.mean(qualities_cpu))
         best_q = float(np.max(qualities_cpu))
         best_idx = int(np.argmax(qualities_cpu))
@@ -1217,5 +1216,19 @@ def main() -> None:
     else:
         logging.info(f"Classical Solver (MiniSat): UNKNOWN status in {classical_time:.2f} seconds.")
 
-    _ = classical_status  # retain for potential downstream integrations
+    rc = 1
     if classical_status == "SAT":
+        rc = 10
+    elif classical_status == "UNSAT":
+        rc = 20
+    elif classical_status == "TIMEOUT":
+        rc = 124
+    elif classical_status == "ERROR":
+        rc = 2
+
+    logging.info(f"Return code: {rc}")
+    # input("Press Enter to exit...")  # comment out to avoid pause on some shells
+
+
+if __name__ == "__main__":
+    main()

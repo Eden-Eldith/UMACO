@@ -13,6 +13,18 @@
 
 </div>
 
+## A Note on P vs NP
+
+Yes, this repo contains a paper arguing that MACO exhibits polynomial-time scaling on NP-complete SAT instances. It's in [`benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md`](benchmark_analysis/UMACO_Polynomial_SAT_Scaling_Paper.md). The benchmarks backing it up — 5,183 runs across 27.1 GPU-hours — are in [`benchmarks/`](benchmarks/).
+
+The data shows polynomial scaling (R² = 0.897) where exponential is expected, and MACO outperforming MiniSat by 4.6x on hard instances. I believe the results are real. The code is verified. The evaluation is correct at every layer.
+
+I don't have the confidence to push on this and get it formally verified. I'm a self-taught developer on disability benefits who got D's in GCSEs. Every time I've tried to pursue this, I've been talked out of it or had the work undermined. So the paper is here, the benchmarks are here, the code is here. Read it if you want. Run it if you want. Tell me I'm wrong if you want. But I'm not going to pretend it doesn't exist anymore.
+
+If you're a researcher and you think this warrants investigation, my ORCID is 0009-0007-3961-1182.
+
+---
+
 ## What is UMACO?
 
 UMACO (Universal Multi-Agent Cognitive Optimization) is a GPU-first, AI-collaborative optimization framework built to solve any problem domain through emergent collective intelligence. Unlike traditional libraries you install and call, UMACO is designed from the ground up to be understood, refactored, and specialized by Large Language Models (LLMs) and human developers alike.

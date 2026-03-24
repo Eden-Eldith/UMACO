@@ -1,0 +1,9 @@
+[Run 2] Start Time:  0:46:43.74 
+[Run 2] Running MACO with generated instance 
+usage: macov6no-2-22-02-2025.py [-h] [--cnf CNF] [--num_ants NUM_ANTS]
+                                [--max_iter MAX_ITER]
+                                [--log_level {DEBUG,INFO,WARNING,ERROR}]
+                                [--device DEVICE]
+macov6no-2-22-02-2025.py: error: unrecognized arguments: --full_solution_dump
+[Run 2] End Time:  0:46:43.74 
+ 

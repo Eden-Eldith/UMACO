@@ -1,0 +1,115 @@
+[Run 42] Start Time:  6:37:10.29 
+[Run 42] Running MACO with generated instance 
+06:40:05 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+06:40:05 [INFO] === Starting GPU-MACO SAT Solver ===
+06:40:05 [INFO] Variables: 50, Clauses: 200, Ants: 256, Max Iterations: 1000
+06:40:05 [INFO] [Iter 0] best_q=0.9300, avg_q=0.8756, entropy=0.678, alpha=3.997, rho=0.036, noise_std=0.0000
+06:40:07 [INFO] Partial reset triggered at iteration 38.
+06:40:07 [INFO] [Iter 50] best_q=0.9887, avg_q=0.9585, entropy=0.522, alpha=4.104, rho=0.010, noise_std=0.0039
+06:40:07 [INFO] >>> Entering finishing phase at iteration 64
+06:40:07 [INFO] >>> Entering finishing phase at iteration 65
+06:40:07 [INFO] >>> Entering finishing phase at iteration 66
+06:40:07 [INFO] >>> Entering finishing phase at iteration 67
+06:40:07 [INFO] >>> Entering finishing phase at iteration 68
+06:40:07 [INFO] >>> Entering finishing phase at iteration 69
+06:40:07 [INFO] >>> Entering finishing phase at iteration 70
+06:40:08 [INFO] >>> Entering finishing phase at iteration 71
+06:40:08 [INFO] >>> Entering finishing phase at iteration 72
+06:40:08 [INFO] >>> Entering finishing phase at iteration 73
+06:40:08 [INFO] >>> Entering finishing phase at iteration 74
+06:40:08 [INFO] >>> Entering finishing phase at iteration 75
+06:40:08 [INFO] >>> Entering finishing phase at iteration 76
+06:40:08 [INFO] >>> Entering finishing phase at iteration 77
+06:40:08 [INFO] >>> Entering finishing phase at iteration 78
+06:40:08 [INFO] >>> Entering finishing phase at iteration 79
+06:40:08 [INFO] >>> Entering finishing phase at iteration 80
+06:40:08 [INFO] >>> Entering finishing phase at iteration 81
+06:40:08 [INFO] >>> Entering finishing phase at iteration 82
+06:40:08 [INFO] >>> Entering finishing phase at iteration 83
+06:40:08 [INFO] >>> Entering finishing phase at iteration 84
+06:40:08 [INFO] >>> Entering finishing phase at iteration 85
+06:40:08 [INFO] >>> Entering finishing phase at iteration 86
+06:40:08 [INFO] >>> Entering finishing phase at iteration 87
+06:40:08 [INFO] >>> Entering finishing phase at iteration 88
+06:40:08 [INFO] >>> Entering finishing phase at iteration 89
+06:40:08 [INFO] >>> Entering finishing phase at iteration 90
+06:40:08 [INFO] >>> Entering finishing phase at iteration 91
+06:40:08 [INFO] >>> Entering finishing phase at iteration 92
+06:40:08 [INFO] >>> Entering finishing phase at iteration 93
+06:40:08 [INFO] >>> Entering finishing phase at iteration 94
+06:40:08 [INFO] Partial reset triggered at iteration 94.
+06:40:08 [INFO] >>> Entering finishing phase at iteration 95
+06:40:08 [INFO] >>> Entering finishing phase at iteration 96
+06:40:08 [INFO] >>> Entering finishing phase at iteration 97
+06:40:08 [INFO] >>> Entering finishing phase at iteration 98
+06:40:08 [INFO] >>> Entering finishing phase at iteration 99
+06:40:08 [INFO] >>> Entering finishing phase at iteration 100
+06:40:08 [INFO] [Iter 100] best_q=0.9948, avg_q=0.9625, entropy=0.509, alpha=4.214, rho=0.010, noise_std=0.0038
+06:40:09 [INFO] >>> Entering finishing phase at iteration 101
+06:40:09 [INFO] >>> Entering finishing phase at iteration 102
+06:40:09 [INFO] >>> Entering finishing phase at iteration 103
+06:40:09 [INFO] >>> Entering finishing phase at iteration 104
+06:40:09 [INFO] >>> Entering finishing phase at iteration 105
+06:40:09 [INFO] >>> Entering finishing phase at iteration 106
+06:40:09 [INFO] >>> Entering finishing phase at iteration 107
+06:40:09 [INFO] >>> Entering finishing phase at iteration 108
+06:40:09 [INFO] >>> Entering finishing phase at iteration 109
+06:40:09 [INFO] >>> Entering finishing phase at iteration 110
+06:40:09 [INFO] >>> Entering finishing phase at iteration 111
+06:40:09 [INFO] >>> Entering finishing phase at iteration 112
+06:40:09 [INFO] >>> Entering finishing phase at iteration 113
+06:40:09 [INFO] >>> Entering finishing phase at iteration 114
+06:40:09 [INFO] >>> Entering finishing phase at iteration 115
+06:40:09 [INFO] >>> Entering finishing phase at iteration 116
+06:40:09 [INFO] >>> Entering finishing phase at iteration 117
+06:40:09 [INFO] >>> Entering finishing phase at iteration 118
+06:40:09 [INFO] >>> Entering finishing phase at iteration 119
+06:40:09 [INFO] >>> Entering finishing phase at iteration 120
+06:40:09 [INFO] >>> Entering finishing phase at iteration 121
+06:40:09 [INFO] >>> Entering finishing phase at iteration 122
+06:40:09 [INFO] >>> Entering finishing phase at iteration 123
+06:40:09 [INFO] >>> Entering finishing phase at iteration 124
+06:40:09 [INFO] Partial reset triggered at iteration 124.
+06:40:09 [INFO] >>> Entering finishing phase at iteration 125
+06:40:09 [INFO] >>> Entering finishing phase at iteration 126
+06:40:09 [INFO] >>> Full or near-full SAT found. Exiting.
+06:40:09 [INFO] === Finished in 3.94 seconds ===
+06:40:09 [INFO] Best quality found (GPU-MACO): 1.0000
+06:40:09 [INFO] Sample of best assignment (first 50 vars): 0 0 1 0 0 1 0 1 0 0 0 1 1 0 0 0 1 1 0 1 1 0 0 1 0 1 1 1 0 0 1 0 0 1 1 1 1 1 0 0 0 0 0 1 0 1 1 0 0 1
+06:40:09 [INFO] [FULL SOLUTION] 0 0 1 0 0 1 0 1 0 0 0 1 1 0 0 0 1 1 0 1 1 0 0 1 0 1 1 1 0 0 1 0 0 1 1 1 1 1 0 0 0 0 0 1 0 1 1 0 0 1
+06:40:09 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+06:40:09 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+06:40:09 [INFO] Classical Solver (MiniSat): SAT in 0.02 seconds.
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 16             (1600 /sec)
+decisions             : 36             (0.00 % random) (3600 /sec)
+propagations          : 265            (26500 /sec)
+conflict literals     : 80             (1.23 % deleted)
+CPU time              : 0.01 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 42] End Time:  6:37:10.29 
+ 

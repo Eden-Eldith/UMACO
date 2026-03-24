@@ -1,0 +1,4 @@
+[Run 5] Start Time:  1:26:09.62 
+[Run 5] Running MACO with generated instance 
+[Run 5] End Time:  1:26:09.62 
+ 

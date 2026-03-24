@@ -1,0 +1,17 @@
+[Run 4] Start Time: 11:21:59.41 
+[Run 4] Running MACO with generated instance 
+11:22:02 [INFO] Running MACO with generated instance
+11:22:02 [INFO] Generated random 3-SAT instance:
+11:22:02 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-5-23-02-2025.py", line 785, in <module>
+    main()
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-5-23-02-2025.py", line 734, in main
+    solver = MACOSystem(config=config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-5-23-02-2025.py", line 421, in __init__
+    self.clause_lr = config.conflict_driven_learning_rate
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MACOConfig' object has no attribute 'conflict_driven_learning_rate'
+[Run 4] End Time: 11:21:59.41 
+ 

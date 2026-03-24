@@ -1,0 +1,12 @@
+[Run 2] Running MACO on maco2.cnf 
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-1-22-02-2025.py", line 989, in <module>
+    main()
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-1-22-02-2025.py", line 951, in main
+    num_vars, num_clauses, clauses = parse_dimacs_cnf(args.cnf)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-1-22-02-2025.py", line 79, in parse_dimacs_cnf
+    lits = list(map(int, parts))
+           ^^^^^^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: '...'
+ 

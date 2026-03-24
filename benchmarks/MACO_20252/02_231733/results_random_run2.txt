@@ -1,0 +1,11 @@
+[Run 2] Running MACO with generated instance 
+Running MACO on 500 variables, 2135 clauses...
+
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 655, in <module>
+    main()
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 632, in main
+    solutions = maco.optimize()
+                ^^^^^^^^^^^^^
+AttributeError: 'MACOSystem' object has no attribute 'optimize'
+ 

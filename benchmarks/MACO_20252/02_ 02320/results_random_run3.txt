@@ -1,0 +1,15 @@
+[Run 3] Start Time:  0:23:20.84 
+[Run 3] Running MACO with generated instance 
+00:23:24 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+Traceback (most recent call last):
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 806, in <module>
+    main()
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 775, in main
+    solver.initialize_search_space(formula=clauses, variables=variables) # Initialize AFTER solver init
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 497, in initialize_search_space
+    self._init_sat_graph() # Initialize graph AFTER setting up GPU arrays
+    ^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'MACOSystem' object has no attribute '_init_sat_graph'
+[Run 3] End Time:  0:23:20.84 
+ 

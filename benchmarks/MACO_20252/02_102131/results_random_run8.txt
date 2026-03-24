@@ -1,0 +1,34 @@
+[Run 8] Start Time: 10:21:31.37 
+[Run 8] Running MACO Ultimate Edition with generated instance 
+10:24:16 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+10:24:16 [INFO] === Starting MACO Ultimate Edition ===
+10:24:16 [INFO] [Iter 0] best_q=0.9400, avg_q=0.8754, entropy=0.603, alpha=3.594, rho=0.143, noise_std=0.0730
+10:24:19 [INFO] [Iter 50] best_q=0.9950, avg_q=0.9781, entropy=0.072, alpha=4.121, rho=0.010, noise_std=0.0100
+10:24:21 [INFO] Partial reset triggered at iteration 92.
+10:24:21 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.311
+10:24:21 [INFO] [Iter 100] best_q=0.9950, avg_q=0.9791, entropy=0.085, alpha=3.323, rho=0.010, noise_std=0.0239
+10:24:23 [INFO] Partial reset triggered at iteration 132.
+10:24:24 [INFO] [Iter 150] best_q=0.9950, avg_q=0.9781, entropy=0.093, alpha=3.944, rho=0.010, noise_std=0.0100
+10:24:25 [INFO] Partial reset triggered at iteration 172.
+10:24:27 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.179
+10:24:27 [INFO] [Iter 200] best_q=0.9950, avg_q=0.9780, entropy=0.088, alpha=3.191, rho=0.010, noise_std=0.0239
+10:24:28 [INFO] Partial reset triggered at iteration 212.
+10:24:30 [INFO] [Iter 250] best_q=0.9950, avg_q=0.9778, entropy=0.084, alpha=3.804, rho=0.010, noise_std=0.0100
+10:24:30 [INFO] Partial reset triggered at iteration 252.
+10:24:32 [INFO] Partial reset triggered at iteration 292.
+10:24:32 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.083
+10:24:32 [INFO] [Iter 300] best_q=0.9950, avg_q=0.9776, entropy=0.089, alpha=3.095, rho=0.010, noise_std=0.0239
+10:24:34 [INFO] Partial reset triggered at iteration 332.
+10:24:35 [INFO] [Iter 350] best_q=0.9950, avg_q=0.9776, entropy=0.087, alpha=3.709, rho=0.010, noise_std=0.0100
+10:24:36 [INFO] Partial reset triggered at iteration 372.
+10:24:38 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.010
+10:24:38 [INFO] [Iter 400] best_q=0.9950, avg_q=0.9840, entropy=0.193, alpha=3.020, rho=0.010, noise_std=0.0249
+10:24:38 [INFO] Partial reset triggered at iteration 412.
+10:24:40 [INFO] >>> Near-full SAT found. Exiting.
+10:24:40 [INFO] === Finished in 24.55 seconds ===
+10:24:40 [INFO] Best Quality Found: 1.0000
+10:24:40 [INFO] True Variables in Best Assignment: 23 / 50
+10:24:40 [INFO] Satisfied Clauses: 200/200 (100.00%)
+10:24:40 [INFO] Classical Solver Status: SAT, Time: 0.02s
+[Run 8] End Time: 10:21:31.37 
+ 

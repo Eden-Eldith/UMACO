@@ -1,0 +1,62 @@
+[Run 475] Start Time: 14:26:21.50 
+[Run 475] Running MACO with generated instance 
+15:49:15 [INFO] Running MACO with generated instance
+15:49:15 [INFO] Generated random 3-SAT instance:
+15:49:15 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+15:49:15 [INFO] === Starting MACO Ultimate Edition ===
+15:49:15 [INFO] === Starting GPU-MACO SAT Solver ===
+15:49:15 [INFO] Variables: 50, Clauses: 200, Ants: 512, Max Iterations: 1000
+15:49:15 [INFO] [Iter 0] best_q=0.9400, avg_q=0.8746, entropy=0.677, alpha=3.594, rho=0.143, noise_std=0.0730
+15:49:18 [INFO] [Iter 50] best_q=0.9952, avg_q=0.9861, entropy=0.535, alpha=3.884, rho=0.010, noise_std=0.0100
+15:49:20 [INFO] Partial reset triggered at iteration 96.
+15:49:20 [INFO] Quantum burst triggered: noise_std from 0.070 to 0.210, alpha now 2.648
+15:49:20 [INFO] [Iter 100] best_q=0.9952, avg_q=0.9854, entropy=0.318, alpha=2.656, rho=0.065, noise_std=0.0651
+15:49:22 [INFO] Partial reset triggered at iteration 136.
+15:49:23 [INFO] [Iter 150] best_q=0.9953, avg_q=0.9802, entropy=0.610, alpha=2.788, rho=0.010, noise_std=0.0100
+15:49:26 [INFO] Quantum burst triggered: noise_std from 0.210 to 0.500, alpha now 1.844
+15:49:26 [INFO] [Iter 200] best_q=0.9955, avg_q=0.9716, entropy=0.803, alpha=2.000, rho=0.089, noise_std=0.0888
+15:49:26 [INFO] Partial reset triggered at iteration 211.
+15:49:28 [INFO] >>> Entering finishing phase at iteration 242
+15:49:28 [INFO] >>> Full or near-full SAT found. Exiting.
+15:49:28 [INFO] === Finished in 12.92 seconds ===
+15:49:28 [INFO] Best quality found (GPU-MACO): 1.0000
+15:49:28 [INFO] Sample of best assignment (first 50 vars): 1 1 1 0 0 1 0 1 0 0 1 1 0 0 0 0 1 1 1 0 1 1 0 1 0 0 0 0 0 1 1 1 0 0 0 0 0 1 0 0 1 1 0 1 1 0 1 0 0 1
+15:49:28 [INFO] [FULL SOLUTION] 1 1 1 0 0 1 0 1 0 0 1 1 0 0 0 0 1 1 1 0 1 1 0 1 0 0 0 0 0 1 1 1 0 0 0 0 0 1 0 0 1 1 0 1 1 0 1 0 0 1
+15:49:28 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+15:49:28 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+15:49:28 [INFO] Classical Solver (MiniSat): UNSAT in 0.02 seconds.
+15:49:28 [INFO] Return code: 20
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 76             (9500 /sec)
+decisions             : 92             (0.00 % random) (11500 /sec)
+propagations          : 1283           (160375 /sec)
+conflict literals     : 297            (17.27 % deleted)
+CPU time              : 0.008 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 475] End Time: 14:26:21.50 
+ 

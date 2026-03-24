@@ -1,0 +1,82 @@
+[Run 48] Start Time:  6:52:11.46 
+[Run 48] Running MACO with generated instance 
+07:00:31 [INFO] Generated random 3-SAT instance: 50 vars, 200 clauses.
+07:00:31 [INFO] === Starting GPU-MACO SAT Solver ===
+07:00:31 [INFO] Variables: 50, Clauses: 200, Ants: 256, Max Iterations: 1000
+07:00:31 [INFO] [Iter 0] best_q=0.9300, avg_q=0.8750, entropy=0.685, alpha=3.997, rho=0.086, noise_std=0.0000
+07:00:32 [INFO] >>> Entering finishing phase at iteration 26
+07:00:32 [INFO] >>> Entering finishing phase at iteration 27
+07:00:32 [INFO] >>> Entering finishing phase at iteration 28
+07:00:32 [INFO] >>> Entering finishing phase at iteration 29
+07:00:32 [INFO] >>> Entering finishing phase at iteration 30
+07:00:32 [INFO] >>> Entering finishing phase at iteration 31
+07:00:32 [INFO] >>> Entering finishing phase at iteration 32
+07:00:32 [INFO] >>> Entering finishing phase at iteration 33
+07:00:32 [INFO] >>> Entering finishing phase at iteration 34
+07:00:32 [INFO] >>> Entering finishing phase at iteration 35
+07:00:32 [INFO] >>> Entering finishing phase at iteration 36
+07:00:32 [INFO] >>> Entering finishing phase at iteration 37
+07:00:32 [INFO] >>> Entering finishing phase at iteration 38
+07:00:32 [INFO] >>> Entering finishing phase at iteration 39
+07:00:32 [INFO] >>> Entering finishing phase at iteration 40
+07:00:32 [INFO] >>> Entering finishing phase at iteration 41
+07:00:33 [INFO] >>> Entering finishing phase at iteration 42
+07:00:33 [INFO] >>> Entering finishing phase at iteration 43
+07:00:33 [INFO] >>> Entering finishing phase at iteration 44
+07:00:33 [INFO] >>> Entering finishing phase at iteration 45
+07:00:33 [INFO] >>> Entering finishing phase at iteration 46
+07:00:33 [INFO] >>> Entering finishing phase at iteration 47
+07:00:33 [INFO] >>> Entering finishing phase at iteration 48
+07:00:33 [INFO] >>> Entering finishing phase at iteration 49
+07:00:33 [INFO] >>> Entering finishing phase at iteration 50
+07:00:33 [INFO] [Iter 50] best_q=0.9953, avg_q=0.9777, entropy=0.185, alpha=4.194, rho=0.010, noise_std=0.0102
+07:00:33 [INFO] >>> Entering finishing phase at iteration 51
+07:00:33 [INFO] >>> Entering finishing phase at iteration 52
+07:00:33 [INFO] >>> Entering finishing phase at iteration 53
+07:00:33 [INFO] >>> Entering finishing phase at iteration 54
+07:00:33 [INFO] >>> Entering finishing phase at iteration 55
+07:00:33 [INFO] >>> Entering finishing phase at iteration 56
+07:00:33 [INFO] Partial reset triggered at iteration 56.
+07:00:33 [INFO] >>> Entering finishing phase at iteration 57
+07:00:33 [INFO] >>> Full or near-full SAT found. Exiting.
+07:00:33 [INFO] === Finished in 1.88 seconds ===
+07:00:33 [INFO] Best quality found (GPU-MACO): 1.0000
+07:00:33 [INFO] Sample of best assignment (first 50 vars): 1 0 0 1 0 0 1 1 0 1 0 1 0 1 1 0 1 1 1 1 0 1 1 1 0 1 0 1 1 0 0 1 1 0 0 0 1 1 1 0 1 1 0 0 0 0 1 0 1 0
+07:00:33 [INFO] [FULL SOLUTION] 1 0 0 1 0 0 1 1 0 1 0 1 0 1 1 0 1 1 1 1 0 1 1 1 0 1 0 1 1 0 0 1 1 0 0 0 1 1 1 0 1 1 0 0 0 0 1 0 1 0
+07:00:33 [INFO] [SOLUTION ANALYSIS] 200/200 clauses satisfied (100.00%)
+07:00:33 [INFO] [HARD CONSTRAINTS] 0 clauses remained unsatisfied.
+07:00:33 [INFO] Classical Solver (MiniSat): SAT in 0.02 seconds.
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 10
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 26             (2889 /sec)
+decisions             : 42             (0.00 % random) (4667 /sec)
+propagations          : 411            (45667 /sec)
+conflict literals     : 113            (18.71 % deleted)
+CPU time              : 0.009 s
+
+SATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 48] End Time:  6:52:11.46 
+ 

@@ -1,0 +1,11 @@
+[Run 1] Running MACO on maco2.cnf 
+22:07:10 [INFO] === Starting GPU-MACO SAT Solver ===
+22:07:10 [INFO] Variables: 100, Clauses: 369, Ants: 256, Max Iterations: 10000
+22:07:10 [INFO] [Iter 0] best_q=0.9214, avg_q=0.8757, entropy=0.785, alpha=0.997, rho=0.056, noise_std=0.0000
+22:07:11 [INFO] >>> Entering finishing phase at iteration 8
+22:07:11 [INFO] >>> Full or near-full SAT found. Exiting.
+22:07:11 [INFO] === Finished in 0.52 seconds ===
+22:07:11 [INFO] Best quality found (GPU-MACO): 1.0000
+22:07:11 [INFO] Sample of best assignment (first 50 vars): 0 1 0 0 0 1 1 0 1 0 1 0 0 0 0 0 0 1 0 0 1 0 0 0 0 1 1 1 0 0 1 1 0 0 1 0 0 0 0 0 1 0 1 0 0 0 1 0 1 0
+22:07:11 [INFO] Classical Solver (MiniSat): SAT in 0.02 seconds.
+ 

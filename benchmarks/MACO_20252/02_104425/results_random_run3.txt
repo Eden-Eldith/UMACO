@@ -1,0 +1,21 @@
+[Run 3] Start Time: 10:44:25.16 
+[Run 3] Running MACO with generated instance 
+10:45:19 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+10:45:19 [INFO] === Starting MACO Ultimate Edition ===
+10:45:19 [INFO] [Iter 0] best_q=0.9400, avg_q=0.8733, entropy=0.755, alpha=3.594, rho=0.143, noise_std=0.0730
+10:45:22 [INFO] Partial reset triggered at iteration 41.
+10:45:22 [INFO] [Iter 50] best_q=0.9950, avg_q=0.9900, entropy=0.156, alpha=4.047, rho=0.010, noise_std=0.0100
+10:45:24 [INFO] Partial reset triggered at iteration 81.
+10:45:25 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.212
+10:45:25 [INFO] [Iter 100] best_q=0.9950, avg_q=0.9900, entropy=0.139, alpha=3.223, rho=0.010, noise_std=0.0244
+10:45:26 [INFO] Partial reset triggered at iteration 121.
+10:45:28 [INFO] [Iter 150] best_q=0.9950, avg_q=0.9900, entropy=0.140, alpha=3.780, rho=0.010, noise_std=0.0100
+10:45:28 [INFO] Partial reset triggered at iteration 161.
+10:45:30 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 3.034
+10:45:30 [INFO] [Iter 200] best_q=0.9950, avg_q=0.9900, entropy=0.128, alpha=3.045, rho=0.010, noise_std=0.0243
+10:45:30 [INFO] Partial reset triggered at iteration 201.
+10:45:32 [INFO] Partial reset triggered at iteration 241.
+10:45:33 [INFO] [Iter 250] best_q=0.9950, avg_q=0.9900, entropy=0.129, alpha=3.617, rho=0.010, noise_std=0.0100
+10:45:34 [INFO] Partial reset triggered at iteration 281.
+10:45:35 [INFO] Quantum burst triggered: noise_std from 0.010 to 0.030, alpha now 2.925
+10:45:36 [INFO] [Iter 300] best_q=0.9950, avg_q=0.9900, entropy=0.126, alpha=2.937, rho=0.010, noise_std=0.0243

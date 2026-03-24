@@ -1,0 +1,22 @@
+[Run 1] Start Time:  5:24:12.86 
+[Run 1] Running MACO with generated instance 
+05:24:13 [INFO] Generated random 3-SAT instance: 500 vars, 2100 clauses.
+05:24:13 [INFO] === Starting GPU-MACO SAT Solver ===
+05:24:13 [INFO] Variables: 500, Clauses: 2100, Ants: 256, Max Iterations: 1000
+05:24:14 [INFO] [Iter 0] best_q=0.8924, avg_q=0.8758, entropy=0.844, alpha=3.997, rho=0.036, noise_std=0.0000
+05:24:24 [INFO] Partial reset triggered at iteration 31.
+05:24:30 [INFO] [Iter 50] best_q=0.9246, avg_q=0.7489, entropy=0.249, alpha=4.173, rho=0.010, noise_std=0.0089
+05:24:34 [INFO] Partial reset triggered at iteration 62.
+05:24:44 [INFO] Partial reset triggered at iteration 92.
+05:24:47 [INFO] [Iter 100] best_q=0.9246, avg_q=0.7984, entropy=0.317, alpha=4.362, rho=0.010, noise_std=0.0074
+05:24:55 [INFO] Partial reset triggered at iteration 122.
+05:25:04 [INFO] [Iter 150] best_q=0.9246, avg_q=0.6821, entropy=0.202, alpha=4.575, rho=0.010, noise_std=0.0099
+05:25:05 [INFO] Partial reset triggered at iteration 152.
+05:25:15 [INFO] Partial reset triggered at iteration 182.
+05:25:21 [INFO] [Iter 200] best_q=0.9246, avg_q=0.6953, entropy=0.240, alpha=4.765, rho=0.010, noise_std=0.0091
+05:25:25 [INFO] Partial reset triggered at iteration 212.
+05:25:35 [INFO] Partial reset triggered at iteration 242.
+05:25:38 [INFO] [Iter 250] best_q=0.9246, avg_q=0.7751, entropy=0.303, alpha=4.963, rho=0.010, noise_std=0.0077
+05:25:46 [INFO] Partial reset triggered at iteration 272.
+05:25:55 [INFO] [Iter 300] best_q=0.9246, avg_q=0.6764, entropy=0.205, alpha=5.177, rho=0.010, noise_std=0.0099
+05:25:56 [INFO] Partial reset triggered at iteration 302.

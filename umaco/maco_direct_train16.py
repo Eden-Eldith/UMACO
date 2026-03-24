@@ -25,11 +25,11 @@ import torch
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-import umaco_gpu_utils as gpu_utils
-from umaco_gpu_utils import asnumpy, to_numpy_scalar
+from . import umaco_gpu_utils as gpu_utils
+from .umaco_gpu_utils import asnumpy, to_numpy_scalar
 
 cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
-from Umaco13 import BaseEconomy, BaseNeuroPheromoneSystem, BaseUniversalNode
+from .Umaco13 import BaseEconomy, BaseNeuroPheromoneSystem, BaseUniversalNode
 from torch.utils.data import DataLoader
 from functools import partial
 from transformers import (
@@ -908,6 +908,10 @@ class EnhancedCognitiveNode(BaseUniversalNode):
             }
         return {}
 
+    def propose_action(self, current_loss: float, scarcity: float) -> Dict[str, Any]:
+        """Required by BaseUniversalNode. Delegates to propose_update."""
+        return self.propose_update(current_loss, iteration=0)
+
     def propose_update(self, current_loss: float, iteration: int, previous_loss: float = None,
                        gradient_norm: float = None) -> Dict[str, Any]:
         """
@@ -960,7 +964,7 @@ class EnhancedCognitiveNode(BaseUniversalNode):
             confidence_factor = 0.8
 
         required_power = (0.2 + 0.3 * self.panic_level) * (0.8 + 0.4 * self.risk_appetite) * confidence_factor
-        resource_granted = self.economy.buy_resources(self.node_id, required_power)
+        resource_granted = self.economy.buy_resources(self.node_id, required_power, self.economy.resource_scarcity)
         self.last_resource_request = required_power
 
         if not resource_granted and np.random.random() < self.cooperation_tendency:

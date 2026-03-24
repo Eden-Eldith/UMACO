@@ -1,0 +1,102 @@
+[Run 326] Start Time:  2:17:31.83 
+[Run 326] Running MACO with generated instance 
+03:47:26 [INFO] Running MACO with generated instance
+03:47:26 [INFO] Generated random 3-SAT instance:
+03:47:26 [INFO] Generated random 3-SAT with 50 vars, 200 clauses.
+03:47:26 [INFO] === Starting MACO Ultimate Edition ===
+03:47:26 [INFO] === Starting GPU-MACO SAT Solver ===
+03:47:26 [INFO] Variables: 50, Clauses: 200, Ants: 1024, Max Iterations: 1000
+03:47:26 [INFO] [Iter 0] best_q=0.9400, avg_q=0.8748, entropy=0.824, alpha=3.599, rho=0.143, noise_std=0.1000
+03:47:31 [INFO] [Iter 50] best_q=0.9954, avg_q=0.9610, entropy=0.918, alpha=3.773, rho=0.056, noise_std=0.0324
+03:47:34 [INFO] Partial reset triggered at iteration 79.
+03:47:36 [INFO] Quantum burst triggered: noise_std from 0.100 to 0.300, alpha now 2.759
+03:47:36 [INFO] [Iter 100] best_q=0.9954, avg_q=0.9872, entropy=0.343, alpha=2.768, rho=0.010, noise_std=0.0100
+03:47:38 [INFO] Partial reset triggered at iteration 119.
+03:47:41 [INFO] [Iter 150] best_q=0.9954, avg_q=0.9582, entropy=0.925, alpha=2.714, rho=0.065, noise_std=0.0654
+03:47:42 [INFO] Partial reset triggered at iteration 159.
+03:47:46 [INFO] Quantum burst triggered: noise_std from 0.300 to 0.500, alpha now 1.980
+03:47:46 [INFO] Partial reset triggered at iteration 199.
+03:47:46 [INFO] [Iter 200] best_q=0.9954, avg_q=0.9695, entropy=0.225, alpha=2.000, rho=0.010, noise_std=0.0100
+03:47:50 [INFO] Partial reset triggered at iteration 239.
+03:47:51 [INFO] [Iter 250] best_q=0.9954, avg_q=0.9843, entropy=0.517, alpha=2.029, rho=0.061, noise_std=0.0614
+03:47:54 [INFO] Partial reset triggered at iteration 279.
+03:47:56 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.605
+03:47:56 [INFO] [Iter 300] best_q=0.9954, avg_q=0.9601, entropy=0.880, alpha=2.000, rho=0.014, noise_std=0.0144
+03:47:58 [INFO] Partial reset triggered at iteration 319.
+03:48:01 [INFO] [Iter 350] best_q=0.9956, avg_q=0.9699, entropy=0.814, alpha=2.000, rho=0.075, noise_std=0.0753
+03:48:04 [INFO] Partial reset triggered at iteration 388.
+03:48:06 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.527
+03:48:06 [INFO] [Iter 400] best_q=0.9956, avg_q=0.9624, entropy=0.900, alpha=2.000, rho=0.013, noise_std=0.0131
+03:48:08 [INFO] Partial reset triggered at iteration 428.
+03:48:10 [INFO] [Iter 450] best_q=0.9956, avg_q=0.9807, entropy=0.543, alpha=2.069, rho=0.048, noise_std=0.0481
+03:48:12 [INFO] Partial reset triggered at iteration 468.
+03:48:15 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.425
+03:48:15 [INFO] [Iter 500] best_q=0.9956, avg_q=0.9594, entropy=0.925, alpha=2.000, rho=0.067, noise_std=0.0672
+03:48:16 [INFO] Partial reset triggered at iteration 508.
+03:48:20 [INFO] Partial reset triggered at iteration 548.
+03:48:20 [INFO] [Iter 550] best_q=0.9956, avg_q=0.9902, entropy=0.245, alpha=2.018, rho=0.074, noise_std=0.0741
+03:48:24 [INFO] Partial reset triggered at iteration 588.
+03:48:25 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.583
+03:48:25 [INFO] [Iter 600] best_q=0.9956, avg_q=0.9513, entropy=0.960, alpha=2.000, rho=0.024, noise_std=0.0236
+03:48:30 [INFO] [Iter 650] best_q=0.9957, avg_q=0.9877, entropy=0.431, alpha=2.062, rho=0.059, noise_std=0.0586
+03:48:31 [INFO] Partial reset triggered at iteration 656.
+03:48:34 [INFO] Partial reset triggered at iteration 696.
+03:48:35 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.496
+03:48:35 [INFO] [Iter 700] best_q=0.9957, avg_q=0.9675, entropy=0.643, alpha=2.000, rho=0.045, noise_std=0.0445
+03:48:38 [INFO] Partial reset triggered at iteration 736.
+03:48:40 [INFO] [Iter 750] best_q=0.9957, avg_q=0.9703, entropy=0.634, alpha=2.034, rho=0.067, noise_std=0.0670
+03:48:42 [INFO] Partial reset triggered at iteration 776.
+03:48:45 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.590
+03:48:45 [INFO] [Iter 800] best_q=0.9957, avg_q=0.9713, entropy=0.745, alpha=2.000, rho=0.010, noise_std=0.0100
+03:48:46 [INFO] Partial reset triggered at iteration 816.
+03:48:50 [INFO] [Iter 850] best_q=0.9957, avg_q=0.9560, entropy=0.952, alpha=2.000, rho=0.062, noise_std=0.0615
+03:48:50 [INFO] Partial reset triggered at iteration 856.
+03:48:54 [INFO] Partial reset triggered at iteration 896.
+03:48:54 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.469
+03:48:54 [INFO] [Iter 900] best_q=0.9957, avg_q=0.9758, entropy=0.567, alpha=2.000, rho=0.026, noise_std=0.0256
+03:48:58 [INFO] Partial reset triggered at iteration 936.
+03:48:59 [INFO] [Iter 950] best_q=0.9957, avg_q=0.9754, entropy=0.660, alpha=2.044, rho=0.061, noise_std=0.0608
+03:49:02 [INFO] Partial reset triggered at iteration 976.
+03:49:04 [INFO] Quantum burst triggered: noise_std from 0.500 to 0.500, alpha now 1.616
+03:49:04 [INFO] === Finished in 97.72 seconds ===
+03:49:04 [INFO] Best quality found (GPU-MACO): 0.9957
+03:49:04 [INFO] Sample of best assignment (first 50 vars): 1 1 1 0 0 1 1 1 0 1 1 0 1 1 0 1 1 1 1 1 1 1 0 1 0 1 0 1 0 1 0 0 1 1 1 0 0 0 1 0 1 0 1 1 0 1 1 0 0 0
+03:49:04 [INFO] [FULL SOLUTION] 1 1 1 0 0 1 1 1 0 1 1 0 1 1 0 1 1 1 1 1 1 1 0 1 0 1 0 1 0 1 0 0 1 1 1 0 0 0 1 0 1 0 1 1 0 1 1 0 0 0
+03:49:04 [INFO] [SOLUTION ANALYSIS] 199/200 clauses satisfied (99.50%)
+03:49:04 [INFO] [HARD CONSTRAINTS] 1 clauses remained unsatisfied.
+03:49:04 [INFO] Classical Solver (MiniSat): UNSAT in 0.02 seconds.
+03:49:04 [INFO] Return code: 20
+
+--------------------------------------
+CLASSICAL SOLVER INVOCATION:
+Command: C:/msys64/ucrt64/bin/minisat.exe temp_problem.cnf
+Return code: 20
+Solver STDOUT:
+ ============================[ Problem Statistics ]=============================
+|                                                                             |
+|  Number of variables:            50                                         |
+|  Number of clauses:             200                                         |
+|  Parse time:                   0.01 s                                       |
+|  Eliminated clauses:           0.00 Mb                                      |
+|  Simplification time:          0.00 s                                       |
+|                                                                             |
+============================[ Search Statistics ]==============================
+| Conflicts |          ORIGINAL         |          LEARNT          | Progress |
+|           |    Vars  Clauses Literals |    Limit  Clauses Lit/Cl |          |
+===============================================================================
+===============================================================================
+restarts              : 1
+conflicts             : 76             (9500 /sec)
+decisions             : 93             (0.00 % random) (11625 /sec)
+propagations          : 1119           (139875 /sec)
+conflict literals     : 281            (22.16 % deleted)
+CPU time              : 0.008 s
+
+UNSATISFIABLE
+
+Solver STDERR:
+ 
+--------------------------------------
+
+[Run 326] End Time:  2:17:31.83 
+ 

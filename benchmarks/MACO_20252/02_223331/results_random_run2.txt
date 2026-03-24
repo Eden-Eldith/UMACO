@@ -1,0 +1,6 @@
+[Run 2] Running MACO with generated instance 
+  File "C:\Users\pcobr\Downloads\MACO\maco v2\macov6no-2-22-02-2025.py", line 1
+    --- START OF FILE macov6no-2-22-02-2025.py ---
+                                    ^
+SyntaxError: leading zeros in decimal integer literals are not permitted; use an 0o prefix for octal integers
+ 

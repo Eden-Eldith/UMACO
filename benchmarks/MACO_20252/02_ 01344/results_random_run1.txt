@@ -1,0 +1,9 @@
+[Run 1] Start Time:  0:13:44.38 
+[Run 1] Running MACO with generated instance 
+usage: macov6no-2-22-02-2025.py [-h] [--cnf CNF] [--num_ants NUM_ANTS]
+                                [--max_iter MAX_ITER]
+                                [--log_level {DEBUG,INFO,WARNING,ERROR}]
+                                [--device DEVICE]
+macov6no-2-22-02-2025.py: error: unrecognized arguments: --num_vars 500 --num_clauses 2135 --clause_size 3
+[Run 1] End Time:  0:13:44.38 
+ 

@@ -41,8 +41,8 @@ import os
 import logging
 import numpy as np
 
-import umaco_gpu_utils as gpu_utils
-from umaco_gpu_utils import asnumpy, to_numpy_scalar
+from . import umaco_gpu_utils as gpu_utils
+from .umaco_gpu_utils import asnumpy, to_numpy_scalar
 
 cp, GPU_AVAILABLE = gpu_utils.resolve_gpu_backend(__name__)
 from dataclasses import dataclass, field
@@ -529,9 +529,9 @@ class UMACO10:
         
         # Initialize PAQ Core components
         self.panic_tensor = self.xp.array(config.panic_seed, dtype=self.xp.float32)
-        self.anxiety_wavefunction = self.xp.zeros((config.n_dim, config.n_dim), 
+        self.anxiety_wavefunction = self.xp.zeros((config.n_dim, config.n_dim),
                                                 dtype=self.xp.complex64)
-        self.anxiety_wavefunction *= config.trauma_factor
+        self.anxiety_wavefunction += config.trauma_factor
 
         # Initialize or use provided systems
         self.pheromones = pheromones or NeuroPheromoneSystem(

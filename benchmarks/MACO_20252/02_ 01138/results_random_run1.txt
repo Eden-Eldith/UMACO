@@ -1,0 +1,9 @@
+[Run 1] Start Time:  0:11:38.08 
+[Run 1] Running MACO with generated instance 
+00:11:43 [INFO] Running MACO with generated instance
+00:11:43 [INFO] Generated random 3-SAT instance:
+00:11:43 [INFO] Generated random 3-SAT with 500 vars, 2500 clauses.
+00:11:43 [INFO] === Starting MACO Ultimate Edition ===
+00:11:43 [INFO] === Starting GPU-MACO SAT Solver ===
+00:11:43 [INFO] Variables: 500, Clauses: 2500, Ants: 512, Max Iterations: 1000
+00:11:44 [INFO] [Iter 0] best_q=0.8904, avg_q=0.8744, entropy=0.908, alpha=3.599, rho=0.143, noise_std=0.1000
