@@ -62,7 +62,7 @@ This evaluation is performed on the GPU with a 2D grid launch $(K, \lceil m/128 
 
 **Evaporation.** For each variable $v$ and polarity $b \in \{0,1\}$:
 
-$$\tau_{v,b} \leftarrow \text{clamp}\bigl((1 - \rho)\,\tau_{v,b},\; 0.001,\; 10.0\bigr)$$
+$$\tau_{v,b} \leftarrow \text{clamp}((1 - \rho) \, \tau_{v,b}, \, 0.001, \, 10.0)$$
 
 where $\rho = 0.13814$ is the evaporation rate.
 
@@ -106,22 +106,22 @@ $$\bar{H} \leftarrow \gamma \cdot H + (1 - \gamma) \cdot \bar{H} \qquad \gamma =
 
 **Adaptive response.** The entropy error $\Delta_H = H^* - \bar{H}$ (where $H^* = 0.68894$) drives proportional control:
 
-$$\sigma \leftarrow \text{clamp}\bigl(\sigma - 0.01\,\Delta_H,\; 0.01,\; 0.1\bigr)$$
-$$\alpha \leftarrow \text{clamp}\bigl(\alpha + 0.02\,\Delta_H,\; 2.0,\; 6.0\bigr)$$
-$$\rho \leftarrow \text{clamp}\bigl(\rho - 0.01\,\Delta_H,\; 0.01,\; 0.5\bigr)$$
-$$\beta \leftarrow \text{clamp}\!\left(1.8 + 0.2\left(\frac{1}{2} + \frac{1}{2}\sin\!\left(\frac{2\pi t}{T_{\max}}\right)\right),\; 1.0,\; 3.0\right)$$
+$$\sigma \leftarrow \text{clamp}(\sigma - 0.01 \Delta_H, \, 0.01, \, 0.1)$$
+$$\alpha \leftarrow \text{clamp}(\alpha + 0.02 \Delta_H, \, 2.0, \, 6.0)$$
+$$\rho \leftarrow \text{clamp}(\rho - 0.01 \Delta_H, \, 0.01, \, 0.5)$$
+$$\beta \leftarrow \text{clamp}\left(1.8 + 0.2\left(\frac{1}{2} + \frac{1}{2}\sin\left(\frac{2\pi t}{T_{\max}}\right)\right), \, 1.0, \, 3.0\right)$$
 
 When entropy is too low (premature convergence), noise increases and exploitation decreases. When too high (insufficient focus), the opposite occurs. $\beta$ oscillates sinusoidally to periodically shift the exploration-exploitation balance regardless of entropy state.
 
 **Quantum bursts.** Every $B = 100$ iterations, if $Q_{\text{best}} < 0.999$:
 
-$$\sigma \leftarrow \min(0.5,\; 3\sigma) \qquad \alpha \leftarrow \max(1.0,\; 0.7\alpha)$$
+$$\sigma \leftarrow \min(0.5, \, 3\sigma) \qquad \alpha \leftarrow \max(1.0, \, 0.7\alpha)$$
 
 This massively disrupts the current search trajectory, forcing exploration of new regions of the solution space.
 
-**Partial resets.** After $P = 40$ iterations without improvement in $Q_{\text{best}}$, let $\tau_{(5\%)}$ be the 5th percentile of all pheromone values. Then:
+**Partial resets.** After $P = 40$ iterations without improvement in $Q_{\text{best}}$, let $\tau_{5}$ be the 5th percentile of all pheromone values. Then:
 
-$$\tau_{v,b} \leftarrow \mathcal{U}(0.01,\; 0.02) \qquad \forall\; \tau_{v,b} < \tau_{(5\%)}$$
+$$\tau_{v,b} \leftarrow \mathcal{U}(0.01, \, 0.02) \qquad \forall \, \tau_{v,b} < \tau_{5}$$
 
 ### 2.6 Local Search
 
@@ -135,7 +135,7 @@ $$\Delta = \sum_{j=1}^{m} w_j \cdot \text{SAT}(C_j, \mathbf{x}') - \sum_{j=1}^{m
 
 4. Accept the flip if $\Delta \geq 0$, or with probability $\exp(\Delta / T)$ if $\Delta < 0$
 
-The temperature anneals as $T(t) = \max\bigl(10^{-3},\; 0.1(1 - t/T_{\max})\bigr)$.
+The temperature anneals as $T(t) = \max(0.001, \, 0.1(1 - t/T_{\max}))$.
 
 ### 2.7 Complete Algorithm
 
@@ -143,13 +143,13 @@ For iteration $t = 0, 1, \ldots, T_{\max}$:
 
 1. **Adapt** $\alpha, \beta, \rho, \sigma$ via entropy feedback (Sec. 2.5)
 2. **Construct** $K = 3072$ assignments $\{\mathbf{x}^{(a)}\}$ in parallel on GPU (Sec. 2.1)
-3. **Local search** on top-$\lfloor 0.2K \rfloor$ solutions from previous iteration (Sec. 2.6)
+3. **Local search** on top $\lfloor 0.2K \rfloor$ solutions from previous iteration (Sec. 2.6)
 4. **Evaluate** $Q(\mathbf{x}^{(a)})$ for all $a$ against weighted clauses (Sec. 2.2)
 5. **Update clause weights** $w_j$ via conflict-driven stubbornness (Sec. 2.4)
 6. **Evaporate** $\tau$, then **deposit** $\propto Q^{3/2}$ (Sec. 2.3)
 7. **Quantum burst** if $t \equiv B-1 \pmod{B}$ and $Q_{\text{best}} < 0.999$ (Sec. 2.5)
-8. **Partial reset** if $t - t_{\text{last\_improve}} \geq P$ (Sec. 2.5)
-9. **Finishing phase**: if $Q_{\text{best}} \geq 0.99663$, apply local search to all $K$ ants at $T = 10^{-5}$; terminate if $Q \geq 1 - 10^{-6}$
+8. **Partial reset** if $t - t_{\text{last-improve}} \geq P$ (Sec. 2.5)
+9. **Finishing phase**: if $Q_{\text{best}} \geq 0.99663$, apply local search to all $K$ ants at $T = 10^{-5}$; terminate if $Q \geq 0.999999$
 
 **Optuna-tuned constants:** $\alpha_0 = 3.54879$, $\beta_0 = 2.38606$, $\rho_0 = 0.13814$, $\tau_0 = 0.20498$, $\sigma_0 = 0.11266$, $\lambda = 0.21015$, $\mu = 0.87959$, $H^* = 0.68894$, $Q_{\text{finish}} = 0.99663$, $P = 40$, $B = 100$.
 
