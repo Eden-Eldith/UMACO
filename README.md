@@ -562,7 +562,7 @@ UMACO draws inspiration from several scientific fields:
 - **Complex Systems**: Emergence and self-organization in multi-agent systems
 - **Neuroeconomics**: Decision-making under uncertainty and resource constraints
 
-[Full UMACO Architecture](https://garden-backend-three.vercel.app/fixed-thesis-maco/)
+[Full UMACO Architecture](https://garden-backend-three.vercel.app/finalized-work/fixed-thesis-maco/)
 
 ## Why Sponsor UMACO?
 
