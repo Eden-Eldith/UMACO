@@ -34,3 +34,5 @@ Thumbs.db
 
 # CuPy cache
 .cupy/
+uv.lock
+CLAUDE.md
