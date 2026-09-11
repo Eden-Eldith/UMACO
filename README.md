@@ -23,6 +23,56 @@ I don't have the confidence to push on this and get it formally verified. I'm a 
 
 If you're a researcher and you think this warrants investigation, my ORCID is 0009-0007-3961-1182.
 
+## Formalising the Argument (September 2026, with Claude)
+
+In September 2026 Eden worked with Claude (Anthropic) on the SAT research in this repository. The starting point was everything already here: the MACO/UMACO SAT solvers, the polynomial-scaling paper and its P vs NP argument, the 5,183-run benchmark corpus, the development history, and the later universal UMACO architecture. Over a few days of joint work, that material was organised into a much sharper research state:
+
+```math
+\boxed{
+\begin{array}{c}
+\text{historical MACO/UMACO} \\
+\downarrow \\
+\text{formal theorem obligations} \\
+\downarrow \\
+\text{Lean-checked implication} \\
+\downarrow \\
+\text{reconstructed System U} \\
+\downarrow \\
+\text{mathematical and GPU analysis} \\
+\downarrow \\
+\text{completeness / hitting-time theorem target}
+\end{array}
+}
+```
+
+**The argument, formalised.** The paper's claim was made mathematically explicit as three obligations: soundness, polynomial per-run cost, and completeness. Its logical spine is now a Lean 4 theorem, `paper_argument`: given Cook–Levin, a sound SAT solver with polynomial per-run cost that satisfies `Complete S δ` gives NP ⊆ P. The development ([`docs/lean/UmacoSat.lean`](docs/lean/UmacoSat.lean)) builds cleanly with 107 theorems, no `sorry`, and only the standard axioms.
+
+**The open theorem, isolated.** The formalisation turns the P vs NP claim from a scaling argument into one precise statement, `Complete S δ`: for every satisfiable CNF, a fraction δ > 0 of a fixed, instance-independent seed set reaches a satisfying assignment within polynomial resources. The benchmark corpus sits where it belongs, as empirical evidence for that hypothesis across the tested range; every verified run is a data point for it. See [`docs/p-vs-np/`](docs/p-vs-np/).
+
+**The lineage, recovered.** Historical code, documentation and the thesis were compared side by side, keeping intended mechanism, historical implementation and implementation drift separate. Two strands came out clearly:
+
+- **February 2025, the SAT walk.** The earliest MACO SAT solvers build a layered literal graph that each agent traverses sequentially with a $\tau^{\alpha}\eta^{\beta}$ rule and a dynamic, clause-informed heuristic η. The later GPU rewrites moved to per-variable sampling and η left the kernel; recovering it gives β its role back.
+- **March 2025, the crisis architecture.** The complex pheromone field, panic and anxiety, the structured SVD burst, persistent homology, covariant momentum and the token economy.
+
+These two strands had never been assembled into a single SAT system.
+
+**System U, the two strands joined.** System U ([`docs/system-u/`](docs/system-u/)) is a 2026 research construction that joins the sequential literal walk to the full UMACO architecture. It is derived top-down from the documented architecture (thesis equations 3.1–3.19 and `umaco/Umaco13.py`) rather than from any single historical implementation: a free-order walk on the literal graph, a complex 2n × 2n field whose attraction and repulsion interfere, the dynamic SAT heuristic, panic and anxiety as per-literal maps, the five-regime structured burst, persistent-homology feedback, covariant momentum, crisis-driven parameters, resets, and an economy that buys search budget.
+
+**Mathematics of System U.** Theorems about System U itself ([`SystemU_theorems.md`](docs/system-u/SystemU_theorems.md)), most of them also checked in Lean:
+
+- the exact law of the sequential walk, its uniform flat-field limit, why a positive exploration floor is required, and which information is field-local and which comes from the partial assignment;
+- the deposit–evaporation update as stochastic gradient ascent on the walk's expected performance (a score-function identity);
+- the burst as an exact operator on the complex field, which gives the five regimes a precise reading: reinforcement, mixed attraction/repulsion, conversion to repulsion, negation, and negation plus repulsion;
+- symmetry under literal relabelling, and what signal the pairwise field receives from OR clauses versus XOR constraints.
+
+**Built and run on the GPU.** System U is implemented in CuPy with full instrumentation of its internal state, event logging, a scaling driver and a trajectory inspector ([`research/experiments/system_u/`](research/experiments/system_u/)). The architecture was run end to end, and each run fed the next: field dynamics, repulsion thresholds, panic scaling, performance calibration, mode formation, and the interplay between the field and local refinement were each observed, adjusted and rerun, with the full history kept in the run log. On planted 3-SAT at threshold density with n = 400, the integrated system reaches a satisfying assignment in 10–29 iterations; with the field switched off, the same instances stay 18–20 clauses short. Random threshold instances are checked satisfiable with CaDiCaL before a run is used to diagnose behaviour.
+
+**A reduced-model branch.** The product-sampler Systems C, C′ and C‴ ([`research/system_c/`](research/system_c/)) produced exact mean-field equations, GPU experiments, and theorems including obstruction results. Their deterministic mean-field flow solves planted 3-SAT at threshold density with n = 4000 (three seeds). The branch shows which limitations belong to simplified marginal-sampling models and do not automatically carry over to the sequential System U.
+
+**Who did what.** Eden supplied the original algorithms and architecture, the benchmark history, the historical source material, the mathematical intuitions and project goals, and the domain knowledge needed to tell intended design from implementation drift. Claude contributed repository archaeology, mathematical extraction, the Lean formalisation, theorem development, the GPU implementation, experiment automation, and structured documentation.
+
+**What's next.** The immediate mathematical target is a rigorous polynomial completeness / hitting-time result for the relevant solver dynamics, or a precise obstruction that identifies what architectural change is required. The formalisation has made that frontier explicit. Start at [`docs/p-vs-np/`](docs/p-vs-np/).
+
 ---
 
 ## What is UMACO?
@@ -227,11 +277,18 @@ UMACO/
 |   |-- ultimate_pf_simulator-v2-n1.py  # Protein folding simulator
 |   \-- ultimate_zvss-v4-n1.py      # ZVSS integrated simulator
 |
-\-- docs/
-    |-- core_concepts.md            # PAQ, TSF, economy, crisis-driven hyperparameters
-    |-- SYSTEM_ARCHITECTURE.md      # Authoritative architecture blueprint
-    |-- adapting_to_llm.md          # Guide for LLM adaptation
-    \-- UMACO Developer Guide.pdf   # Comprehensive PDF developer guide
+|-- docs/
+|   |-- core_concepts.md            # PAQ, TSF, economy, crisis-driven hyperparameters
+|   |-- SYSTEM_ARCHITECTURE.md      # Authoritative architecture blueprint
+|   |-- adapting_to_llm.md          # Guide for LLM adaptation
+|   |-- UMACO Developer Guide.pdf   # Comprehensive PDF developer guide
+|   |-- p-vs-np/                    # The paper's P vs NP argument in Lean: start here
+|   |-- system-u/                   # System U: definition, theorems, architecture audit
+|   \-- lean/                       # UmacoSat.lean (107 theorems) + lake project files
+|
+\-- research/
+    |-- experiments/system_u/       # System U GPU implementation, scaling driver, run log
+    \-- system_c/                   # Reduced-model Systems C/C′/C‴: analysis and GPU code
 ```
 
 ### Key Files

@@ -36,3 +36,9 @@ Thumbs.db
 .cupy/
 uv.lock
 CLAUDE.md
+
+# Lean build output (docs/lean)
+.lake/
+
+# Local working notes, not for publication
+To_integrate/
